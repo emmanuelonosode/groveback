@@ -4,6 +4,11 @@ from decouple import config, Csv
 
 DEBUG = True
 
+# MySQL on this host doesn't have timezone tables installed, so CONVERT_TZ
+# would return NULL and break date_hierarchy in the admin. Using UTC means
+# Django never calls CONVERT_TZ (stored timezone == display timezone).
+TIME_ZONE = "UTC"
+
 # Hardcoded production domains to prevent DisallowedHost errors
 ALLOWED_HOSTS = [
     "admin.haskerrealtygroup.com",

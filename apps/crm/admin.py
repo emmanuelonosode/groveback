@@ -58,7 +58,6 @@ class LeadAdmin(ModelAdmin):
     search_fields = ["full_name", "email", "phone", "preferred_location", "message",
                      "property_interest__title", "utm_source", "utm_campaign", "referral_source"]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
     inlines = [LeadActivityInline, RentalApplicationInline]
     actions = ["mark_contacted", "mark_qualified", "mark_lost", "send_acknowledgment_email"]
 
