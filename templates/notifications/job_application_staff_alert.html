@@ -1,0 +1,80 @@
+{% extends "notifications/email_base.html" %}
+
+{% block subject %}New Job Application: {{ app.full_name }} &mdash; {{ app.role_title }}{% endblock %}
+
+{% block content %}
+  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
+    <tr>
+      <td style="background-color:#fef3c7;border-radius:20px;padding:6px 16px;">
+        <span style="font-size:12px;font-weight:700;color:#92400e;letter-spacing:0.5px;">NEW JOB APPLICATION</span>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#0B1F3A;line-height:1.3;">
+    {{ app.full_name }} applied for {{ app.role_title }}
+  </p>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:0 0 24px 0;">
+    <tr>
+      <td style="padding:24px;">
+        <p style="margin:0 0 12px 0;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Applicant Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;color:#475569;line-height:2;">
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;width:40%;">Reference #</td>
+            <td style="color:#0B1F3A;font-weight:700;">JOB-{{ app.pk|stringformat:"05d" }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Position Applied</td>
+            <td style="color:#0B1F3A;font-weight:600;">{{ app.role_title }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Full Name</td>
+            <td style="color:#0B1F3A;">{{ app.full_name }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Email</td>
+            <td style="color:#0B1F3A;"><a href="mailto:{{ app.email }}" style="color:#1A56DB;">{{ app.email }}</a></td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Phone</td>
+            <td style="color:#0B1F3A;">{{ app.phone }}</td>
+          </tr>
+          {% if app.linkedin_url %}
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">LinkedIn / Portfolio</td>
+            <td style="color:#0B1F3A;"><a href="{{ app.linkedin_url }}" style="color:#1A56DB;">{{ app.linkedin_url }}</a></td>
+          </tr>
+          {% endif %}
+          {% if app.extra_field_label %}
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">{{ app.extra_field_label }}</td>
+            <td style="color:#0B1F3A;">{{ app.extra_field_value }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Applied</td>
+            <td style="color:#0B1F3A;">{{ app.applied_at|date:"F j, Y g:i A" }}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:0 0 24px 0;">
+    <tr>
+      <td style="padding:24px;">
+        <p style="margin:0 0 10px 0;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Why They Want to Join</p>
+        <p style="margin:0;font-size:14px;color:#334155;line-height:1.7;white-space:pre-line;">{{ app.motivation }}</p>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 16px 0;font-size:14px;color:#334155;line-height:1.7;">
+    Review this application in the admin dashboard and update the status to keep the pipeline moving.
+  </p>
+
+  <p style="margin:32px 0 0 0;font-size:14px;color:#334155;">
+    &mdash; Hasker &amp; Co. Realty Group Hiring System
+  </p>
+{% endblock %}

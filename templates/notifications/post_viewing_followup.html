@@ -1,0 +1,139 @@
+{% extends "notifications/email_base.html" %}
+{% block content %}
+
+<!-- Greeting -->
+<p style="font-size:13px;font-weight:700;color:#1A56DB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px 0;">
+  Thanks for visiting today
+</p>
+<p style="font-size:22px;font-weight:800;color:#0B1F3A;line-height:1.25;margin:0 0 14px 0;">
+  {{ first_name }}, what did you think{% if prop %} of {{ prop.title }}{% endif %}?
+</p>
+<p style="font-size:15px;color:#475569;line-height:1.8;margin:0 0 24px 0;">
+  We hope your visit went well! Getting to see a home in person tells you so much more than any photo ever could.
+  If this felt like the one — applications take less than 10 minutes and we turn them around in 24 hours.
+</p>
+
+<!-- Featured property -->
+{% if prop %}
+{% if prop_images %}
+<a href="{{ frontend_url }}/properties/{{ prop.slug }}" style="display:block;margin-bottom:0;">
+  <img src="{{ prop_images.0 }}" width="520" height="240"
+       style="display:block;width:100%;height:auto;max-height:240px;object-fit:cover;border-radius:12px 12px 0 0;"
+       alt="{{ prop.title }}" />
+</a>
+{% endif %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#f8fafc;border:1px solid #e2e8f0;{% if not prop_images %}border-radius:12px;{% else %}border-radius:0 0 12px 12px;border-top:none;{% endif %}padding:18px 20px;margin-bottom:24px;">
+  <tr>
+    <td>
+      <p style="font-size:17px;font-weight:800;color:#0B1F3A;margin:0 0 4px 0;">{{ prop.title }}</p>
+      <p style="font-size:13px;color:#64748b;margin:0 0 10px 0;">
+        {{ prop.city }}, {{ prop.state }}
+        {% if prop.bedrooms %} &nbsp;&middot;&nbsp; {{ prop.bedrooms }} bed{% endif %}
+        {% if prop.bathrooms %} &nbsp;&middot;&nbsp; {{ prop.bathrooms }} bath{% endif %}
+      </p>
+      {% if prop_price_formatted %}
+      <p style="font-size:26px;font-weight:900;color:#1A56DB;margin:0;">
+        ${{ prop_price_formatted }}{% if prop.listing_type == "for-rent" %}<span style="font-size:14px;font-weight:500;color:#64748b;">/mo</span>{% endif %}
+      </p>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+<!-- Apply CTA -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+  <tr>
+    <td align="center">
+      <a href="{{ apply_url }}"
+         style="display:inline-block;background:#10b981;color:#fff;font-size:15px;font-weight:800;padding:15px 48px;border-radius:8px;text-decoration:none;">
+        Apply for This Home — Takes 10 Min
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- Agent card -->
+{% if agent %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 22px;margin-bottom:26px;">
+  <tr>
+    <td>
+      <p style="font-size:10px;font-weight:800;color:#1A56DB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 8px 0;">
+        Your Agent
+      </p>
+      <p style="font-size:16px;font-weight:800;color:#0B1F3A;margin:0 0 4px 0;">{{ agent.get_full_name }}</p>
+      <p style="font-size:13px;color:#475569;margin:0 0 2px 0;">Hasker &amp; Co. Realty Group</p>
+      {% if agent.email %}
+      <p style="font-size:13px;color:#64748b;margin:0 0 2px 0;">
+        <a href="mailto:{{ agent.email }}" style="color:#1A56DB;text-decoration:none;">{{ agent.email }}</a>
+      </p>
+      {% endif %}
+      {% if agent.phone %}
+      <p style="font-size:13px;color:#64748b;margin:0;">
+        <a href="tel:{{ agent.phone }}" style="color:#1A56DB;text-decoration:none;font-weight:600;">{{ agent.phone }}</a>
+      </p>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+<!-- Similar homes -->
+{% if similar_with_images %}
+<p style="font-size:13px;font-weight:800;color:#0B1F3A;letter-spacing:1px;text-transform:uppercase;margin:0 0 14px 0;">
+  Also worth a look nearby:
+</p>
+{% for item in similar_with_images %}
+{% with p=item.prop img=item.images.0 %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="margin-bottom:12px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
+  <tr>
+    {% if img %}
+    <td width="110" style="padding:0;vertical-align:top;">
+      <a href="{{ frontend_url }}/properties/{{ p.slug }}">
+        <img src="{{ img }}" width="110" height="90"
+             style="display:block;width:110px;height:90px;object-fit:cover;border-radius:10px 0 0 10px;"
+             alt="{{ p.title }}" />
+      </a>
+    </td>
+    {% endif %}
+    <td style="padding:14px 16px;vertical-align:middle;">
+      <p style="font-size:14px;font-weight:700;color:#0B1F3A;margin:0 0 3px 0;">
+        <a href="{{ frontend_url }}/properties/{{ p.slug }}" style="color:#0B1F3A;text-decoration:none;">{{ p.title }}</a>
+      </p>
+      <p style="font-size:11px;color:#64748b;margin:0 0 6px 0;">
+        {{ p.city }}, {{ p.state }}
+        {% if p.bedrooms %} &nbsp;&middot;&nbsp; {{ p.bedrooms }} bed{% endif %}
+      </p>
+      {% if p.price %}
+      <p style="font-size:15px;font-weight:800;color:#1A56DB;margin:0;">
+        ${{ p.price|floatformat:0 }}{% if p.listing_type == "for-rent" %}<span style="font-size:11px;font-weight:400;">/mo</span>{% endif %}
+      </p>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+{% endwith %}
+{% endfor %}
+{% endif %}
+
+<!-- Sign off -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:24px;border-top:2px solid #f1f5f9;">
+  <tr>
+    <td style="padding-top:20px;">
+      <p style="font-size:14px;color:#64748b;line-height:1.7;margin:0 0 4px 0;">
+        Still deciding? No pressure — we're here whenever you're ready.
+      </p>
+      <p style="font-size:13px;color:#94a3b8;margin:0;">
+        Call or text us at
+        <a href="tel:+17572082767" style="color:#1A56DB;text-decoration:none;font-weight:600;">+1 (757) 208-2767</a>
+        &nbsp;&middot;&nbsp;
+        <a href="mailto:info@haskerrealtygroup.com" style="color:#1A56DB;text-decoration:none;">info@haskerrealtygroup.com</a>
+      </p>
+    </td>
+  </tr>
+</table>
+
+{% endblock %}

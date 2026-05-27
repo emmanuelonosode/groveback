@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>{% block subject %}{{ subject|default:"New Listings — Hasker &amp; Co." }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <!--[if mso]><style>* { font-family: Arial, sans-serif !important; }</style><![endif]-->
+  <style>
+    body  { margin: 0; padding: 0; background-color: #E8E5DC; }
+    img   { border: 0; display: block; }
+    a     { text-decoration: none; }
+    table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
+    @media only screen and (max-width: 600px) {
+      .email-outer    { padding: 24px 0 40px !important; }
+      .header-cell    { padding: 18px 22px !important; }
+      .nav-hide       { display: none !important; font-size: 0 !important; max-height: 0 !important; overflow: hidden !important; }
+      .hero-text      { padding: 28px 24px 32px !important; }
+      .hero-h1        { font-size: 26px !important; }
+      .trust-cell     { padding: 36px 22px !important; }
+      .pillar-cell    { display: block !important; width: 100% !important; padding-bottom: 28px !important; }
+      .listing-outer  { padding: 0 22px 40px !important; }
+      .illo-hide      { display: none !important; width: 0 !important; overflow: hidden !important; }
+      .listing-meta   { padding: 18px 20px !important; }
+      .apply-cell     { padding: 28px 24px !important; }
+      .footer-cell    { padding: 28px 22px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#E8E5DC;-webkit-font-smoothing:antialiased;">
+
+{% load i18n %}
+
+<!-- ────────────────────────────────────── OUTER WRAPPER -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#E8E5DC">
+  <tr>
+    <td align="center" style="padding:48px 16px 80px;" class="email-outer">
+
+      <!-- ── EMAIL CARD ─────────────────────────────────── -->
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #F1F5F9;box-shadow:0 12px 40px rgba(11,31,58,0.08),0 2px 6px rgba(11,31,58,0.04);">
+
+        <!-- ═══ HEADER ═══════════════════════════════════ -->
+        <tr>
+          <td bgcolor="#ffffff" style="padding:22px 32px 18px;border-bottom:1px solid #F1F5F9;" class="header-cell">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <!-- Brand logo -->
+                <td style="vertical-align:middle;">
+                  <img
+                    src="{{ frontend_url }}/logo/logo.png"
+                    alt="Hasker &amp; Co. Realty Group"
+                    height="38"
+                    style="display:block;height:38px;width:auto;max-width:180px;"
+                  />
+                </td>
+                <!-- Navigation links (hidden on mobile) -->
+                <td align="right" style="vertical-align:middle;" class="nav-hide">
+                  <span style="font-family:'DM Sans',Arial,sans-serif;font-size:12px;font-weight:500;color:#475569;">
+                    <a href="{{ frontend_url }}/properties" style="color:#475569;text-decoration:none;margin-left:22px;">Browse</a>
+                    <a href="{{ frontend_url }}/apply" style="color:#475569;text-decoration:none;margin-left:22px;">Apply</a>
+                    <a href="mailto:info@haskerrealtygroup.com" style="color:#475569;text-decoration:none;margin-left:22px;">Contact</a>
+                  </span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ═══ HERO ══════════════════════════════════════ -->
+        <tr>
+          <td bgcolor="#FBF9F4" style="padding:0;">
+            <!-- Welcome banner illustration -->
+            <img
+              src="{{ frontend_url }}/illustrations/email-header-welcome.png"
+              alt="Welcome to Hasker &amp; Co. Realty Group"
+              width="600"
+              style="display:block;width:100%;height:auto;max-width:600px;"
+            />
+            <!-- Centered hero copy -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="padding:36px 32px 40px;" class="hero-text">
+                  <!-- Eyebrow label -->
+                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#1A56DB;">
+                    {{ eyebrow|default:"New Listings &middot; This Week" }}
+                  </p>
+                  <!-- Serif headline -->
+                  <h1 style="margin:14px 0 12px;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-weight:700;font-size:38px;line-height:1.1;letter-spacing:-0.02em;color:#0B1F3A;" class="hero-h1">
+                    {{ hero_headline|default:"Good homes. Ready when you are." }}
+                  </h1>
+                  <!-- Body paragraph -->
+                  <p style="margin:0 auto;font-family:'DM Sans',Arial,sans-serif;font-size:15px;line-height:1.625;color:#475569;max-width:460px;">
+                    {{ hero_body|default:"New properties just listed across Hasker cities. Fair prices, no surprises, decisions in 24&nbsp;hours." }}
+                  </p>
+                  <!-- CTA button -->
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:26px auto 0;">
+                    <tr>
+                      <td bgcolor="#0B1F3A" style="border-radius:2px;">
+                        <a href="{{ cta_url|default:frontend_url }}" style="display:inline-block;font-family:'DM Sans',Arial,sans-serif;font-weight:500;font-size:14px;letter-spacing:0.05em;color:#ffffff;text-decoration:none;padding:14px 26px;">
+                          {{ cta_text|default:"Browse New Rentals" }} &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ═══ TRUST PILLARS ════════════════════════════ -->
+        <tr>
+          <td bgcolor="#ffffff" style="padding:56px 32px;border-top:1px solid #F1F5F9;" class="trust-cell">
+            <!-- Section heading -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+              <tr>
+                <td align="center">
+                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#1A56DB;">Why Hasker &amp; Co.</p>
+                  <h2 style="margin:10px 0 0;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:26px;line-height:1.25;color:#0B1F3A;">Built on trust, since 2012.</h2>
+                </td>
+              </tr>
+            </table>
+            <!-- Three pillars — equal-width columns -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <!-- No hidden fees -->
+                <td align="center" valign="top" style="width:33.33%;padding:0 6px;" class="pillar-cell">
+                  <img src="{{ frontend_url }}/illustrations/spot-shield.png" alt="" width="88" height="88" style="display:block;margin:0 auto 12px;width:88px;height:88px;" />
+                  <h3 style="margin:0 0 4px;font-family:'DM Sans',Arial,sans-serif;font-weight:600;font-size:14px;color:#0B1F3A;">No hidden fees</h3>
+                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">What you see is what you pay. Every time.</p>
+                </td>
+                <!-- Families housed -->
+                <td align="center" valign="top" style="width:33.33%;padding:0 6px;" class="pillar-cell">
+                  <img src="{{ frontend_url }}/illustrations/spot-handshake.png" alt="" width="88" height="88" style="display:block;margin:0 auto 12px;width:88px;height:88px;" />
+                  <h3 style="margin:0 0 4px;font-family:'DM Sans',Arial,sans-serif;font-weight:600;font-size:14px;color:#0B1F3A;">2,000+ families</h3>
+                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">Housed across 12 cities since we opened.</p>
+                </td>
+                <!-- 24h decisions -->
+                <td align="center" valign="top" style="width:33.33%;padding:0 6px;" class="pillar-cell">
+                  <img src="{{ frontend_url }}/illustrations/spot-clock.png" alt="" width="88" height="88" style="display:block;margin:0 auto 12px;width:88px;height:88px;" />
+                  <h3 style="margin:0 0 4px;font-family:'DM Sans',Arial,sans-serif;font-weight:600;font-size:14px;color:#0B1F3A;">24-hour decisions</h3>
+                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">Apply online — we'll have your answer the next day.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ═══ FEATURED LISTING (optional) ═════════════ -->
+        {% if listing_title %}
+        <tr>
+          <td style="padding:0 32px 56px;" class="listing-outer">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #F1F5F9;border-radius:2px;overflow:hidden;">
+              <!-- Image row — full width, brand-light blue bg -->
+              <tr>
+                <td bgcolor="#EFF4FF" align="center" style="padding:32px 0;">
+                  <img src="{{ frontend_url }}/illustrations/spot-house.png" alt="" width="140" height="140" style="display:block;margin:0 auto;width:140px;height:140px;" />
+                </td>
+              </tr>
+              <!-- Details row -->
+              <tr>
+                <td style="padding:24px 28px;" class="listing-meta">
+                  <span style="display:inline-block;background-color:#DBEAFE;color:#1A56DB;font-family:'DM Sans',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-bottom:10px;">Featured &middot; New</span>
+                  <h3 style="margin:0 0 4px;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:20px;line-height:1.2;color:#0B1F3A;">{{ listing_title }}</h3>
+                  {% if listing_address %}
+                  <p style="margin:0 0 14px;font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#475569;">{{ listing_address }}</p>
+                  {% endif %}
+                  {% if listing_price %}
+                  <div style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:24px;color:#0B1F3A;margin-bottom:4px;">${{ listing_price }}/mo</div>
+                  {% endif %}
+                  {% if listing_details %}
+                  <div style="font-family:'DM Sans',Arial,sans-serif;font-size:12px;color:#64748B;letter-spacing:0.05em;">{{ listing_details }}</div>
+                  {% endif %}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endif %}
+
+        <!-- ═══ APPLY CTA STRIP ══════════════════════════ -->
+        <tr>
+          <td bgcolor="#0B1F3A" align="center" style="padding:40px 32px;" class="apply-cell">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+              <!-- Illustration row -->
+              <tr>
+                <td align="center" style="padding-bottom:20px;">
+                  <img src="{{ frontend_url }}/illustrations/spot-phone-apply.png" alt="" width="100" height="100" style="display:block;margin:0 auto;width:100px;height:100px;" />
+                </td>
+              </tr>
+              <!-- Copy row -->
+              <tr>
+                <td align="center">
+                  <p style="margin:0 0 8px;font-family:'DM Sans',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#A9C5F6;">Quick application</p>
+                  <h3 style="margin:0 0 16px;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:24px;line-height:1.2;color:#ffffff;">Apply in 10 minutes.<br>Decisions in 24 hours.</h3>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                    <tr>
+                      <td style="border-bottom:1px solid rgba(255,255,255,0.35);padding-bottom:2px;">
+                        <a href="{{ apply_url|default:frontend_url }}/apply" style="font-family:'DM Sans',Arial,sans-serif;font-weight:500;font-size:14px;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">
+                          Start your application &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ═══ FOOTER ════════════════════════════════════ -->
+        <tr>
+          <td bgcolor="#FBF9F4" align="center" style="padding:36px 32px 32px;border-top:1px solid #F1F5F9;" class="footer-cell">
+            <!-- Brand wordmark -->
+            <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:13px;letter-spacing:-0.02em;color:#0B1F3A;">HASKER &amp; CO. REALTY GROUP</div>
+            <div style="font-family:'DM Sans',Arial,sans-serif;font-size:11px;color:#64748B;margin:6px 0 18px;letter-spacing:0.02em;">Good Homes. Fair Prices. No Surprises.</div>
+
+            <!-- Social links -->
+            <p style="margin:0 0 18px;font-family:'DM Sans',Arial,sans-serif;font-size:12px;color:#94A3B8;">
+              <a href="https://www.instagram.com/haskerrealtygroup/" style="color:#64748B;text-decoration:none;">Instagram</a>
+              &nbsp;&middot;&nbsp;
+              <a href="https://www.facebook.com/haskerrealtygroup" style="color:#64748B;text-decoration:none;">Facebook</a>
+              &nbsp;&middot;&nbsp;
+              <a href="https://www.linkedin.com/company/hasker-realty-group" style="color:#64748B;text-decoration:none;">LinkedIn</a>
+            </p>
+
+            <!-- Divider rule -->
+            <div style="width:40px;height:1px;background-color:#CBD5E1;margin:0 auto 16px;"></div>
+
+            <!-- Physical address -->
+            <p style="margin:0 0 14px;font-family:'DM Sans',Arial,sans-serif;font-size:11px;color:#64748B;line-height:1.6;">
+              240 Oceanfront Way, Suite 300<br>
+              Virginia Beach, VA 23451 &nbsp;&bull;&nbsp; (757) 208-2767
+            </p>
+
+            <!-- Legal / unsubscribe -->
+            <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:10px;color:#94A3B8;line-height:1.8;">
+              You're receiving this because you joined our list at haskerrealtygroup.com.<br>
+              <a href="#" style="color:#64748B;text-decoration:none;">Manage preferences</a>
+              &nbsp;&middot;&nbsp;
+              <a href="#" style="color:#64748B;text-decoration:none;">Unsubscribe</a>
+              &nbsp;&middot;&nbsp;
+              <a href="{{ frontend_url }}/privacy" style="color:#64748B;text-decoration:none;">Privacy</a>
+            </p>
+          </td>
+        </tr>
+
+      </table><!-- /email card -->
+    </td>
+  </tr>
+</table><!-- /wrapper -->
+
+</body>
+</html>

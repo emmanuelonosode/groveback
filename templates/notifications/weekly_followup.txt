@@ -1,0 +1,20 @@
+Hasker & Co. Realty Group — Weekly Lead Follow-up Reminder
+=======================================================
+
+Hi {{ agent.first_name }},
+
+You have {{ leads|length }} lead{{ leads|length|pluralize }} that haven't been contacted in over 7 days:
+
+{% for lead in leads %}
+• {{ lead.full_name }} ({{ lead.get_status_display }})
+  Email: {{ lead.email }}{% if lead.phone %}  |  Phone: {{ lead.phone }}{% endif %}
+  Interest: {{ lead.get_interest_type_display }}{% if lead.preferred_location %}  |  Location: {{ lead.preferred_location }}{% endif %}
+  Last contacted: {{ lead.last_contacted_at|date:"F j, Y"|default:"Never" }}
+{% endfor %}
+
+Please follow up with these leads as soon as possible.
+
+Log in to the CRM to view full details and update their status.
+
+---
+Hasker & Co. Realty Group | info@haskerrealtygroup.com

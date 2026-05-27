@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice {{ invoice.invoice_number }}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1a1a1a; padding: 0; font-size: 14px; }
+    /* Top header band */
+    .header-band { background: #0B1F3A; padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+    .wordmark { display: flex; align-items: center; gap: 14px; }
+    .wordmark-text .name { font-size: 19px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px; line-height: 1.2; }
+    .wordmark-text .sub { font-size: 9px; font-weight: 400; color: #1A56DB; letter-spacing: 2.8px; text-transform: uppercase; margin-top: 3px; }
+    .accent-bar { height: 4px; background: #1A56DB; }
+    /* Content area */
+    .content { padding: 40px 48px; }
+    .invoice-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+    .invoice-label { font-size: 32px; font-weight: 800; color: #0B1F3A; letter-spacing: -1px; text-transform: uppercase; }
+    .invoice-meta { text-align: right; }
+    .invoice-meta .inv-number { font-size: 15px; font-weight: 700; color: #0B1F3A; }
+    .invoice-meta p { color: #555; margin-top: 5px; font-size: 13px; }
+    .divider { border: none; border-top: 2px solid #0B1F3A; margin: 0 0 28px 0; }
+    .parties { display: flex; justify-content: space-between; margin-bottom: 36px; gap: 20px; }
+    .party h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; margin-bottom: 8px; font-weight: 700; }
+    .party p { line-height: 1.65; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+    thead th { background: #0B1F3A; color: white; padding: 11px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+    tbody td { padding: 11px 14px; border-bottom: 1px solid #eee; font-size: 13px; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) td { background: #f9fafb; }
+    .totals { margin-left: auto; width: 300px; }
+    .totals table { margin-bottom: 0; }
+    .totals td { padding: 7px 14px; font-size: 13px; }
+    .totals .grand-total td { font-weight: 800; font-size: 16px; border-top: 2px solid #0B1F3A; padding-top: 12px; color: #0B1F3A; }
+    .footer { margin-top: 48px; padding: 16px 48px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #888; text-align: center; background: #f8fafc; }
+    .status-badge { display: inline-block; padding: 5px 14px; border-radius: 99px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; background: #dcfce7; color: #166534; }
+  </style>
+</head>
+<body>
+  <!-- Header band -->
+  <div class="header-band">
+    <div class="wordmark">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
+        <circle cx="22" cy="22" r="22" fill="#0B1F3A" stroke="#1A56DB" stroke-width="1.5"/>
+        <g transform="translate(22,22) scale(0.173) translate(-160,-160)">
+          <polygon points="76,160 160,56 244,160 160,264" fill="#1A56DB"/>
+          <polygon points="120,160 160,104 200,160" fill="#FFFFFF"/>
+          <rect x="124" y="160" width="72" height="50" rx="4" fill="#FFFFFF"/>
+          <rect x="146" y="170" width="28" height="40" rx="4" fill="#1A56DB"/>
+        </g>
+      </svg>
+      <div class="wordmark-text">
+        <div class="name">HASKER &amp; CO.</div>
+        <div class="sub">REALTY GROUP</div>
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <span class="status-badge">{{ invoice.get_status_display }}</span>
+    </div>
+  </div>
+  <div class="accent-bar"></div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="invoice-title-row">
+      <div class="invoice-label">Invoice</div>
+      <div class="invoice-meta">
+        <div class="inv-number">{{ invoice.invoice_number }}</div>
+        <p>Issued: {{ invoice.issued_date|date:"F j, Y" }}</p>
+        <p>Due: {{ invoice.due_date|date:"F j, Y" }}</p>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="parties">
+    <div class="party">
+      <h4>From</h4>
+      <p><strong>Hasker &amp; Co. Realty Group</strong></p>
+      <p>info@haskerrealtygroup.com</p>
+    </div>
+    <div class="party">
+      <h4>Billed To</h4>
+      <p><strong>{{ invoice.transaction.client.full_name }}</strong></p>
+      <p>{{ invoice.transaction.client.email }}</p>
+      {% if invoice.transaction.client.lead.phone %}
+      <p>{{ invoice.transaction.client.lead.phone }}</p>
+      {% endif %}
+    </div>
+    <div class="party">
+      <h4>Property</h4>
+      <p>{{ invoice.transaction.property.title }}</p>
+      <p>{{ invoice.transaction.property.address }}</p>
+      <p>{{ invoice.transaction.property.city }}, {{ invoice.transaction.property.state }}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th style="text-align:center">Qty</th>
+        <th style="text-align:right">Unit Price</th>
+        <th style="text-align:right">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in invoice.line_items %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td style="text-align:center">{{ item.quantity }}</td>
+        <td style="text-align:right">${{ item.unit_price|floatformat:2 }}</td>
+        <td style="text-align:right">${{ item.total|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <table>
+      <tr><td>Subtotal</td><td style="text-align:right">${{ invoice.subtotal|floatformat:2 }}</td></tr>
+      {% if invoice.tax_rate %}
+      <tr><td>Tax ({{ invoice.tax_rate }}%)</td><td style="text-align:right">${{ invoice.tax_amount|floatformat:2 }}</td></tr>
+      {% endif %}
+      <tr class="grand-total"><td>Total Due</td><td style="text-align:right">${{ invoice.total|floatformat:2 }}</td></tr>
+    </table>
+  </div>
+
+  </div><!-- /content -->
+
+  <div class="footer">
+    <strong>Hasker &amp; Co. Realty Group</strong> &bull; info@haskerrealtygroup.com &bull; All amounts in USD &bull; Equal Housing Opportunity
+  </div>
+</body>
+</html>

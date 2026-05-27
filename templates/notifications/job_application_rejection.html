@@ -1,0 +1,30 @@
+{% extends "notifications/email_base.html" %}
+
+{% block subject %}Re: Your application for {{ app.role_title }} &mdash; Hasker &amp; Co. Realty Group{% endblock %}
+
+{% block content %}
+  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#0B1F3A;line-height:1.3;">
+    Hi {{ app.full_name|truncatewords:2 }},
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+    Thank you for taking the time to apply for the <strong>{{ app.role_title }}</strong> position at Hasker &amp; Co. Realty Group and for your interest in joining our team.
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+    After careful consideration, we have decided to move forward with other candidates whose experience more closely matches our current needs. This was not an easy decision &mdash; we reviewed your application thoroughly and appreciate the time you invested.
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+    We encourage you to apply again in the future as new roles open up. You can view open positions at any time at <a href="https://haskerrealtygroup.com/careers" style="color:#1A56DB;">haskerrealtygroup.com/careers</a>.
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:14px;color:#64748b;">
+    Thank you again for your interest in Hasker &amp; Co. Realty Group.
+  </p>
+
+  <p style="margin:32px 0 0 0;font-size:14px;color:#334155;">
+    Best regards,<br>
+    <strong style="color:#0B1F3A;">The Hiring Team at Hasker &amp; Co. Realty Group</strong>
+  </p>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "notifications/email_base.html" %}
+
+{% block subject %}Payment Verified — Hasker & Co. Realty Group{% endblock %}
+
+{% block content %}
+  <!-- Spot illustration -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;text-align:center;">
+    <tr>
+      <td>
+        <img src="{{ frontend_url }}/illustrations/spot-shield.png" alt="" width="80" height="80" style="display:inline-block;width:80px;height:80px;" />
+      </td>
+    </tr>
+  </table>
+
+  <!-- Status badge -->
+  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
+    <tr>
+      <td style="background-color:#dcfce7;border-radius:20px;padding:6px 16px;">
+        <span style="font-size:12px;font-weight:700;color:#15803d;letter-spacing:0.5px;">&#10003; PAYMENT VERIFIED</span>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#0B1F3A;line-height:1.3;">
+    Great news, {{ recipient_name }}!
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+    Your payment has been successfully verified and applied to your account. You can now see the updated status in your profile.
+  </p>
+
+  <!-- Payment summary card -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:20px 0;">
+    <tr>
+      <td style="padding:24px;">
+        <p style="margin:0 0 12px 0;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Verified Payment Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;color:#475569;line-height:2;">
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Status</td>
+            <td style="color:#15803d;font-weight:700;text-align:right;">Completed</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Amount</td>
+            <td style="color:#0B1F3A;font-weight:700;text-align:right;">${{ payment.amount|floatformat:2 }}</td>
+          </tr>
+          {% if payment.invoice %}
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Invoice Paid</td>
+            <td style="color:#0B1F3A;text-align:right;">{{ payment.invoice.invoice_number }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Verified At</td>
+            <td style="color:#0B1F3A;text-align:right;">{{ payment.verified_at|date:"F j, Y, g:i a" }}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 24px 0;font-size:15px;color:#334155;line-height:1.7;">
+    Thank you for your prompt payment. If this was for a rental application, our team will proceed with the next steps of the review process.
+  </p>
+
+  <!-- Action CTA -->
+  <table cellpadding="0" cellspacing="0" border="0" style="margin:12px 0;width:100%;">
+    <tr>
+      <td align="center" style="background-color:#1A56DB;border-radius:8px;">
+        <a href="{{ frontend_url }}/portal/profile" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;width:100%;text-align:center;">
+          View My Profile
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:32px 0 0 0;font-size:14px;color:#334155;">
+    Best regards,<br>
+    <strong style="color:#0B1F3A;">The Hasker &amp; Co. Realty Group Team</strong>
+  </p>
+{% endblock %}

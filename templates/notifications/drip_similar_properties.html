@@ -1,0 +1,96 @@
+{% extends "notifications/email_base.html" %}
+{% block content %}
+
+<!-- Greeting -->
+<p style="font-size:13px;font-weight:700;color:#1A56DB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px 0;">
+  We picked these for you
+</p>
+<p style="font-size:22px;font-weight:800;color:#0B1F3A;line-height:1.25;margin:0 0 12px 0;">
+  {{ first_name }}, these homes in {{ city }} just caught our eye.
+</p>
+<p style="font-size:15px;color:#475569;line-height:1.8;margin:0 0 28px 0;">
+  You reached out a couple of days ago — we haven't forgotten about you.
+  Our team hand-picked these based on exactly what you're looking for.
+  Each one is available <strong>right now</strong>.
+</p>
+
+<!-- Property Cards -->
+{% for item in props_with_images %}
+{% with p=item.prop img=item.images.0 %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="margin-bottom:18px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+  <tr>
+    {% if img %}
+    <td width="140" style="vertical-align:top;padding:0;">
+      <a href="{{ frontend_url }}/properties/{{ p.slug }}">
+        <img src="{{ img }}" width="140" height="120"
+             style="display:block;object-fit:cover;width:140px;height:120px;border-radius:12px 0 0 12px;"
+             alt="{{ p.title }}" />
+      </a>
+    </td>
+    {% endif %}
+    <td style="padding:16px 18px;vertical-align:middle;">
+      <p style="font-size:15px;font-weight:800;color:#0B1F3A;margin:0 0 4px 0;line-height:1.3;">
+        <a href="{{ frontend_url }}/properties/{{ p.slug }}" style="color:#0B1F3A;text-decoration:none;">{{ p.title }}</a>
+      </p>
+      <p style="font-size:12px;color:#64748b;margin:0 0 8px 0;">
+        {{ p.city }}, {{ p.state }}
+        {% if p.bedrooms %} &nbsp;&middot;&nbsp; {{ p.bedrooms }} bed{% if p.bedrooms != 1 %}s{% endif %}{% endif %}
+        {% if p.bathrooms %} &nbsp;&middot;&nbsp; {{ p.bathrooms }} bath{% if p.bathrooms != 1 %}s{% endif %}{% endif %}
+      </p>
+      {% if p.price %}
+      <p style="font-size:18px;font-weight:900;color:#1A56DB;margin:0 0 12px 0;">
+        ${{ p.price|floatformat:0 }}{% if p.listing_type == "for-rent" %}<span style="font-size:12px;font-weight:500;color:#64748b;">/mo</span>{% endif %}
+      </p>
+      {% endif %}
+      <a href="{{ frontend_url }}/properties/{{ p.slug }}"
+         style="display:inline-block;background:#0B1F3A;color:#fff;font-size:12px;font-weight:700;padding:7px 18px;border-radius:6px;text-decoration:none;">
+        View Home &rarr;
+      </a>
+    </td>
+  </tr>
+</table>
+{% endwith %}
+{% endfor %}
+
+<!-- Divider -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px 0;">
+  <tr><td style="border-top:2px solid #f1f5f9;font-size:0;">&nbsp;</td></tr>
+</table>
+
+<!-- Value prop blurb -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:18px 22px;margin-bottom:24px;">
+  <tr>
+    <td>
+      <p style="font-size:13px;font-weight:700;color:#1e40af;margin:0 0 6px 0;">
+        Why families choose Hasker &amp; Co.
+      </p>
+      <p style="font-size:13px;color:#1e3a8a;line-height:1.8;margin:0;">
+        &#10003;&nbsp; No hidden fees — ever &nbsp;&nbsp;
+        &#10003;&nbsp; Approval decisions in 24 hours<br>
+        &#10003;&nbsp; 2,000+ families housed &nbsp;&nbsp;
+        &#10003;&nbsp; Real agents, not bots
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- CTA -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+  <tr>
+    <td align="center">
+      <a href="{{ frontend_url }}/properties?q={{ city }}"
+         style="display:inline-block;background:#1A56DB;color:#ffffff;font-size:14px;font-weight:700;padding:14px 40px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;">
+        See All Available Homes in {{ city }}
+      </a>
+    </td>
+  </tr>
+</table>
+
+<p style="font-size:13px;color:#94a3b8;line-height:1.7;text-align:center;margin:0;">
+  Questions? Reply to this email or call us anytime at
+  <a href="tel:+17572082767" style="color:#1A56DB;text-decoration:none;">+1 (757) 208-2767</a>
+</p>
+
+{% endblock %}

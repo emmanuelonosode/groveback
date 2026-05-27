@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Receipt — Hasker &amp; Co. Realty Group</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Georgia', serif; color: #1a1a1a; padding: 48px; font-size: 14px; }
+    .header { text-align: center; margin-bottom: 40px; }
+    .brand { font-size: 24px; font-weight: bold; color: #1e3a5f; letter-spacing: 0.5px; }
+    .brand-sub { font-size: 11px; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+    .receipt-title { margin-top: 24px; font-size: 32px; text-transform: uppercase; letter-spacing: 4px; color: #1e3a5f; }
+    .divider { border: none; border-top: 2px solid #1e3a5f; margin: 24px auto; width: 80px; }
+    .amount-box { text-align: center; margin: 32px 0; }
+    .amount-box .label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: #888; }
+    .amount-box .amount { font-size: 48px; color: #1e3a5f; font-weight: bold; margin-top: 8px; }
+    table { width: 100%; border-collapse: collapse; margin: 32px 0; }
+    td { padding: 10px 0; border-bottom: 1px solid #eee; }
+    td:first-child { color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; width: 40%; }
+    td:last-child { font-weight: 500; }
+    .footer { margin-top: 48px; text-align: center; font-size: 11px; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">Hasker &amp; Co. Realty Group</div>
+    <div class="brand-sub">Luxury Real Estate</div>
+    <div class="receipt-title">Receipt</div>
+    <hr class="divider">
+  </div>
+
+  <div class="amount-box">
+    <div class="label">Amount Received</div>
+    <div class="amount">${{ payment.amount|floatformat:2 }}</div>
+  </div>
+
+  <table>
+    <tr><td>Client</td><td>{{ payment.transaction.client.full_name }}</td></tr>
+    <tr><td>Property</td><td>{{ payment.transaction.property.title }}</td></tr>
+    <tr><td>Payment Method</td><td>{{ payment.get_payment_method_display }}</td></tr>
+    <tr><td>Date</td><td>{{ payment.paid_at|date:"F j, Y" }}</td></tr>
+    <tr><td>Status</td><td>{{ payment.get_status_display }}</td></tr>
+  </table>
+
+  <div class="footer">
+    Hasker &amp; Co. Realty Group &bull; info@haskerrealtygroup.com<br>
+    This is an official payment receipt. Please retain for your records.
+  </div>
+</body>
+</html>

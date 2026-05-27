@@ -1,0 +1,24 @@
+Dear {{ app.first_name }},
+
+Thank you for submitting your rental application to Hasker & Co. Realty Group.
+
+APPLICATION DETAILS
+-------------------
+Reference Number : #{{ app.pk|stringformat:"05d" }}
+Applicant        : {{ app.full_name }}
+Property         : {% if app.rental_property %}{{ app.rental_property.title }}{% else %}To be confirmed{% endif %}
+Intended Move-In : {{ app.move_in_date }}
+Submitted        : {{ app.submitted_at|date:"F j, Y \a\t g:i A" }}
+
+Your application has been received and is currently under review. A member of our team will be in touch with you shortly.
+
+Your completed application PDF is attached to this email for your records.
+
+If you have any questions, please don't hesitate to contact us.
+
+Warm regards,
+Hasker & Co. Realty Group
+info@haskerrealtygroup.com
+
+---
+This is an automated confirmation email. Please do not reply to this message.

@@ -1,0 +1,182 @@
+{% extends "notifications/email_base.html" %}
+
+{% block subject %}Your Move-In Instructions — {{ app.rental_property.title|default:"Your New Home" }}{% endblock %}
+
+{% block hero_image %}
+<tr>
+  <td style="background-color:#f4f2ee;padding:0;">
+    <img
+      src="{{ frontend_url }}/illustrations/banner-moving-truck.png"
+      alt="Moving day"
+      width="580"
+      style="display:block;width:100%;max-width:580px;height:auto;"
+    />
+  </td>
+</tr>
+{% endblock %}
+
+{% block content %}
+  <!-- Move-in badge -->
+  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
+    <tr>
+      <td style="background-color:#eff4ff;border-radius:20px;padding:6px 16px;">
+        <span style="font-size:12px;font-weight:700;color:#1A56DB;letter-spacing:0.5px;">&#127968; MOVE-IN INSTRUCTIONS</span>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#0B1F3A;line-height:1.3;">
+    Welcome home, {{ app.first_name }}!
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+    We're excited to welcome you to your new home. Below are everything you need to know for a smooth move-in.
+  </p>
+
+  <!-- Move-in details card -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eff4ff;border:1px solid #bfdbfe;border-radius:6px;margin:20px 0;">
+    <tr>
+      <td style="padding:20px 24px;">
+        <p style="margin:0 0 12px 0;font-size:11px;font-weight:700;color:#1A56DB;letter-spacing:1.5px;text-transform:uppercase;">Your Move-In Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:13px;color:#475569;line-height:2.2;">
+          {% if app.rental_property %}
+          <tr>
+            <td style="width:140px;color:#94a3b8;font-weight:600;">Property</td>
+            <td style="color:#0B1F3A;font-weight:700;">{{ app.rental_property.title }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Address</td>
+            <td style="color:#0B1F3A;">{{ app.rental_property.address }}, {{ app.rental_property.city }}, {{ app.rental_property.state }} {{ app.rental_property.zip_code }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Move-In Date</td>
+            <td style="color:#0B1F3A;font-weight:700;">{{ app.move_in_date|date:"l, F j, Y" }}</td>
+          </tr>
+          {% if app.rental_property.agent %}
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Your Agent</td>
+            <td style="color:#0B1F3A;">{{ app.rental_property.agent.get_full_name }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;font-weight:600;">Agent Phone</td>
+            <td>
+              <a href="tel:{{ app.rental_property.agent.phone }}" style="color:#1A56DB;font-weight:600;text-decoration:none;">{{ app.rental_property.agent.phone|default:"+1 (757) 208-2767" }}</a>
+            </td>
+          </tr>
+          {% endif %}
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Steps -->
+  <p style="margin:24px 0 16px 0;font-size:15px;font-weight:700;color:#0B1F3A;">Move-In Day Instructions</p>
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+
+    <!-- Key handover -->
+    <tr>
+      <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td style="width:36px;vertical-align:top;padding-top:1px;">
+              <img src="{{ frontend_url }}/illustrations/spot-key.png" alt="" width="28" height="28" style="display:block;width:28px;height:28px;" />
+            </td>
+            <td style="vertical-align:top;">
+              <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#0B1F3A;">Key Handover</p>
+              <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
+                Your agent will meet you <strong>in person at the property</strong> on your move-in date to hand over the keys, provide a welcome pack, and walk you through the home.
+                Please confirm your arrival time with your agent at least 24 hours in advance.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Utilities -->
+    <tr>
+      <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td style="width:36px;vertical-align:top;padding-top:1px;">
+              <span style="display:inline-block;font-size:16px;">&#9889;</span>
+            </td>
+            <td style="vertical-align:top;">
+              <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#0B1F3A;">Set Up Your Utilities</p>
+              <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
+                Please ensure the following are transferred into your name <strong>before your move-in date</strong>:<br>
+                &nbsp;&nbsp;• Electricity &amp; Gas — contact your local utility provider<br>
+                &nbsp;&nbsp;• Water &amp; Sewer — contact your local municipality<br>
+                &nbsp;&nbsp;• Internet &amp; Cable — arrange directly with your provider of choice<br>
+                Your agent can advise on the local providers for your area.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Property walkthrough -->
+    <tr>
+      <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td style="width:36px;vertical-align:top;padding-top:1px;">
+              <span style="display:inline-block;font-size:16px;">&#128203;</span>
+            </td>
+            <td style="vertical-align:top;">
+              <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#0B1F3A;">Move-In Inspection</p>
+              <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
+                Your agent will conduct a move-in walkthrough with you to document the condition of the property. Please note any pre-existing marks or issues on the inspection form — this protects your security deposit.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Emergency contact -->
+    <tr>
+      <td style="padding:12px 0;vertical-align:top;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td style="width:36px;vertical-align:top;padding-top:1px;">
+              <span style="display:inline-block;font-size:16px;">&#128222;</span>
+            </td>
+            <td style="vertical-align:top;">
+              <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#0B1F3A;">Maintenance &amp; Emergency Contact</p>
+              <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
+                For any maintenance issues after move-in, contact our office at
+                <a href="tel:+17572082767" style="color:#1A56DB;font-weight:600;text-decoration:none;">+1 (757) 208-2767</a>
+                or email <a href="mailto:info@haskerrealtygroup.com" style="color:#1A56DB;text-decoration:none;">info@haskerrealtygroup.com</a>.
+                For urgent after-hours emergencies (water, gas, security), this same number is monitored 24/7.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+  </table>
+
+  <!-- CTA -->
+  {% if app.rental_property.agent %}
+  <table cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 8px 0;">
+    <tr>
+      <td style="background-color:#1A56DB;border-radius:6px;">
+        <a href="tel:{{ app.rental_property.agent.phone }}" style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">
+          Contact {{ app.rental_property.agent.get_full_name }}
+        </a>
+      </td>
+    </tr>
+  </table>
+  {% endif %}
+
+  <p style="margin:20px 0 0 0;font-size:14px;color:#334155;line-height:1.7;">
+    We're looking forward to seeing you on move-in day. Welcome to your new home!<br><br>
+    Warm regards,<br>
+    <strong style="color:#0B1F3A;">The Hasker &amp; Co. Realty Group Team</strong>
+  </p>
+{% endblock %}

@@ -1,0 +1,26 @@
+A new rental application has been submitted.
+
+APPLICANT
+---------
+Name    : {{ app.full_name }}
+Email   : {{ app.email }}
+Phone   : {{ app.cell_phone }}
+
+RENTAL DETAILS
+--------------
+Property         : {% if app.rental_property %}{{ app.rental_property.title }}{% else %}Not specified{% endif %}
+Intended Move-In : {{ app.move_in_date }}
+Stay Duration    : {{ app.intended_stay_duration }}
+Months Upfront   : {{ app.months_rent_upfront }}
+Has Children     : {% if app.has_kids %}Yes ({{ app.number_of_kids }}){% else %}No{% endif %}
+Has Pets         : {% if app.has_pets %}Yes — {{ app.pet_description }}{% else %}No{% endif %}
+Smokes           : {% if app.smokes %}Yes{% else %}No{% endif %}
+Drinks           : {% if app.drinks %}Yes{% else %}No{% endif %}
+
+Reference #{{ app.pk|stringformat:"05d" }} — submitted {{ app.submitted_at|date:"F j, Y \a\t g:i A" }}
+
+The completed application PDF is attached. Please log in to the admin dashboard to review and update the application status.
+
+Admin: {{ admin_url }}/admin/crm/rentalapplication/{{ app.pk }}/change/
+
+Hasker & Co. Realty Group — Internal Notification

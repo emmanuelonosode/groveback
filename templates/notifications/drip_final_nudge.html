@@ -1,0 +1,108 @@
+{% extends "notifications/email_base.html" %}
+{% block content %}
+
+<!-- Greeting -->
+<p style="font-size:13px;font-weight:700;color:#1A56DB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px 0;">
+  A personal note
+</p>
+<p style="font-size:22px;font-weight:800;color:#0B1F3A;line-height:1.25;margin:0 0 14px 0;">
+  {{ first_name }}, we don't want you to walk away empty-handed.
+</p>
+<p style="font-size:15px;color:#475569;line-height:1.8;margin:0 0 24px 0;">
+  We reached out a couple of times and haven't heard back — which is completely okay.
+  Life gets busy, and finding the right home takes time. But this is our last note,
+  and we wanted to make sure you know: <strong>we're still here for you{% if city %} in {{ city }}{% endif %}</strong>.
+</p>
+
+{% if prop %}
+<!-- Featured property recap -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px;">
+  <tr>
+    {% if prop_images %}
+    <td style="padding:0;">
+      <a href="{{ frontend_url }}/properties/{{ prop.slug }}" style="display:block;">
+        <img src="{{ prop_images.0 }}" width="520" height="200"
+             style="display:block;width:100%;height:auto;max-height:200px;object-fit:cover;border-radius:12px 12px 0 0;"
+             alt="{{ prop.title }}" />
+      </a>
+    </td>
+  </tr>
+  <tr>
+    {% endif %}
+    <td style="padding:18px 20px;">
+      <p style="font-size:16px;font-weight:800;color:#0B1F3A;margin:0 0 4px 0;">{{ prop.title }}</p>
+      <p style="font-size:12px;color:#64748b;margin:0 0 10px 0;">{{ prop.city }}, {{ prop.state }}</p>
+      {% if prop_price_formatted %}
+      <p style="font-size:24px;font-weight:900;color:#1A56DB;margin:0;">
+        ${{ prop_price_formatted }}{% if prop.listing_type == "for-rent" %}<span style="font-size:13px;font-weight:400;color:#64748b;">/mo</span>{% endif %}
+      </p>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+<!-- Trust block -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#0B1F3A;border-radius:12px;padding:22px 26px;margin-bottom:26px;">
+  <tr>
+    <td>
+      <p style="font-size:11px;font-weight:800;color:#93c5fd;margin:0 0 14px 0;text-transform:uppercase;letter-spacing:1.5px;">
+        Why 2,000+ families trust Hasker &amp; Co.
+      </p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="padding:5px 0;font-size:13px;color:#e2e8f0;line-height:1.5;">
+            &#10003;&nbsp; <strong style="color:#fff;">No hidden fees</strong> — what you see is what you pay
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;font-size:13px;color:#e2e8f0;line-height:1.5;">
+            &#10003;&nbsp; <strong style="color:#fff;">24-hour application decisions</strong> — no weeks of waiting
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;font-size:13px;color:#e2e8f0;line-height:1.5;">
+            &#10003;&nbsp; <strong style="color:#fff;">Real human agents</strong> — your call will always be answered
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:5px 0;font-size:13px;color:#e2e8f0;line-height:1.5;">
+            &#10003;&nbsp; <strong style="color:#fff;">Equal Housing Opportunity</strong> — every applicant treated fairly
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- CTA -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
+  <tr>
+    <td align="center">
+      {% if prop %}
+      <a href="{{ frontend_url }}/apply?property={{ prop.slug }}"
+         style="display:inline-block;background:#1A56DB;color:#fff;font-size:15px;font-weight:800;padding:15px 44px;border-radius:8px;text-decoration:none;">
+        Start My Application
+      </a>
+      {% else %}
+      <a href="{{ frontend_url }}/properties{% if city %}?q={{ city }}{% endif %}"
+         style="display:inline-block;background:#1A56DB;color:#fff;font-size:15px;font-weight:800;padding:15px 44px;border-radius:8px;text-decoration:none;">
+        Browse Available Homes
+      </a>
+      {% endif %}
+    </td>
+  </tr>
+</table>
+
+<p style="font-size:14px;color:#475569;line-height:1.8;text-align:center;margin:0 0 6px 0;">
+  Or talk to a real person — we promise we don't bite.
+</p>
+<p style="font-size:15px;font-weight:700;color:#0B1F3A;text-align:center;margin:0;">
+  <a href="tel:+17572082767" style="color:#1A56DB;text-decoration:none;">+1 (757) 208-2767</a>
+  &nbsp;&middot;&nbsp;
+  <a href="mailto:info@haskerrealtygroup.com" style="color:#1A56DB;text-decoration:none;">info@haskerrealtygroup.com</a>
+</p>
+
+{% endblock %}

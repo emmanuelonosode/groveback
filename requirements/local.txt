@@ -1,0 +1,4 @@
+-r base.txt
+django-debug-toolbar==4.*
+factory-boy==3.*
+Faker==26.*

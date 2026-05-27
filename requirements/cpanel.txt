@@ -1,0 +1,5 @@
+# cPanel deployment requirements (no Gunicorn — Passenger handles WSGI)
+-r base.txt
+whitenoise==6.*
+psycopg2-binary>=2.9
+sentry-sdk==2.*

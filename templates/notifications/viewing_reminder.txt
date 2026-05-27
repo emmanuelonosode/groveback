@@ -1,0 +1,17 @@
+Hasker & Co. Realty Group — Viewing Reminder
+=========================================
+
+This is a reminder for your upcoming property viewing.
+
+Property: {{ viewing.property.title }}
+Address:  {{ viewing.property.address }}, {{ viewing.property.city }}, {{ viewing.property.state }}
+Date/Time: {{ viewing.scheduled_at|date:"l, F j, Y" }} at {{ viewing.scheduled_at|time:"g:i A" }}
+Agent:    {{ viewing.agent.full_name }}
+{% if viewing.notes %}
+Notes: {{ viewing.notes }}
+{% endif %}
+
+If you need to reschedule, please contact us at info@haskerrealtygroup.com.
+
+---
+Hasker & Co. Realty Group | info@haskerrealtygroup.com

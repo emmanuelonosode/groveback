@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page {
+    size: A4;
+    margin: 48px 48px 60px 48px;
+    @bottom-center {
+      content: "Page " counter(page) " of " counter(pages);
+      font-family: Helvetica, Arial, sans-serif;
+      font-size: 9px;
+      color: #888;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 13px;
+    color: #1a1a1a;
+    background: #fff;
+    border-top: 5px solid #0B1F3A;
+  }
+
+  /* ── Header ───────────────────────────────────────────────── */
+  .header {
+    display: table;
+    width: 100%;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #0B1F3A;
+    margin-bottom: 20px;
+  }
+  .header-logo  { display: table-cell; vertical-align: middle; width: 55%; }
+  .header-meta  { display: table-cell; vertical-align: middle; width: 45%; text-align: right; }
+
+  .doc-title {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #0B1F3A;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .doc-subtitle {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9px;
+    color: #666;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .doc-ref {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 11px;
+    color: #1A56DB;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+  .doc-date {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10px;
+    color: #666;
+    margin-top: 2px;
+  }
+
+  /* ── Section Cards ────────────────────────────────────────── */
+  .section {
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .section-header {
+    background: #0B1F3A;
+    color: #fff;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+  }
+  .section-body {
+    padding: 0;
+  }
+
+  /* Two-column field table */
+  .field-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .field-table tr:nth-child(even) { background: #f9fafb; }
+  .field-table td {
+    padding: 6px 12px;
+    vertical-align: top;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 12px;
+  }
+  .field-table tr:last-child td { border-bottom: none; }
+  .field-label {
+    width: 36%;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .field-value {
+    width: 64%;
+    color: #1a1a1a;
+  }
+  .field-value strong { color: #0B1F3A; }
+
+  /* ── Certification Box ────────────────────────────────────── */
+  .certification-box {
+    border: 1px solid #0B1F3A;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 8px 12px 12px 12px;
+    background: #f9fafb;
+  }
+  .certification-text {
+    font-style: italic;
+    font-size: 12px;
+    color: #374151;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .sig-row {
+    display: table;
+    width: 100%;
+    margin-top: 8px;
+  }
+  .sig-cell {
+    display: table-cell;
+    width: 50%;
+    padding-right: 16px;
+  }
+  .sig-line {
+    border-bottom: 1px solid #374151;
+    height: 28px;
+    width: 90%;
+  }
+  .sig-label {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* ── Status Badge ─────────────────────────────────────────── */
+  .status-badge {
+    display: inline-block;
+    background: #1A56DB;
+    color: #fff;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+
+  /* ── Footer ───────────────────────────────────────────────── */
+  .footer {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    text-align: center;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9px;
+    color: #9ca3af;
+    page-break-inside: avoid;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Header ─────────────────────────────────────────────────────── -->
+<div class="header">
+  <div class="header-logo">
+    <!-- Inline SVG Logo -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 48" height="44" width="210">
+      <polygon points="20,24 36,4 52,24 36,44" fill="#1A56DB"/>
+      <polygon points="28,24 36,13 44,24" fill="white"/>
+      <rect x="29" y="24" width="14" height="10" rx="1" fill="white"/>
+      <rect x="33" y="26" width="6" height="8" rx="1" fill="#1A56DB"/>
+      <text x="62" y="23" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif"
+            font-weight="700" font-size="18" fill="#0B1F3A" letter-spacing="0.5">HARGROVE</text>
+      <text x="63" y="37" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif"
+            font-weight="400" font-size="9" fill="#1A56DB" letter-spacing="3">REALTY GROUP</text>
+    </svg>
+  </div>
+  <div class="header-meta">
+    <div class="doc-title">Rental Application</div>
+    <div class="doc-subtitle">Private &amp; Confidential</div>
+    <div class="doc-ref">Ref #{{ app.pk|stringformat:"05d" }}
+      <span class="status-badge">{{ app.get_status_display }}</span>
+    </div>
+    <div class="doc-date">Submitted: {{ app.submitted_at|date:"F j, Y" }}</div>
+    {% if app.rental_property %}
+    <div class="doc-date" style="margin-top:4px;color:#0B1F3A;font-weight:600">{{ app.rental_property.title }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ── Section 1: Applicant ───────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">Applicant Information</div>
+  <div class="section-body">
+    <table class="field-table">
+      <tr>
+        <td class="field-label">First Name</td>
+        <td class="field-value"><strong>{{ app.first_name }}</strong></td>
+      </tr>
+      <tr>
+        <td class="field-label">Middle Name</td>
+        <td class="field-value">{{ app.middle_name|default:"—" }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Last Name</td>
+        <td class="field-value"><strong>{{ app.last_name }}</strong></td>
+      </tr>
+      <tr>
+        <td class="field-label">Email</td>
+        <td class="field-value">{{ app.email }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Cell Phone</td>
+        <td class="field-value">{{ app.cell_phone }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Home Phone</td>
+        <td class="field-value">{{ app.home_phone|default:"—" }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ── Section 2: Current Residence ──────────────────────────────── -->
+<div class="section">
+  <div class="section-header">Current Residence</div>
+  <div class="section-body">
+    <table class="field-table">
+      <tr>
+        <td class="field-label">Present Address</td>
+        <td class="field-value">{{ app.present_address }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">City</td>
+        <td class="field-value">{{ app.city }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">State</td>
+        <td class="field-value">{{ app.state }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Zip Code</td>
+        <td class="field-value">{{ app.zip_code }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ── Section 3: Rental Details ──────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">Rental Details</div>
+  <div class="section-body">
+    <table class="field-table">
+      {% if app.rental_property %}
+      <tr>
+        <td class="field-label">Property</td>
+        <td class="field-value"><strong>{{ app.rental_property.title }}</strong></td>
+      </tr>
+      {% endif %}
+      <tr>
+        <td class="field-label">Intended Move-In</td>
+        <td class="field-value">{{ app.move_in_date|date:"F j, Y" }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Intended Stay Duration</td>
+        <td class="field-value">{{ app.intended_stay_duration }}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Months Rent Upfront</td>
+        <td class="field-value">{{ app.months_rent_upfront }} month{{ app.months_rent_upfront|pluralize }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ── Section 4: Household ───────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">Household</div>
+  <div class="section-body">
+    <table class="field-table">
+      <tr>
+        <td class="field-label">Children</td>
+        <td class="field-value">
+          {% if app.has_kids %}Yes — {{ app.number_of_kids }} child{{ app.number_of_kids|pluralize:"ren" }}{% else %}No{% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td class="field-label">Pets</td>
+        <td class="field-value">
+          {% if app.has_pets %}Yes — {{ app.pet_description }}{% else %}No{% endif %}
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ── Section 5: Lifestyle ───────────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">Habits &amp; Lifestyle</div>
+  <div class="section-body">
+    <table class="field-table">
+      <tr>
+        <td class="field-label">Do you smoke?</td>
+        <td class="field-value">{% if app.smokes %}Yes{% else %}No{% endif %}</td>
+      </tr>
+      <tr>
+        <td class="field-label">Do you drink?</td>
+        <td class="field-value">{% if app.drinks %}Yes{% else %}No{% endif %}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ── Section 6: Certification ──────────────────────────────────── -->
+<div class="section">
+  <div class="section-header">Certification</div>
+  <div class="section-body">
+    <div class="certification-box">
+      <p class="certification-text">{{ app.certification_text }}</p>
+      <div class="sig-row">
+        <div class="sig-cell">
+          <div class="sig-line"></div>
+          <div class="sig-label">Applicant Signature</div>
+        </div>
+        <div class="sig-cell">
+          <div class="sig-line"></div>
+          <div class="sig-label">Date</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ─────────────────────────────────────────────────────── -->
+<div class="footer">
+  Hasker &amp; Co. Realty Group &nbsp;·&nbsp; Confidential Rental Application &nbsp;·&nbsp; {{ app.submitted_at|date:"F j, Y" }}
+</div>
+
+</body>
+</html>

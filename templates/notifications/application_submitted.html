@@ -1,0 +1,101 @@
+{% extends "notifications/email_base.html" %}
+
+{% block subject %}Application Received — Hasker &amp; Co. Realty Group{% endblock %}
+
+{% block content %}
+
+  <!-- Spot illustration -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px 0;text-align:center;">
+    <tr>
+      <td>
+        <img src="{{ frontend_url }}/illustrations/spot-phone-apply.png" alt="" width="84" height="84" style="display:inline-block;width:84px;height:84px;" />
+      </td>
+    </tr>
+  </table>
+
+  <!-- Status label -->
+  <p style="margin:0 0 24px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1A56DB;">
+    Application Received
+  </p>
+
+  <!-- Heading -->
+  <h1 style="margin:0 0 16px;font-size:26px;font-weight:700;color:#0B1F3A;line-height:1.25;letter-spacing:-0.4px;">
+    Thank you,<br>{{ app.first_name }}.
+  </h1>
+
+  <!-- Lead paragraph -->
+  <p style="margin:0 0 32px;font-size:15px;color:#475569;line-height:1.75;">
+    We have received your rental application. Our team is reviewing your submission and will be in touch within 1–2 business days.
+  </p>
+
+  <!-- Summary table -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="border:1px solid #e2e8f0;margin-bottom:32px;">
+    <tr>
+      <td colspan="2" style="padding:14px 20px 10px;border-bottom:1px solid #f1f5f9;">
+        <p style="margin:0;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;">
+          Application Summary
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;width:40%;">Reference</td>
+      <td style="padding:12px 20px;font-size:13px;color:#0B1F3A;font-weight:600;border-bottom:1px solid #f1f5f9;">#{{ app.pk|stringformat:"05d" }}</td>
+    </tr>
+    <tr>
+      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;">Applicant</td>
+      <td style="padding:12px 20px;font-size:13px;color:#0B1F3A;font-weight:600;border-bottom:1px solid #f1f5f9;">{{ app.full_name }}</td>
+    </tr>
+    <tr>
+      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;">Property</td>
+      <td style="padding:12px 20px;font-size:13px;color:#0B1F3A;font-weight:600;border-bottom:1px solid #f1f5f9;">{% if app.rental_property %}{{ app.rental_property.title }}{% else %}To be confirmed{% endif %}</td>
+    </tr>
+    <tr>
+      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;">Move-In Date</td>
+      <td style="padding:12px 20px;font-size:13px;color:#0B1F3A;font-weight:600;border-bottom:1px solid #f1f5f9;">{{ app.move_in_date }}</td>
+    </tr>
+    <tr>
+      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;">Submitted</td>
+      <td style="padding:12px 20px;font-size:13px;color:#0B1F3A;font-weight:600;">{{ app.submitted_at|date:"F j, Y" }}</td>
+    </tr>
+  </table>
+
+  <!-- Next steps -->
+  <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#0B1F3A;letter-spacing:0.2px;">What happens next?</p>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;">
+        <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;"><span style="color:#1A56DB;font-weight:700;">1&nbsp;</span>&nbsp;We verify your payment proof <span style="color:#94a3b8;">(1–2 business hours)</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;">
+        <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;"><span style="color:#1A56DB;font-weight:700;">2&nbsp;</span>&nbsp;Our team reviews your full application</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:8px 0;">
+        <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;"><span style="color:#1A56DB;font-weight:700;">3&nbsp;</span>&nbsp;You receive an email with the decision</p>
+      </td>
+    </tr>
+  </table>
+
+  <!-- CTA -->
+  <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+    <tr>
+      <td style="background-color:#0B1F3A;">
+        <a href="{{ frontend_url }}/portal/profile"
+           style="display:inline-block;padding:14px 32px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ffffff;text-decoration:none;">
+          Track My Application
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Sign-off -->
+  <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.6;">
+    Have a question? Reply to this email or reach us at
+    <a href="mailto:info@haskerrealtygroup.com" style="color:#1A56DB;font-weight:500;">info@haskerrealtygroup.com</a>.
+  </p>
+
+{% endblock %}

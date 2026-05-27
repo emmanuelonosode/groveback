@@ -1,0 +1,16 @@
+Dear {{ client_name }},
+
+Please find your invoice {{ invoice.invoice_number }} from Hasker & Co. Realty Group attached to this email.
+
+Invoice Summary:
+  Invoice #: {{ invoice.invoice_number }}
+  Date:      {{ invoice.issued_date|date:"F j, Y" }}
+  Due:       {{ invoice.due_date|date:"F j, Y" }}
+  Total:     ${{ invoice.total|floatformat:2 }}
+
+Please make payment by the due date. If you have any questions, reply to this email or call us directly.
+
+Thank you for choosing Hasker & Co. Realty Group.
+
+---
+Hasker & Co. Realty Group | info@haskerrealtygroup.com

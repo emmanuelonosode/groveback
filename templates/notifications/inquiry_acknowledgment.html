@@ -1,0 +1,507 @@
+{% extends "notifications/email_base.html" %}
+
+{% block subject %}{% if prop %}{{ prop.title }} — Available Now | Hasker &amp; Co. Realty Group{% else %}Your Inquiry — Hasker &amp; Co. Realty Group{% endif %}{% endblock %}
+
+{% block content %}
+
+{% if prop %}
+
+<!-- ═══════════════════════════════════════════════════════
+     GREETING — warm, personal, first-name
+════════════════════════════════════════════════════════ -->
+<p style="margin:0 0 2px 0;font-size:13px;font-weight:600;color:#6b7280;">
+  Hi {% if lead.full_name %}{{ lead.full_name.split.0 }}{% else %}there{% endif %},
+</p>
+<p style="margin:0 0 6px 0;font-size:22px;font-weight:800;color:#0a1628;line-height:1.3;">
+  You asked about one of our best listings.<br>Here's everything you need to know.
+</p>
+{% if lead.detected_city %}
+<p style="margin:0 0 28px 0;font-size:12px;color:#9ca3af;">
+  📍 Reaching out from <strong style="color:#374151;">{{ lead.detected_city }}</strong>
+</p>
+{% else %}
+<div style="height:28px;"></div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO IMAGE — full bleed, max impact
+════════════════════════════════════════════════════════ -->
+{% if prop_images %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 0 0;">
+  <tr>
+    <td style="font-size:0;line-height:0;border-radius:12px 12px 0 0;overflow:hidden;background-color:#0a1628;">
+      <img src="{{ prop_images.0 }}"
+           alt="{{ prop.title }}"
+           width="520"
+           style="display:block;width:100%;max-width:520px;height:auto;min-height:260px;object-fit:cover;border-radius:12px 12px 0 0;" />
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+<!-- Property title bar -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#0a1628;{% if not prop_images %}border-radius:12px 12px 0 0;{% endif %}">
+  <tr>
+    <td style="padding:18px 24px 20px 24px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="vertical-align:middle;">
+            <p style="margin:0 0 4px 0;font-size:20px;font-weight:800;color:#ffffff;line-height:1.2;">{{ prop.title }}</p>
+            <p style="margin:0;font-size:12px;color:#94a3b8;">📍 {{ prop.address }}, {{ prop.city }}, {{ prop.state }} {{ prop.zip_code }}</p>
+          </td>
+          <td style="vertical-align:middle;text-align:right;padding-left:16px;white-space:nowrap;">
+            <span style="display:inline-block;background-color:#10b981;color:#ffffff;font-size:10px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:0.8px;text-transform:uppercase;">
+              ✓ Available
+            </span>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- Photo grid -->
+{% if prop_images|length > 1 %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:2px 0 0 0;">
+  <tr>
+    <td width="50%" style="padding-right:1px;font-size:0;line-height:0;">
+      <img src="{{ prop_images.1 }}" alt="Photo 2" width="259"
+           style="display:block;width:100%;max-width:259px;height:160px;object-fit:cover;" />
+    </td>
+    {% if prop_images|length > 2 %}
+    <td width="50%" style="padding-left:1px;font-size:0;line-height:0;">
+      {% if prop_images|length > 3 %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="font-size:0;line-height:0;padding-bottom:1px;">
+            <img src="{{ prop_images.2 }}" alt="Photo 3" width="259"
+                 style="display:block;width:100%;height:79px;object-fit:cover;" />
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:0;line-height:0;position:relative;">
+            <img src="{{ prop_images.3 }}" alt="Photo 4" width="259"
+                 style="display:block;width:100%;height:79px;object-fit:cover;" />
+          </td>
+        </tr>
+      </table>
+      {% else %}
+      <img src="{{ prop_images.2 }}" alt="Photo 3" width="259"
+           style="display:block;width:100%;height:160px;object-fit:cover;" />
+      {% endif %}
+    </td>
+    {% endif %}
+  </tr>
+</table>
+{% endif %}
+
+<!-- View all photos -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:2px 0 32px 0;">
+  <tr>
+    <td align="center" style="background-color:#f9fafb;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;padding:12px 20px;">
+      <a href="{{ frontend_url }}/properties/{{ prop.slug }}"
+         style="font-size:13px;font-weight:600;color:#1A56DB;text-decoration:none;">
+        View all photos &amp; virtual tour &rarr;
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     PRICE + LISTING TYPE
+════════════════════════════════════════════════════════ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
+  <tr>
+    <td>
+      <p style="margin:0 0 2px 0;font-size:11px;font-weight:600;color:#9ca3af;letter-spacing:1.5px;text-transform:uppercase;">Asking Price</p>
+      <p style="margin:0;font-size:38px;font-weight:900;color:#0a1628;line-height:1;letter-spacing:-1px;">
+        ${{ prop_price_formatted }}{% if prop.price_label %}<span style="font-size:18px;font-weight:500;color:#9ca3af;letter-spacing:0;"> {{ prop.price_label }}</span>{% endif %}
+      </p>
+    </td>
+    <td align="right" style="vertical-align:bottom;padding-bottom:6px;">
+      <span style="display:inline-block;font-size:12px;font-weight:700;color:#059669;background-color:#ecfdf5;border:1.5px solid #a7f3d0;padding:6px 16px;border-radius:20px;">
+        {% if prop.listing_type == "for-rent" %}For Rent{% elif prop.listing_type == "for-lease" %}For Lease{% else %}For Sale{% endif %}
+      </span>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     STATS ROW
+════════════════════════════════════════════════════════ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;margin:0 0 8px 0;">
+  <tr>
+    {% if prop.bedrooms %}
+    <td class="stat-cell" style="padding:16px 8px;text-align:center;border-right:1px solid #e5e7eb;">
+      <p style="margin:0 0 3px 0;font-size:11px;">🛏️</p>
+      <p style="margin:0;font-size:20px;font-weight:800;color:#0a1628;">{{ prop.bedrooms }}</p>
+      <p style="margin:3px 0 0 0;font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;">Beds</p>
+    </td>
+    {% endif %}
+    {% if prop.bathrooms %}
+    <td class="stat-cell" style="padding:16px 8px;text-align:center;border-right:1px solid #e5e7eb;">
+      <p style="margin:0 0 3px 0;font-size:11px;">🚿</p>
+      <p style="margin:0;font-size:20px;font-weight:800;color:#0a1628;">{{ prop.bathrooms|floatformat:0 }}</p>
+      <p style="margin:3px 0 0 0;font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;">Baths</p>
+    </td>
+    {% endif %}
+    {% if prop.sqft %}
+    <td class="stat-cell" style="padding:16px 8px;text-align:center;border-right:1px solid #e5e7eb;">
+      <p style="margin:0 0 3px 0;font-size:11px;">📐</p>
+      <p style="margin:0;font-size:20px;font-weight:800;color:#0a1628;">{{ prop.sqft|floatformat:0 }}</p>
+      <p style="margin:3px 0 0 0;font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;">Sq Ft</p>
+    </td>
+    {% endif %}
+    {% if prop.garage %}
+    <td class="stat-cell" style="padding:16px 8px;text-align:center;border-right:1px solid #e5e7eb;">
+      <p style="margin:0 0 3px 0;font-size:11px;">🚗</p>
+      <p style="margin:0;font-size:20px;font-weight:800;color:#0a1628;">{{ prop.garage }}</p>
+      <p style="margin:3px 0 0 0;font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;">Garage</p>
+    </td>
+    {% endif %}
+    {% if prop.year_built %}
+    <td class="stat-cell" style="padding:16px 8px;text-align:center;border-right:1px solid #e5e7eb;">
+      <p style="margin:0 0 3px 0;font-size:11px;">🏗️</p>
+      <p style="margin:0;font-size:20px;font-weight:800;color:#0a1628;">{{ prop.year_built }}</p>
+      <p style="margin:3px 0 0 0;font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;">Built</p>
+    </td>
+    {% endif %}
+    {% if prop.stories and prop.stories > 1 %}
+    <td class="stat-cell" style="padding:16px 8px;text-align:center;">
+      <p style="margin:0 0 3px 0;font-size:11px;">🏠</p>
+      <p style="margin:0;font-size:20px;font-weight:800;color:#0a1628;">{{ prop.stories }}</p>
+      <p style="margin:3px 0 0 0;font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;">Stories</p>
+    </td>
+    {% endif %}
+  </tr>
+</table>
+
+<!-- Extra details pills -->
+<p style="margin:0 0 32px 0;font-size:12px;color:#6b7280;line-height:2.2;">
+  {% if prop.neighborhood %}<span style="display:inline-block;background-color:#f3f4f6;border:1px solid #e5e7eb;color:#374151;padding:3px 12px;border-radius:20px;font-weight:500;margin-right:6px;">📍 {{ prop.neighborhood }}</span>{% endif %}
+  {% if prop.lot_size %}<span style="display:inline-block;background-color:#f3f4f6;border:1px solid #e5e7eb;color:#374151;padding:3px 12px;border-radius:20px;font-weight:500;margin-right:6px;">{{ prop.lot_size }} acre lot</span>{% endif %}
+  {% if prop.condition %}<span style="display:inline-block;background-color:#f3f4f6;border:1px solid #e5e7eb;color:#374151;padding:3px 12px;border-radius:20px;font-weight:500;">{{ prop.get_condition_display }}</span>{% endif %}
+</p>
+
+<!-- ═══════════════════════════════════════════════════════
+     ABOUT THIS HOME
+════════════════════════════════════════════════════════ -->
+{% if prop.description %}
+<p style="margin:0 0 10px 0;font-size:11px;font-weight:700;color:#1A56DB;letter-spacing:2px;text-transform:uppercase;">About This Home</p>
+<div style="height:1px;background-color:#e5e7eb;margin:0 0 16px 0;"></div>
+<p style="margin:0 0 36px 0;font-size:15px;color:#374151;line-height:1.85;">
+  {{ prop.description }}
+</p>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     AMENITIES & FEATURES
+════════════════════════════════════════════════════════ -->
+{% if prop_amenities_grouped %}
+<p style="margin:0 0 10px 0;font-size:11px;font-weight:700;color:#1A56DB;letter-spacing:2px;text-transform:uppercase;">Features &amp; Amenities</p>
+<div style="height:1px;background-color:#e5e7eb;margin:0 0 20px 0;"></div>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 36px 0;">
+  {% for group in prop_amenities_grouped %}
+  <tr>
+    <td style="padding:0 0 18px 0;">
+      <p style="margin:0 0 10px 0;font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:1px;">{{ group.category }}</p>
+      <p style="margin:0;line-height:2.2;">
+        {% for amenity in group.amenities %}
+        <span style="display:inline-block;background-color:#eff6ff;color:#1e40af;font-size:12px;font-weight:500;padding:4px 14px;border-radius:20px;border:1px solid #bfdbfe;margin:0 6px 4px 0;">{{ amenity }}</span>
+        {% endfor %}
+      </p>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     NEIGHBORHOOD LIFESTYLE
+════════════════════════════════════════════════════════ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f0f9ff;border:1.5px solid #bae6fd;border-radius:12px;margin:0 0 28px 0;">
+  <tr>
+    <td style="padding:24px 28px;">
+      <p style="margin:0 0 16px 0;font-size:11px;font-weight:700;color:#0284c7;letter-spacing:2px;text-transform:uppercase;">
+        Life in {{ prop.city }}{% if prop.neighborhood %} — {{ prop.neighborhood }}{% endif %}
+      </p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="50%" style="vertical-align:top;padding:0 8px 10px 0;font-size:13px;color:#1e40af;">🏫 &nbsp;Top-rated schools nearby</td>
+          <td width="50%" style="vertical-align:top;padding:0 0 10px 8px;font-size:13px;color:#1e40af;">🛒 &nbsp;Shopping &amp; dining minutes away</td>
+        </tr>
+        <tr>
+          <td width="50%" style="vertical-align:top;padding:0 8px 10px 0;font-size:13px;color:#1e40af;">🚗 &nbsp;Easy highway access</td>
+          <td width="50%" style="vertical-align:top;padding:0 0 10px 8px;font-size:13px;color:#1e40af;">🏥 &nbsp;Medical centers &amp; hospitals close</td>
+        </tr>
+        <tr>
+          <td width="50%" style="vertical-align:top;font-size:13px;color:#1e40af;">🌳 &nbsp;Safe, family-friendly streets</td>
+          <td width="50%" style="vertical-align:top;font-size:13px;color:#1e40af;">🎯 &nbsp;Strong community &amp; culture</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     WHY HASKER & CO. — light, not dark
+════════════════════════════════════════════════════════ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;margin:0 0 28px 0;">
+  <tr>
+    <td style="padding:24px 28px;">
+      <p style="margin:0 0 16px 0;font-size:11px;font-weight:700;color:#374151;letter-spacing:2px;text-transform:uppercase;">Why 2,000+ Families Choose Us</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td width="50%" style="padding:0 12px 10px 0;font-size:13px;color:#374151;vertical-align:top;">
+            <span style="color:#10b981;font-weight:700;">✓</span> &nbsp;<strong>No hidden fees</strong> — ever
+          </td>
+          <td width="50%" style="padding:0 0 10px 0;font-size:13px;color:#374151;vertical-align:top;">
+            <span style="color:#10b981;font-weight:700;">✓</span> &nbsp;<strong>24-hour</strong> approval decisions
+          </td>
+        </tr>
+        <tr>
+          <td width="50%" style="padding:0 12px 10px 0;font-size:13px;color:#374151;vertical-align:top;">
+            <span style="color:#10b981;font-weight:700;">✓</span> &nbsp;<strong>BBB A+ rated</strong> &amp; licensed
+          </td>
+          <td width="50%" style="padding:0 0 10px 0;font-size:13px;color:#374151;vertical-align:top;">
+            <span style="color:#10b981;font-weight:700;">✓</span> &nbsp;<strong>Real human</strong> agent support
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding:0;font-size:13px;color:#374151;vertical-align:top;">
+            <span style="color:#10b981;font-weight:700;">✓</span> &nbsp;Across <strong>12 US cities</strong> — Equal Housing certified
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     URGENCY BANNER
+════════════════════════════════════════════════════════ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px 0;">
+  <tr>
+    <td style="background-color:#fffbeb;border:1.5px solid #fcd34d;border-left:5px solid #f59e0b;border-radius:8px;padding:16px 20px;">
+      <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#92400e;">⚡ Homes in {{ prop.city }} move fast.</p>
+      <p style="margin:0;font-size:13px;color:#b45309;line-height:1.6;">
+        At this price point, properties like this rarely stay available beyond 2 weeks. Schedule a viewing or start your application today — we'd hate for you to miss out.
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     CTA BUTTONS — 3 clear actions
+════════════════════════════════════════════════════════ -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 32px 0;">
+  <tr>
+    <td style="padding-right:6px;" width="33%">
+      <a href="{{ frontend_url }}/properties/{{ prop.slug }}"
+         style="display:block;text-align:center;background-color:#0a1628;color:#ffffff;font-size:13px;font-weight:700;padding:14px 10px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;">
+        🏠 View Listing
+      </a>
+    </td>
+    <td style="padding:0 3px;" width="33%">
+      <a href="{{ frontend_url }}/schedule?property={{ prop.slug }}"
+         style="display:block;text-align:center;background-color:#1A56DB;color:#ffffff;font-size:13px;font-weight:700;padding:14px 10px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;">
+        📅 Book Viewing
+      </a>
+    </td>
+    <td style="padding-left:6px;" width="33%">
+      <a href="{{ frontend_url }}/apply?property={{ prop.slug }}"
+         style="display:block;text-align:center;background-color:#10b981;color:#ffffff;font-size:13px;font-weight:700;padding:14px 10px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;">
+        ✓ Apply Now
+      </a>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     AGENT CARD
+════════════════════════════════════════════════════════ -->
+{% if prop.agent %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1.5px solid #e5e7eb;border-radius:12px;margin:0 0 36px 0;overflow:hidden;">
+  <tr>
+    <td style="padding:20px 24px;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="vertical-align:middle;">
+            <p style="margin:0 0 2px 0;font-size:10px;font-weight:700;color:#9ca3af;letter-spacing:2px;text-transform:uppercase;">Your Agent</p>
+            <p style="margin:0 0 2px 0;font-size:18px;font-weight:800;color:#0a1628;">{{ prop.agent.full_name }}</p>
+            <p style="margin:0;font-size:12px;color:#6b7280;">Hasker &amp; Co. Realty Group</p>
+          </td>
+          <td align="right" style="vertical-align:middle;">
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                {% if prop.agent.phone %}
+                <td style="padding-right:8px;">
+                  <a href="tel:{{ prop.agent.phone }}"
+                     style="display:inline-block;background-color:#1A56DB;color:#ffffff;font-size:12px;font-weight:700;padding:9px 18px;border-radius:8px;text-decoration:none;">
+                    Call
+                  </a>
+                </td>
+                {% endif %}
+                <td>
+                  <a href="mailto:{{ prop.agent.email }}"
+                     style="display:inline-block;background-color:#f9fafb;border:1.5px solid #e5e7eb;color:#374151;font-size:12px;font-weight:700;padding:9px 18px;border-radius:8px;text-decoration:none;">
+                    Email
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+{% else %}
+
+<!-- ═══════════════════════════════════════════════════════
+     GENERIC INQUIRY — no property linked
+════════════════════════════════════════════════════════ -->
+<p style="margin:0 0 6px 0;font-size:22px;font-weight:800;color:#0a1628;line-height:1.3;">
+  Hi {{ lead.full_name }},<br>we got your inquiry.
+</p>
+<p style="margin:0 0 28px 0;font-size:15px;color:#6b7280;line-height:1.8;">
+  A member of our team will reach out within <strong style="color:#374151;">1 business day</strong>. In the meantime, browse our current listings{% if lead.preferred_location %} in <strong style="color:#0a1628;">{{ lead.preferred_location }}</strong>{% elif lead.detected_city %} near <strong style="color:#0a1628;">{{ lead.detected_city }}</strong>{% endif %} — we think you'll find something you love.
+</p>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9fafb;border:1.5px solid #e5e7eb;border-radius:12px;margin:0 0 28px 0;">
+  <tr>
+    <td style="padding:22px 26px;">
+      <p style="margin:0 0 14px 0;font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:2px;text-transform:uppercase;">Your Inquiry</p>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:13px;color:#6b7280;line-height:2.4;">
+        <tr>
+          <td style="width:130px;font-weight:600;">Reference</td>
+          <td style="color:#0a1628;font-weight:700;">#{{ lead.pk|stringformat:"05d" }}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Name</td>
+          <td style="color:#374151;">{{ lead.full_name }}</td>
+        </tr>
+        {% if lead.preferred_location %}
+        <tr>
+          <td style="font-weight:600;">Looking in</td>
+          <td style="color:#374151;">{{ lead.preferred_location }}</td>
+        </tr>
+        {% endif %}
+        {% if lead.budget_min or lead.budget_max %}
+        <tr>
+          <td style="font-weight:600;">Budget</td>
+          <td style="color:#374151;">
+            {% if lead.budget_min and lead.budget_max %}${{ lead.budget_min|floatformat:0 }} – ${{ lead.budget_max|floatformat:0 }}
+            {% elif lead.budget_min %}From ${{ lead.budget_min|floatformat:0 }}
+            {% elif lead.budget_max %}Up to ${{ lead.budget_max|floatformat:0 }}{% endif %}
+          </td>
+        </tr>
+        {% endif %}
+        <tr>
+          <td style="font-weight:600;">Date</td>
+          <td style="color:#374151;">{{ lead.created_at|date:"F j, Y" }}</td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 36px 0;">
+  <tr>
+    <td style="background-color:#1A56DB;border-radius:8px;">
+      <a href="{{ frontend_url }}/properties"
+         style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.3px;">
+        Browse Available Homes &rarr;
+      </a>
+    </td>
+  </tr>
+</table>
+
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     NEARBY HOMES — same city, same listing type
+════════════════════════════════════════════════════════ -->
+{% if nearby_props %}
+<div style="height:1px;background-color:#e5e7eb;margin:0 0 28px 0;"></div>
+
+<p style="margin:0 0 4px 0;font-size:11px;font-weight:700;color:#1A56DB;letter-spacing:2px;text-transform:uppercase;">
+  {% if prop %}Also Available Nearby{% else %}Homes Near You{% endif %}
+</p>
+<p style="margin:0 0 20px 0;font-size:14px;color:#6b7280;">
+  {% if search_city %}More homes available in <strong style="color:#374151;">{{ search_city }}</strong>:{% endif %}
+</p>
+
+{% for nearby in nearby_props %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1.5px solid #e5e7eb;border-radius:12px;margin:0 0 14px 0;overflow:hidden;">
+  <tr>
+    {% if nearby.image %}
+    <td style="width:170px;font-size:0;line-height:0;vertical-align:top;" class="nearby-img">
+      <img src="{{ nearby.image }}" alt="{{ nearby.title }}"
+           width="170" height="140"
+           style="display:block;width:170px;height:140px;object-fit:cover;border-radius:10px 0 0 10px;" />
+    </td>
+    {% endif %}
+    <td style="padding:16px 20px;vertical-align:top;">
+      <p style="margin:0 0 4px 0;">
+        <span style="font-size:9px;font-weight:700;color:#1A56DB;letter-spacing:1.5px;text-transform:uppercase;">
+          {% if nearby.listing_type == "for-rent" %}For Rent{% elif nearby.listing_type == "for-lease" %}For Lease{% else %}For Sale{% endif %}
+        </span>
+      </p>
+      <p style="margin:0 0 2px 0;font-size:15px;font-weight:800;color:#0a1628;line-height:1.3;">{{ nearby.title }}</p>
+      <p style="margin:0 0 10px 0;font-size:11px;color:#9ca3af;">
+        {{ nearby.city }}, {{ nearby.state }}{% if nearby.neighborhood %} &bull; {{ nearby.neighborhood }}{% endif %}
+      </p>
+      <p style="margin:0 0 10px 0;font-size:22px;font-weight:900;color:#1A56DB;line-height:1;">
+        ${{ nearby.price }}{% if nearby.price_label %}<span style="font-size:13px;font-weight:500;color:#9ca3af;"> {{ nearby.price_label }}</span>{% endif %}
+      </p>
+      <p style="margin:0 0 14px 0;font-size:12px;color:#6b7280;">
+        {% if nearby.bedrooms %}🛏️ {{ nearby.bedrooms }} bd &nbsp;{% endif %}
+        {% if nearby.bathrooms %}🚿 {{ nearby.bathrooms|floatformat:0 }} ba &nbsp;{% endif %}
+        {% if nearby.sqft %}📐 {{ nearby.sqft }} sqft{% endif %}
+      </p>
+      <a href="{{ frontend_url }}/properties/{{ nearby.slug }}"
+         style="display:inline-block;background-color:#0a1628;color:#ffffff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:8px;text-decoration:none;">
+        View Home &rarr;
+      </a>
+    </td>
+  </tr>
+</table>
+{% endfor %}
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 36px 0;">
+  <tr>
+    <td align="center">
+      <a href="{{ frontend_url }}/properties{% if search_city %}?city={{ search_city }}{% endif %}"
+         style="display:inline-block;background-color:#ffffff;border:1.5px solid #1A56DB;color:#1A56DB;font-size:13px;font-weight:700;padding:12px 32px;border-radius:8px;text-decoration:none;">
+        See All Homes in {{ search_city }} &rarr;
+      </a>
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     SIGN OFF
+════════════════════════════════════════════════════════ -->
+<div style="height:1px;background-color:#e5e7eb;margin:0 0 24px 0;"></div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr>
+    <td>
+      <p style="margin:0 0 6px 0;font-size:14px;color:#6b7280;line-height:1.7;">
+        Questions? Call or text us anytime —
+        <a href="tel:+17572082767" style="color:#1A56DB;font-weight:700;text-decoration:none;">+1 (757) 208-2767</a>
+      </p>
+      <p style="margin:0 0 20px 0;font-size:12px;color:#9ca3af;">Monday–Saturday, 9AM–7PM Eastern. We respond to every message.</p>
+      <p style="margin:0;font-size:14px;color:#374151;line-height:1.7;">
+        Warm regards,<br>
+        <strong style="font-size:16px;color:#0a1628;">The Hasker &amp; Co. Team</strong>
+      </p>
+    </td>
+  </tr>
+</table>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+Hasker & Co. Realty Group — New Lead Alert
+======================================
+
+A new lead has been submitted. Here are the details:
+
+Name:    {{ lead.full_name }}
+Email:   {{ lead.email }}
+Phone:   {{ lead.phone|default:"Not provided" }}
+Source:  {{ lead.get_source_display }}
+Interest: {{ lead.get_interest_type_display }}
+{% if lead.property_interest %}
+Property: {{ lead.property_interest.title }}
+{% endif %}
+{% if lead.message %}
+Message:
+{{ lead.message }}
+{% endif %}
+{% if lead.budget_min or lead.budget_max %}
+Budget: ${{ lead.budget_min|default:"—" }} – ${{ lead.budget_max|default:"open" }}
+{% endif %}
+
+Please follow up within 24 hours.
+
+---
+Hasker & Co. Realty Group | info@haskerrealtygroup.com
