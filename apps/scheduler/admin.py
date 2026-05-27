@@ -16,7 +16,6 @@ class ViewingAdmin(ModelAdmin):
         "agent__first_name", "agent__last_name",
     ]
     ordering = ["scheduled_at"]
-    date_hierarchy = "scheduled_at"
     readonly_fields = ["reminder_sent", "created_at", "updated_at"]
     actions = ["mark_completed", "mark_cancelled", "mark_confirmed"]
 

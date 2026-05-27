@@ -62,7 +62,6 @@ class TransactionAdmin(ModelAdmin):
     list_filter = ["transaction_type", "status", "agent"]
     search_fields = ["client__lead__full_name", "property__title", "agent__email"]
     ordering = ["-created_at"]
-    date_hierarchy = "created_at"
     inlines = [PaymentInline, InvoiceInline]
     readonly_fields = ["commission_amount", "created_at", "updated_at"]
     actions = ["mark_completed", "mark_cancelled"]

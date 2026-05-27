@@ -49,7 +49,6 @@ class PropertyAdmin(ModelAdmin):
     ]
     ordering = ["-created_at"]
     readonly_fields = ["slug", "created_at", "updated_at"]
-    date_hierarchy = "created_at"
     inlines = [PropertyImageInline, PropertyAmenityInline]
     actions = [
         "publish_properties", "unpublish_properties",

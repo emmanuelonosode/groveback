@@ -14,7 +14,6 @@ class JobApplicationAdmin(ModelAdmin):
     list_filter  = ["status", "role_id", "applied_at"]
     search_fields = ["full_name", "email", "phone", "role_title"]
     ordering = ["-applied_at"]
-    date_hierarchy = "applied_at"
     readonly_fields = ["applied_at", "reviewed_by"]
     actions = [
         "mark_under_review",
