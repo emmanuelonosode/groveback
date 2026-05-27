@@ -95,8 +95,13 @@ if DATABASE_URL.startswith("sqlite"):
         }
     }
 else:
-    import dj_database_url  # noqa — installed via psycopg2-binary extras if needed
+    import dj_database_url
     DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
+    if DATABASE_URL.startswith("mysql"):
+        DATABASES["default"].setdefault("OPTIONS", {}).update({
+            "charset": "utf8mb4",
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+        })
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
 AUTH_USER_MODEL = "accounts.CustomUser"
