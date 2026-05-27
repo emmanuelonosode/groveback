@@ -23,21 +23,6 @@ class Migration(migrations.Migration):
             name="payment_intent_id",
             field=models.CharField(blank=True, max_length=200, null=True),
         ),
-        migrations.AddField(
-            model_name="rentalapplication",
-            name="utm_source",
-            field=models.CharField(blank=True, max_length=100),
-        ),
-        migrations.AddField(
-            model_name="rentalapplication",
-            name="utm_medium",
-            field=models.CharField(blank=True, max_length=100),
-        ),
-        migrations.AddField(
-            model_name="rentalapplication",
-            name="utm_campaign",
-            field=models.CharField(blank=True, max_length=200),
-        ),
         migrations.AlterField(
             model_name="rentalapplication",
             name="status",
