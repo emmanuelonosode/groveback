@@ -5,6 +5,9 @@ from .models import Lead, LeadActivity, Client, LeadStatus, RentalApplication, A
 class LeadCreateSerializer(serializers.ModelSerializer):
     """Used by public inquiry forms — minimal required fields."""
 
+    # Phone-first strategy: email is optional so callback-only leads can be captured
+    email = serializers.EmailField(required=False, allow_blank=True, default="")
+
     class Meta:
         model = Lead
         fields = [

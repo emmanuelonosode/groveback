@@ -2,9 +2,56 @@ from django.db.models import Sum, Count, Avg, Q
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.accounts.permissions import IsManagerOrAbove
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def visitor_session(request):
+    """
+    POST /api/v1/analytics/visitors/
+    Silently captures anonymous visitor context on first page interaction.
+    Uses session_id to deduplicate — safe to call multiple times.
+    """
+    from .models import VisitorSession
+
+    session_id = (request.data.get("session_id") or "").strip()
+    if not session_id:
+        return Response({"detail": "session_id required."}, status=400)
+
+    # Capture the real IP server-side (more reliable than the frontend's ipapi.co call)
+    ip = (
+        request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
+        or request.META.get("HTTP_X_REAL_IP", "")
+        or request.META.get("REMOTE_ADDR", "")
+    ) or None
+
+    _, created = VisitorSession.objects.get_or_create(
+        session_id=session_id,
+        defaults=dict(
+            ip_address=ip,
+            city=          request.data.get("city",          ""),
+            region=        request.data.get("region",        ""),
+            country_code=  request.data.get("country_code",  ""),
+            browser=       request.data.get("browser",       ""),
+            os=            request.data.get("os",            ""),
+            device_type=   request.data.get("device_type",   ""),
+            screen=        request.data.get("screen",        ""),
+            language=      request.data.get("language",      ""),
+            timezone=      request.data.get("timezone",      ""),
+            landing_page=  request.data.get("landing_page",  ""),
+            referrer=      request.data.get("referrer",      ""),
+            utm_source=    request.data.get("utm_source",    ""),
+            utm_medium=    request.data.get("utm_medium",    ""),
+            utm_campaign=  request.data.get("utm_campaign",  ""),
+            referral_code= request.data.get("referral_code", ""),
+        ),
+    )
+
+    return Response({"captured": created}, status=201 if created else 200)
 
 
 @api_view(["GET"])

@@ -112,12 +112,13 @@ class LeadListCreateView(generics.ListCreateAPIView):
             send_lead_notification(lead.id)
         except Exception as e:
             logger.error("send_lead_notification failed for lead %s: %s", lead.id, e)
-        # Send acknowledgment email to the prospective tenant
-        try:
-            from apps.notifications.tasks import send_lead_acknowledgment_email
-            send_lead_acknowledgment_email(lead.id)
-        except Exception as e:
-            logger.error("send_lead_acknowledgment_email failed for lead %s: %s", lead.id, e)
+        # Send acknowledgment email only when an email address was provided
+        if lead.email:
+            try:
+                from apps.notifications.tasks import send_lead_acknowledgment_email
+                send_lead_acknowledgment_email(lead.id)
+            except Exception as e:
+                logger.error("send_lead_acknowledgment_email failed for lead %s: %s", lead.id, e)
 
 
 class LeadDetailView(generics.RetrieveUpdateAPIView):
