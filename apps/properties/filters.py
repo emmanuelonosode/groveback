@@ -1,6 +1,8 @@
 import re
+import difflib
 import django_filters
-from django.db.models import Q
+from django.core.cache import cache
+from django.db.models import Q, Case, When, Value, IntegerField
 from .models import Property
 
 
@@ -11,6 +13,7 @@ class PropertyFilter(django_filters.FilterSet):
     baths = django_filters.NumberFilter(field_name="bathrooms", lookup_expr="gte")
     min_sqft = django_filters.NumberFilter(field_name="sqft", lookup_expr="gte")
     max_sqft = django_filters.NumberFilter(field_name="sqft", lookup_expr="lte")
+    pets = django_filters.BooleanFilter(method="filter_pets")
     q = django_filters.CharFilter(method="search_filter")
     sort = django_filters.CharFilter(method="sort_filter")
 
@@ -114,6 +117,30 @@ class PropertyFilter(django_filters.FilterSet):
         "wisconsin": "WI", "wyoming": "WY",
     }
 
+    def filter_pets(self, queryset, name, value):
+        """Pet-friendly toggle — matches against amenity names (no schema field exists)."""
+        if value:
+            return queryset.filter(
+                Q(amenities__name__icontains="pet")
+                | Q(amenities__name__icontains="dog")
+                | Q(amenities__name__icontains="cat")
+            ).distinct()
+        return queryset
+
+    @staticmethod
+    def _known_cities():
+        """Distinct published-property cities, cached 5 min — used for fuzzy typo matching."""
+        cities = cache.get("property_known_cities")
+        if cities is None:
+            cities = list(
+                Property.objects.filter(is_published=True)
+                .exclude(city="")
+                .values_list("city", flat=True)
+                .distinct()
+            )
+            cache.set("property_known_cities", cities, 300)
+        return cities
+
     def search_filter(self, queryset, name, value):
         q_obj = (
             Q(title__icontains=value)
@@ -125,6 +152,16 @@ class PropertyFilter(django_filters.FilterSet):
             | Q(description__icontains=value)
             | Q(amenities__name__icontains=value)
         )
+
+        # Fuzzy typo tolerance: if the term closely matches a known city
+        # (e.g. "Atlatna" -> "Atlanta"), OR-in that city. Stdlib only.
+        single_term = value.strip()
+        if single_term and len(single_term) >= 4 and "," not in single_term:
+            close = difflib.get_close_matches(
+                single_term.title(), self._known_cities(), n=1, cutoff=0.78
+            )
+            if close:
+                q_obj |= Q(city__iexact=close[0])
 
         # "Atlanta, GA" or "Atlanta, Georgia" — comma-separated
         if ',' in value:
@@ -171,7 +208,8 @@ class PropertyFilter(django_filters.FilterSet):
     lng_max = django_filters.NumberFilter(field_name="longitude", lookup_expr="lte")
 
     def sort_filter(self, queryset, name, value):
-        sort_map = {
+        # Explicit user-chosen sorts always win.
+        explicit = {
             "price_asc":  ["price"],
             "price_desc": ["-price"],
             "newest":     ["-created_at"],
@@ -179,9 +217,27 @@ class PropertyFilter(django_filters.FilterSet):
             "beds_asc":   ["bedrooms"],
             "beds_desc":  ["-bedrooms"],
             "sqft_desc":  ["-sqft"],
-            # Diverse: interleaves properties across cities and bedroom counts
-            # so no single estate/suburb dominates the default browse page.
-            "diverse":    ["city", "state", "-bedrooms", "price"],
         }
-        order = sort_map.get(value, ["-created_at"])
-        return queryset.order_by(*order)
+        if value in explicit:
+            return queryset.order_by(*explicit[value])
+
+        # No explicit sort (default / "diverse"). If the user is searching by text,
+        # rank by relevance instead of the diverse interleave — they want matches
+        # for their term first, not a spread across every city.
+        q_term = (self.data.get("q") or "").strip()
+        if q_term:
+            queryset = queryset.annotate(
+                _relevance=Case(
+                    When(city__iexact=q_term,       then=Value(0)),
+                    When(city__istartswith=q_term,  then=Value(1)),
+                    When(zip_code__iexact=q_term,    then=Value(1)),
+                    When(neighborhood__icontains=q_term, then=Value(2)),
+                    When(title__icontains=q_term,    then=Value(3)),
+                    default=Value(5),
+                    output_field=IntegerField(),
+                )
+            )
+            return queryset.order_by("_relevance", "-is_featured", "price")
+
+        # No text query → diverse interleave (default browse page).
+        return queryset.order_by("city", "state", "-bedrooms", "price")

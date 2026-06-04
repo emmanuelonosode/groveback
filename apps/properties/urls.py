@@ -10,6 +10,7 @@ urlpatterns = [
     path("favorites/<int:property_id>/", views.FavoritePropertyDetailView.as_view(), name="property-favorites-detail"),
     path("map-pins/", views.MapPinsView.as_view(), name="property-map-pins"),
     path("cities/", views.city_stats, name="property-cities"),
+    path("parse-query/", views.parse_query, name="property-parse-query"),
     path("<slug:slug>/", views.PropertyDetailView.as_view(), name="property-detail"),
     path("<slug:slug>/inquiries/", views.property_inquiry, name="property-inquiry"),
 ]

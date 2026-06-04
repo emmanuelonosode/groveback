@@ -278,3 +278,37 @@ def city_stats(request):
         }
         for r in qs
     ])
+
+
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def parse_query(request):
+    """
+    POST /api/v1/properties/parse-query/   body: {"q": "..."}
+    Parses a natural-language search into structured filters via Claude Haiku.
+    Returns {"ok": true, "filters": {...}} or {"ok": false} so the frontend
+    falls back to sending the raw `q` to the regex parser.
+    """
+    from django.core.cache import cache
+    from .ai_search import parse_query as ai_parse
+
+    q = (request.data.get("q") or "").strip()
+    if not q:
+        return Response({"ok": False})
+
+    # Lightweight per-IP rate limit: 30 AI parses / minute.
+    ip = (
+        request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
+        or request.META.get("REMOTE_ADDR", "")
+        or "anon"
+    )
+    rl_key = f"ai_search_rl:{ip}"
+    count = cache.get(rl_key, 0)
+    if count >= 30:
+        return Response({"ok": False})
+    cache.set(rl_key, count + 1, 60)
+
+    filters = ai_parse(q)
+    if not filters:
+        return Response({"ok": False})
+    return Response({"ok": True, "filters": filters})
