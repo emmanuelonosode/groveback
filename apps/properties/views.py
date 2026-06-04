@@ -51,9 +51,10 @@ class PropertyListCreateView(generics.ListCreateAPIView):
     POST /api/v1/properties/  — staff only, create listing
     """
     queryset = Property.objects.select_related("agent", "agent__agent_profile").prefetch_related("images", "amenities").distinct()
+    # Only DjangoFilterBackend — PropertyFilter owns search (q) AND sort. The global
+    # OrderingFilter must NOT run here: it would override our sort with -created_at.
+    filter_backends = [DjangoFilterBackend]
     filterset_class = PropertyFilter
-    ordering_fields = ["price", "created_at", "bedrooms", "sqft"]
-    ordering = ["-created_at"]
     pagination_class = FlexiblePageSize
 
     def get_serializer_class(self):

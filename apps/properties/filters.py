@@ -64,7 +64,13 @@ class PropertyFilter(django_filters.FilterSet):
                 if re.search(r'\b(?:garage|parking)\b', q_val, re.IGNORECASE) and not data.get("garage__gte"):
                     data["garage__gte"] = "1"
                     q_val = re.sub(r'\b(?:garage|parking)\b', '', q_val, flags=re.IGNORECASE)
-                
+
+                # 3b. Pets ("pet friendly", "pet-friendly", "dog", "cat")
+                if re.search(r'\b(?:pet|pets|dog|dogs|cat|cats)\b', q_val, re.IGNORECASE):
+                    if not data.get("pets"):
+                        data["pets"] = "true"
+                    q_val = re.sub(r'\b(?:pet|pets|dog|dogs|cat|cats|friendly)\b', ' ', q_val, flags=re.IGNORECASE)
+
                 # 4. Route property-type keywords into the type filter
                 _TYPE_KEYWORDS = {
                     "condo": "condo", "condominium": "condo",
@@ -153,15 +159,30 @@ class PropertyFilter(django_filters.FilterSet):
             | Q(amenities__name__icontains=value)
         )
 
-        # Fuzzy typo tolerance: if the term closely matches a known city
-        # (e.g. "Atlatna" -> "Atlanta"), OR-in that city. Stdlib only.
+        known = self._known_cities()
+        known_lower = {c.lower(): c for c in known}
         single_term = value.strip()
+
+        # Fuzzy typo tolerance: if the whole term closely matches a known city
+        # (e.g. "Atlatna" -> "Atlanta"), OR-in that city. Stdlib only.
         if single_term and len(single_term) >= 4 and "," not in single_term:
-            close = difflib.get_close_matches(
-                single_term.title(), self._known_cities(), n=1, cutoff=0.78
-            )
+            close = difflib.get_close_matches(single_term.title(), known, n=1, cutoff=0.78)
             if close:
                 q_obj |= Q(city__iexact=close[0])
+
+        # Embedded-city match: rescues phrase queries like "pet friendly in atlanta"
+        # (common when the AI parser is unavailable) by matching any known city
+        # name that appears as a word — or adjacent word pair ("san antonio") —
+        # inside the query. OR-only, so it can only broaden results, never narrow.
+        words = [w.strip(",.-").lower() for w in single_term.split()]
+        words = [w for w in words if len(w) >= 3]
+        for w in words:
+            if w in known_lower:
+                q_obj |= Q(city__iexact=known_lower[w])
+        for i in range(len(words) - 1):
+            pair = f"{words[i]} {words[i + 1]}"
+            if pair in known_lower:
+                q_obj |= Q(city__iexact=known_lower[pair])
 
         # "Atlanta, GA" or "Atlanta, Georgia" — comma-separated
         if ',' in value:
