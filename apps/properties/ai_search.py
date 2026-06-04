@@ -18,7 +18,7 @@ from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_MODEL = "gemini-2.0-flash"        # cheap, fast, generous free tier
+DEFAULT_MODEL = "gemini-2.5-flash"        # 2.0-flash has 0 free-tier quota on many projects
 CACHE_TTL     = 7 * 24 * 60 * 60          # 7 days — identical queries served free
 TIMEOUT_S     = 4.0                        # hard cap; fall back to regex if slower
 MAX_LEN       = 300                        # don't spend tokens on absurd input
@@ -67,6 +67,9 @@ def parse_query(text):
             "responseMimeType": "application/json",
             "temperature": 0,
             "maxOutputTokens": 512,
+            # 2.5-flash is a "thinking" model — disable it so the whole token
+            # budget goes to the JSON answer (and the call stays fast/cheap).
+            "thinkingConfig": {"thinkingBudget": 0},
         },
     }
 

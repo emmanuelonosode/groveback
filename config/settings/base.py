@@ -139,7 +139,7 @@ CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", default="")
 # AI-powered natural-language search (optional — search degrades gracefully to the
 # regex parser when this is unset, so leaving it blank disables AI search safely).
 GEMINI_API_KEY = config("GEMINI_API_KEY", default="")
-GEMINI_MODEL   = config("GEMINI_MODEL", default="gemini-2.0-flash")
+GEMINI_MODEL   = config("GEMINI_MODEL", default="gemini-2.5-flash")
 
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
