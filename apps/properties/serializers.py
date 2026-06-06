@@ -52,6 +52,7 @@ class PropertyAmenitySerializer(serializers.ModelSerializer):
 class PropertyListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list views."""
     primary_image_url = serializers.SerializerMethodField()
+    image_urls = serializers.SerializerMethodField()
     agent_name = serializers.SerializerMethodField()
     # DecimalField serializes as a string by default; override so the map's
     # Number.isFinite() check receives actual JSON numbers, not "33.749000".
@@ -64,7 +65,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
             "id", "slug", "title", "type", "listing_type", "status",
             "price", "price_label", "bedrooms", "bathrooms", "sqft",
             "address", "city", "state", "neighborhood",
-            "is_featured", "primary_image_url", "agent_name", "created_at",
+            "is_featured", "primary_image_url", "image_urls", "agent_name", "created_at",
             "latitude", "longitude",
         ]
 
@@ -75,6 +76,20 @@ class PropertyListSerializer(serializers.ModelSerializer):
         if not img or not img.image:
             return None
         return _resolve_image_url(img.image)
+
+    def get_image_urls(self, obj):
+        # Up to 6 image URLs for the card carousel — primary first, then by order.
+        # Uses the prefetched `images` (already ordered by order, id) — no extra queries.
+        images = sorted(obj.images.all(), key=lambda i: (not i.is_primary,))
+        urls = []
+        for img in images:
+            if img.image:
+                u = _resolve_image_url(img.image)
+                if u:
+                    urls.append(u)
+            if len(urls) >= 6:
+                break
+        return urls
 
     def get_agent_name(self, obj):
         return obj.agent.full_name if obj.agent_id else ""
