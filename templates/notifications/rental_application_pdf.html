@@ -21,7 +21,7 @@
     font-size: 13px;
     color: #1a1a1a;
     background: #fff;
-    border-top: 5px solid #0B1F3A;
+    border-top: 5px solid #1E3A5F;
   }
 
   /* ── Header ───────────────────────────────────────────────── */
@@ -29,7 +29,7 @@
     display: table;
     width: 100%;
     padding-bottom: 16px;
-    border-bottom: 2px solid #0B1F3A;
+    border-bottom: 2px solid #1E3A5F;
     margin-bottom: 20px;
   }
   .header-logo  { display: table-cell; vertical-align: middle; width: 55%; }
@@ -39,7 +39,7 @@
     font-family: Helvetica, Arial, sans-serif;
     font-size: 15px;
     font-weight: 700;
-    color: #0B1F3A;
+    color: #1E3A5F;
     letter-spacing: 2px;
     text-transform: uppercase;
   }
@@ -54,7 +54,7 @@
   .doc-ref {
     font-family: Helvetica, Arial, sans-serif;
     font-size: 11px;
-    color: #1A56DB;
+    color: #2563EB;
     font-weight: 600;
     margin-top: 6px;
   }
@@ -74,7 +74,7 @@
     overflow: hidden;
   }
   .section-header {
-    background: #0B1F3A;
+    background: #1E3A5F;
     color: #fff;
     font-family: Helvetica, Arial, sans-serif;
     font-size: 9px;
@@ -113,11 +113,11 @@
     width: 64%;
     color: #1a1a1a;
   }
-  .field-value strong { color: #0B1F3A; }
+  .field-value strong { color: #1E3A5F; }
 
   /* ── Certification Box ────────────────────────────────────── */
   .certification-box {
-    border: 1px solid #0B1F3A;
+    border: 1px solid #1E3A5F;
     border-radius: 4px;
     padding: 12px 16px;
     margin: 8px 12px 12px 12px;
@@ -157,7 +157,7 @@
   /* ── Status Badge ─────────────────────────────────────────── */
   .status-badge {
     display: inline-block;
-    background: #1A56DB;
+    background: #2563EB;
     color: #fff;
     font-family: Helvetica, Arial, sans-serif;
     font-size: 9px;
@@ -190,14 +190,14 @@
   <div class="header-logo">
     <!-- Inline SVG Logo -->
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 48" height="44" width="210">
-      <polygon points="20,24 36,4 52,24 36,44" fill="#1A56DB"/>
+      <polygon points="20,24 36,4 52,24 36,44" fill="#2563EB"/>
       <polygon points="28,24 36,13 44,24" fill="white"/>
       <rect x="29" y="24" width="14" height="10" rx="1" fill="white"/>
-      <rect x="33" y="26" width="6" height="8" rx="1" fill="#1A56DB"/>
+      <rect x="33" y="26" width="6" height="8" rx="1" fill="#2563EB"/>
       <text x="62" y="23" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif"
-            font-weight="700" font-size="18" fill="#0B1F3A" letter-spacing="0.5">HARGROVE</text>
+            font-weight="700" font-size="18" fill="#1E3A5F" letter-spacing="0.5">HARGROVE</text>
       <text x="63" y="37" font-family="'Helvetica Neue',Helvetica,Arial,sans-serif"
-            font-weight="400" font-size="9" fill="#1A56DB" letter-spacing="3">REALTY GROUP</text>
+            font-weight="400" font-size="9" fill="#2563EB" letter-spacing="3">REALTY GROUP</text>
     </svg>
   </div>
   <div class="header-meta">
@@ -208,7 +208,7 @@
     </div>
     <div class="doc-date">Submitted: {{ app.submitted_at|date:"F j, Y" }}</div>
     {% if app.rental_property %}
-    <div class="doc-date" style="margin-top:4px;color:#0B1F3A;font-weight:600">{{ app.rental_property.title }}</div>
+    <div class="doc-date" style="margin-top:4px;color:#1E3A5F;font-weight:600">{{ app.rental_property.title }}</div>
     {% endif %}
   </div>
 </div>

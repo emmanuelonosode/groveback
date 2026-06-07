@@ -21,7 +21,7 @@
     </tr>
   </table>
 
-  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#0B1F3A;line-height:1.3;">
+  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#1E3A5F;line-height:1.3;">
     Great news, {{ recipient_name }}!
   </p>
 
@@ -41,17 +41,17 @@
           </tr>
           <tr>
             <td style="color:#94a3b8;font-weight:600;">Amount</td>
-            <td style="color:#0B1F3A;font-weight:700;text-align:right;">${{ payment.amount|floatformat:2 }}</td>
+            <td style="color:#1E3A5F;font-weight:700;text-align:right;">${{ payment.amount|floatformat:2 }}</td>
           </tr>
           {% if payment.invoice %}
           <tr>
             <td style="color:#94a3b8;font-weight:600;">Invoice Paid</td>
-            <td style="color:#0B1F3A;text-align:right;">{{ payment.invoice.invoice_number }}</td>
+            <td style="color:#1E3A5F;text-align:right;">{{ payment.invoice.invoice_number }}</td>
           </tr>
           {% endif %}
           <tr>
             <td style="color:#94a3b8;font-weight:600;">Verified At</td>
-            <td style="color:#0B1F3A;text-align:right;">{{ payment.verified_at|date:"F j, Y, g:i a" }}</td>
+            <td style="color:#1E3A5F;text-align:right;">{{ payment.verified_at|date:"F j, Y, g:i a" }}</td>
           </tr>
         </table>
       </td>
@@ -65,7 +65,7 @@
   <!-- Action CTA -->
   <table cellpadding="0" cellspacing="0" border="0" style="margin:12px 0;width:100%;">
     <tr>
-      <td align="center" style="background-color:#1A56DB;border-radius:8px;">
+      <td align="center" style="background-color:#2563EB;border-radius:8px;">
         <a href="{{ frontend_url }}/portal/profile" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;width:100%;text-align:center;">
           View My Profile
         </a>
@@ -75,6 +75,6 @@
 
   <p style="margin:32px 0 0 0;font-size:14px;color:#334155;">
     Best regards,<br>
-    <strong style="color:#0B1F3A;">The Hasker &amp; Co. Realty Group Team</strong>
+    <strong style="color:#1E3A5F;">The Hasker &amp; Co. Realty Group Team</strong>
   </p>
 {% endblock %}

@@ -15,10 +15,10 @@
 {% endif %}
 
 <!-- Greeting -->
-<p style="font-size:13px;font-weight:700;color:#1A56DB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px 0;">
+<p style="font-size:13px;font-weight:700;color:#2563EB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 6px 0;">
   Time-sensitive
 </p>
-<p style="font-size:22px;font-weight:800;color:#0B1F3A;line-height:1.25;margin:0 0 14px 0;">
+<p style="font-size:22px;font-weight:800;color:#1E3A5F;line-height:1.25;margin:0 0 14px 0;">
   {{ first_name }}, the right home won't wait.
 </p>
 <p style="font-size:15px;color:#475569;line-height:1.8;margin:0 0 24px 0;">
@@ -30,7 +30,7 @@
 <!-- Featured property -->
 {% if prop %}
 {% if prop_images %}
-<a href="{{ frontend_url }}/properties/{{ prop.slug }}" style="display:block;text-decoration:none;margin-bottom:14px;">
+<a href="{{ frontend_url }}/houses-for-rent/{{ prop.slug }}" style="display:block;text-decoration:none;margin-bottom:14px;">
   <img src="{{ prop_images.0 }}" width="520" height="260"
        style="display:block;width:100%;max-width:520px;height:auto;max-height:260px;object-fit:cover;border-radius:12px;"
        alt="{{ prop.title }}" />
@@ -40,14 +40,14 @@
        style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin-bottom:20px;">
   <tr>
     <td>
-      <p style="font-size:17px;font-weight:800;color:#0B1F3A;margin:0 0 4px 0;">{{ prop.title }}</p>
+      <p style="font-size:17px;font-weight:800;color:#1E3A5F;margin:0 0 4px 0;">{{ prop.title }}</p>
       <p style="font-size:13px;color:#64748b;margin:0 0 10px 0;">
         {{ prop.city }}, {{ prop.state }}
         {% if prop.bedrooms %} &nbsp;&middot;&nbsp; {{ prop.bedrooms }} bed{% endif %}
         {% if prop.bathrooms %} &nbsp;&middot;&nbsp; {{ prop.bathrooms }} bath{% endif %}
       </p>
       {% if prop_price_formatted %}
-      <p style="font-size:26px;font-weight:900;color:#1A56DB;margin:0;line-height:1.1;">
+      <p style="font-size:26px;font-weight:900;color:#2563EB;margin:0;line-height:1.1;">
         ${{ prop_price_formatted }}{% if prop.listing_type == "for-rent" %}<span style="font-size:14px;font-weight:500;color:#64748b;">/mo</span>{% endif %}
       </p>
       {% endif %}
@@ -58,7 +58,7 @@
 
 <!-- Social proof strip -->
 <table width="100%" cellpadding="0" cellspacing="0" border="0"
-       style="background:#0B1F3A;border-radius:10px;padding:16px 22px;margin-bottom:22px;">
+       style="background:#1E3A5F;border-radius:10px;padding:16px 22px;margin-bottom:22px;">
   <tr>
     <td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -92,8 +92,8 @@
       {% endif %}
     </td>
     <td width="48%" align="center" style="padding-left:8px;">
-      <a href="{{ frontend_url }}/properties?q={{ city }}"
-         style="display:block;background:#f1f5f9;color:#0B1F3A;font-size:13px;font-weight:700;padding:14px 12px;border-radius:8px;text-decoration:none;text-align:center;border:1px solid #e2e8f0;">
+      <a href="{{ frontend_url }}/houses-for-rent?q={{ city }}"
+         style="display:block;background:#f1f5f9;color:#1E3A5F;font-size:13px;font-weight:700;padding:14px 12px;border-radius:8px;text-decoration:none;text-align:center;border:1px solid #e2e8f0;">
         Browse {{ city }} Homes
       </a>
     </td>
@@ -102,7 +102,7 @@
 
 <p style="font-size:13px;color:#94a3b8;line-height:1.7;text-align:center;margin:0;">
   Prefer to talk? Call or text us at
-  <a href="tel:+17572082767" style="color:#1A56DB;text-decoration:none;font-weight:600;">+1 (757) 208-2767</a>
+  <a href="tel:+17572082767" style="color:#2563EB;text-decoration:none;font-weight:600;">+1 (757) 208-2767</a>
 </p>
 
 {% endblock %}
