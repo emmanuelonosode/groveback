@@ -16,15 +16,21 @@ class ViewingAdmin(ModelAdmin):
         "agent__first_name", "agent__last_name",
     ]
     ordering = ["scheduled_at"]
-    readonly_fields = ["reminder_sent", "created_at", "updated_at"]
+    readonly_fields = ["reminder_sent", "confirmation_sent", "created_at", "updated_at"]
     actions = ["mark_completed", "mark_cancelled", "mark_confirmed"]
 
     fieldsets = (
         ("Details", {
             "fields": ("lead", "property", "agent", "scheduled_at"),
         }),
+        ("Confirmation email", {
+            "fields": ("lease_term", "access_code"),
+            "description": "These appear in the self-tour confirmation email sent to the "
+                           "tenant. When/Where/Lease price come from the scheduled time and "
+                           "the selected property.",
+        }),
         ("Status", {
-            "fields": ("status", "notes", "reminder_sent"),
+            "fields": ("status", "notes", "reminder_sent", "confirmation_sent"),
         }),
         ("Timestamps", {
             "fields": ("created_at", "updated_at"),
@@ -49,8 +55,20 @@ class ViewingAdmin(ModelAdmin):
 
     @admin.action(description="Mark as Confirmed")
     def mark_confirmed(self, request, queryset):
+        from apps.notifications.tasks import send_tour_confirmation_email
         updated = queryset.update(status=ViewingStatus.CONFIRMED)
-        self.message_user(request, f"{updated} viewings confirmed.")
+        sent = 0
+        # Send the self-tour confirmation for any not yet emailed.
+        for viewing in queryset.filter(confirmation_sent=False):
+            try:
+                send_tour_confirmation_email(viewing.pk)
+                sent += 1
+            except Exception:
+                pass  # Never block the admin action if email fails.
+        self.message_user(
+            request,
+            f"{updated} viewings confirmed. {sent} confirmation email(s) sent.",
+        )
 
     @admin.action(description="Mark as Completed")
     def mark_completed(self, request, queryset):

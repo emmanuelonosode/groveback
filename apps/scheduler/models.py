@@ -27,8 +27,18 @@ class Viewing(models.Model):
     )
     scheduled_at = models.DateTimeField()
     status = models.CharField(max_length=20, choices=ViewingStatus.choices, default=ViewingStatus.SCHEDULED)
+    lease_term = models.CharField(
+        max_length=50, blank=True,
+        help_text='Shown in the confirmation email, e.g. "24 months". Leave blank to hide.',
+    )
+    access_code = models.CharField(
+        max_length=20, blank=True,
+        help_text="Self-tour entry code. If set, it appears in the confirmation email; "
+                  "if blank, the email says the code will be sent before the tour.",
+    )
     notes = models.TextField(blank=True)
     reminder_sent = models.BooleanField(default=False)
+    confirmation_sent = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

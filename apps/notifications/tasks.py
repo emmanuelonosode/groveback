@@ -478,6 +478,60 @@ def send_viewing_reminder(viewing_id: int):
         raise
 
 
+def send_tour_confirmation_email(viewing_id: int):
+    """
+    Self-tour confirmation sent to the prospective tenant when staff schedule
+    (or confirm) a Viewing in the admin. Includes when/where/lease, access-code
+    instructions, and a login CTA. Idempotent via Viewing.confirmation_sent.
+    """
+    try:
+        from apps.scheduler.models import Viewing
+
+        viewing = (
+            Viewing.objects
+            .select_related("lead", "property", "agent")
+            .get(pk=viewing_id)
+        )
+
+        lead = viewing.lead
+        prop = viewing.property
+
+        if not lead or not lead.email:
+            return "No lead email — skipping tour confirmation"
+
+        first_name = lead.full_name.split()[0] if lead.full_name else "there"
+        prop_price_formatted = f"{int(prop.price):,}" if prop and prop.price else ""
+
+        from_header, connection = _get_email_sender()
+        body = render_to_string("notifications/tour_confirmation.html", {
+            "viewing": viewing,
+            "lead": lead,
+            "first_name": first_name,
+            "prop": prop,
+            "prop_price_formatted": prop_price_formatted,
+            "lease_term": viewing.lease_term,    # admin-entered, optional
+            "access_code": viewing.access_code,  # admin-entered, optional
+            "frontend_url": settings.FRONTEND_URL,
+        })
+
+        msg = EmailMessage(
+            subject=f"Your self-tour at {prop.address} is confirmed",
+            body=body,
+            from_email=from_header,
+            to=[lead.email],
+            connection=connection,
+        )
+        msg.content_subtype = "html"
+        msg.send()
+
+        Viewing.objects.filter(pk=viewing_id).update(confirmation_sent=True)
+        return f"Tour confirmation sent to {lead.email}"
+
+    except Exception:
+        logger.exception("send_tour_confirmation_email failed for viewing %s", viewing_id)
+        raise
+
+
 # ---------------------------------------------------------------------------
 # Scheduled tasks — wire up as cPanel cron jobs if needed
 # ---------------------------------------------------------------------------

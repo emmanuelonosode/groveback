@@ -1,0 +1,199 @@
+{% extends "notifications/email_base.html" %}
+{% block subject %}Your self-tour is confirmed — Hasker &amp; Co. Realty Group{% endblock %}
+
+{% block content %}
+
+<!-- ── Greeting ─────────────────────────────────────────── -->
+<p style="font-size:13px;font-weight:700;color:#2563EB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 8px 0;">
+  Self-tour confirmed
+</p>
+<p style="font-size:23px;font-weight:800;color:#1E3A5F;line-height:1.25;margin:0 0 14px 0;">
+  Hi {{ first_name }}, you're all set.
+</p>
+<p style="font-size:15px;color:#475569;line-height:1.8;margin:0 0 26px 0;">
+  Your self-tour at <strong style="color:#1E3A5F;">{{ prop.address }}</strong> is confirmed.
+  We're excited to help you explore your next home — tour at your own pace, no pressure.
+</p>
+
+<!-- ── Tour details card ────────────────────────────────── -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:14px;margin:0 0 26px 0;">
+  <tr>
+    <td style="padding:22px 24px 8px;">
+
+      <!-- When -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;">
+        <tr>
+          <td style="vertical-align:top;">
+            <p style="font-size:10px;font-weight:800;color:#94A3B8;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 4px 0;">When</p>
+            <p style="font-size:16px;font-weight:800;color:#1E3A5F;margin:0;">
+              {{ viewing.scheduled_at|date:"l, F j, Y" }}
+            </p>
+            <p style="font-size:14px;font-weight:600;color:#2563EB;margin:2px 0 0 0;">
+              {{ viewing.scheduled_at|time:"g:i A" }}
+            </p>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Where -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:14px;border-top:1px solid #E8EDF3;padding-top:14px;">
+        <tr>
+          <td style="padding-top:14px;vertical-align:top;">
+            <p style="font-size:10px;font-weight:800;color:#94A3B8;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 4px 0;">Where</p>
+            <p style="font-size:15px;font-weight:700;color:#1E3A5F;margin:0 0 4px 0;">
+              {{ prop.address }}{% if prop.city %}, {{ prop.city }}{% endif %}{% if prop.state %}, {{ prop.state }}{% endif %} {{ prop.zip_code }}
+            </p>
+            <a href="https://www.google.com/maps/search/?api=1&amp;query={{ prop.address|urlencode }}{% if prop.city %},+{{ prop.city|urlencode }}{% endif %}{% if prop.state %},+{{ prop.state|urlencode }}{% endif %}"
+               style="font-size:13px;font-weight:600;color:#2563EB;text-decoration:none;">
+              Get directions &rarr;
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Lease for / term -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #E8EDF3;padding-top:14px;">
+        <tr>
+          <td style="padding:14px 0 18px;vertical-align:top;width:50%;">
+            <p style="font-size:10px;font-weight:800;color:#94A3B8;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 4px 0;">Lease for</p>
+            <p style="font-size:18px;font-weight:900;color:#1E3A5F;margin:0;">
+              {% if prop_price_formatted %}${{ prop_price_formatted }}{% if prop.listing_type == "for-rent" %}<span style="font-size:13px;font-weight:500;color:#64748B;">/mo</span>{% endif %}{% else %}Contact us{% endif %}
+            </p>
+          </td>
+          {% if lease_term %}
+          <td style="padding:14px 0 18px;vertical-align:top;width:50%;">
+            <p style="font-size:10px;font-weight:800;color:#94A3B8;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 4px 0;">Lease term</p>
+            <p style="font-size:18px;font-weight:900;color:#1E3A5F;margin:0;">{{ lease_term }}</p>
+          </td>
+          {% endif %}
+        </tr>
+      </table>
+
+    </td>
+  </tr>
+</table>
+
+<!-- ── Access code ──────────────────────────────────────── -->
+{% if access_code %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#EFF5FF;border:1px solid #D6E4FF;border-radius:12px;margin:0 0 24px 0;">
+  <tr>
+    <td align="center" style="padding:20px 20px;">
+      <p style="font-size:10px;font-weight:800;color:#2563EB;letter-spacing:1.5px;text-transform:uppercase;margin:0 0 8px 0;">Your access code</p>
+      <p style="font-size:34px;font-weight:900;color:#1E3A5F;letter-spacing:6px;margin:0 0 8px 0;">{{ access_code }}</p>
+      <p style="font-size:13px;color:#475569;line-height:1.6;margin:0;">
+        Enter this on the <strong style="color:#1E3A5F;">Smart Home keypad</strong> on the front door.
+        It only works during your scheduled tour time.
+      </p>
+    </td>
+  </tr>
+</table>
+{% else %}
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#EFF5FF;border:1px solid #D6E4FF;border-radius:12px;margin:0 0 24px 0;">
+  <tr>
+    <td style="padding:16px 20px;">
+      <p style="font-size:14px;color:#1E3A5F;line-height:1.7;margin:0;">
+        We'll send you an <strong>access code by email within 15 minutes of your tour time</strong>.
+        You can also receive it by text through your account.
+      </p>
+    </td>
+  </tr>
+</table>
+{% endif %}
+
+<!-- ── Login CTA ────────────────────────────────────────── -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 30px 0;">
+  <tr>
+    <td align="center">
+      <a href="{{ frontend_url }}/login"
+         style="display:inline-block;background:#2563EB;color:#ffffff;font-size:15px;font-weight:800;padding:15px 52px;border-radius:10px;text-decoration:none;">
+        View &amp; manage my tour
+      </a>
+      <p style="font-size:12px;color:#94A3B8;margin:12px 0 0 0;">
+        Log in to view your tour details, reschedule, or get your access code.
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- ── How to get in ────────────────────────────────────── -->
+<p style="font-size:13px;font-weight:800;color:#1E3A5F;letter-spacing:1px;text-transform:uppercase;margin:0 0 14px 0;">
+  How to get in
+</p>
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px 0;">
+  <tr>
+    <td style="vertical-align:top;width:22px;padding:0 0 14px 0;">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563EB;margin-top:7px;"></span>
+    </td>
+    <td style="vertical-align:top;padding:0 0 14px 0;">
+      <p style="font-size:14px;color:#475569;line-height:1.7;margin:0;">
+        Your access code will be sent from
+        <a href="mailto:no-reply@haskerrealtygroup.com" style="color:#2563EB;text-decoration:none;">no-reply@haskerrealtygroup.com</a>
+        or by text from <strong style="color:#1E3A5F;">(757) 208-2767</strong>.
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;width:22px;padding:0 0 14px 0;">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563EB;margin-top:7px;"></span>
+    </td>
+    <td style="vertical-align:top;padding:0 0 14px 0;">
+      <p style="font-size:14px;color:#475569;line-height:1.7;margin:0;">
+        The code will only grant you access to the house <strong style="color:#1E3A5F;">during your scheduled tour time</strong>.
+        It won't work if you come at a different time.
+      </p>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;width:22px;padding:0;">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#2563EB;margin-top:7px;"></span>
+    </td>
+    <td style="vertical-align:top;padding:0;">
+      <p style="font-size:14px;color:#475569;line-height:1.7;margin:0;">
+        Use the <strong style="color:#1E3A5F;">Smart Home keypad</strong> on the front door to enter the house with your code.
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- ── Gated community ──────────────────────────────────── -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background:#FBF9F4;border:1px solid #EFE9DC;border-radius:12px;margin:0 0 28px 0;">
+  <tr>
+    <td style="padding:18px 22px;">
+      <p style="font-size:13px;font-weight:800;color:#1E3A5F;margin:0 0 12px 0;">
+        If this home is in a gated community:
+      </p>
+      <p style="font-size:14px;color:#475569;line-height:1.7;margin:0 0 10px 0;">
+        &bull;&nbsp; Make sure you're at the <strong style="color:#1E3A5F;">main entrance</strong>. Some communities have side entrances.
+      </p>
+      <p style="font-size:14px;color:#475569;line-height:1.7;margin:0 0 10px 0;">
+        &bull;&nbsp; <strong style="color:#1E3A5F;">If there's a guard:</strong> tell them you're there for a home tour with Hasker &amp; Co. Realty Group.
+      </p>
+      <p style="font-size:14px;color:#475569;line-height:1.7;margin:0;">
+        &bull;&nbsp; <strong style="color:#1E3A5F;">If there's a code box:</strong> look up Hasker &amp; Co. Realty Group in the contact list and call.
+      </p>
+    </td>
+  </tr>
+</table>
+
+<!-- ── Sign off ─────────────────────────────────────────── -->
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:2px solid #F1F5F9;">
+  <tr>
+    <td style="padding-top:20px;">
+      <p style="font-size:14px;color:#64748B;line-height:1.7;margin:0 0 4px 0;">
+        Questions before your visit? We're here to help.
+      </p>
+      <p style="font-size:13px;color:#94A3B8;margin:0;">
+        Call or text us at
+        <a href="tel:+17572082767" style="color:#2563EB;text-decoration:none;font-weight:600;">(757) 208-2767</a>
+        &nbsp;&middot;&nbsp;
+        <a href="mailto:info@haskerrealtygroup.com" style="color:#2563EB;text-decoration:none;">info@haskerrealtygroup.com</a>
+      </p>
+    </td>
+  </tr>
+</table>
+
+{% endblock %}
