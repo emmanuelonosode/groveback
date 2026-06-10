@@ -192,10 +192,18 @@ class RentalApplicationCreateSerializer(serializers.ModelSerializer):
         raw_ssn = validated_data.pop("ssn", "").strip()
         instance = super().create(validated_data)
         if raw_ssn:
-            from apps.notifications.encryption import encrypt_ssn
             cleaned = raw_ssn.replace("-", "").replace(" ", "")
-            instance.ssn_encrypted = encrypt_ssn(raw_ssn)
+            # Always store the last 4 (never fails).
             instance.ssn_last4 = cleaned[-4:] if len(cleaned) >= 4 else cleaned
+            # Encrypt the full SSN — but a crypto failure must not 500 the applicant.
+            try:
+                from apps.notifications.encryption import encrypt_ssn
+                instance.ssn_encrypted = encrypt_ssn(raw_ssn)
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception(
+                    "SSN encryption failed for application %s — stored last4 only", instance.pk
+                )
             instance.save(update_fields=["ssn_encrypted", "ssn_last4"])
         return instance
 

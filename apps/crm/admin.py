@@ -251,11 +251,17 @@ class RentalApplicationAdmin(ModelAdmin):
     ssn_masked.short_description = "SSN"
 
     def ssn_view(self, obj):
-        """Detail read-only field — decrypted for superadmins, masked otherwise."""
+        """Detail read-only field — full decrypted SSN for admin staff."""
         if not obj.ssn_encrypted:
+            # Legacy records may only have the last 4 on file.
+            if obj.ssn_last4:
+                return format_html(
+                    '<span style="color:#999">●●●-●●-{} <em>(only last 4 on file)</em></span>',
+                    obj.ssn_last4,
+                )
             return format_html('<span style="color:#aaa">Not provided</span>')
         request = getattr(self, "_request", None)
-        if request and request.user.is_superuser:
+        if request and request.user.is_staff:
             try:
                 from apps.notifications.encryption import decrypt_ssn
                 decrypted = decrypt_ssn(obj.ssn_encrypted)
@@ -266,9 +272,9 @@ class RentalApplicationAdmin(ModelAdmin):
             except Exception:
                 return format_html('<span style="color:#c62828">⚠ Decryption error</span>')
         return format_html(
-            '<span style="color:#999;font-style:italic">●●●-●●-●●●● — Superadmin access only</span>'
+            '<span style="color:#999;font-style:italic">●●●-●●-●●●● — Staff access only</span>'
         )
-    ssn_view.short_description = "SSN (Full — Superadmin Only)"
+    ssn_view.short_description = "SSN (Full)"
 
     fieldsets = (
         ("Applicant", {
@@ -291,7 +297,7 @@ class RentalApplicationAdmin(ModelAdmin):
                 "has_drivers_license", "drivers_license_number", "drivers_license_state",
             ),
             "classes": ("collapse",),
-            "description": "Full SSN is AES-encrypted at rest. Superadmins see the decrypted value; all others see only the last 4 digits.",
+            "description": "Full SSN is AES-encrypted at rest and decrypted here for authorized staff. Handle per your privacy policy — this is sensitive PII.",
         }),
         ("Income & Employment", {
             "fields": (

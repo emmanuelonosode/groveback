@@ -17,3 +17,4 @@ dj-database-url>=2.0
 requests>=2.31
 beautifulsoup4>=4.12
 lxml>=5.0
+cryptography>=42.0  # Fernet encryption for SSN at rest (apps/notifications/encryption.py)
