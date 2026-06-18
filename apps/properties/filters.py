@@ -75,7 +75,10 @@ class PropertyFilter(django_filters.FilterSet):
                 _TYPE_KEYWORDS = {
                     "condo": "condo", "condominium": "condo",
                     "townhouse": "townhouse", "townhome": "townhouse",
-                    "apartment": "residential", "house": "residential",
+                    # NOTE: keep "apartment" → residential until real apartment inventory
+                    # exists, so on-site search returns homes instead of an empty page.
+                    # Flip to "apartment" once type=apartment listings are live.
+                    "apartment": "residential", "apartments": "residential", "house": "residential",
                     "commercial": "commercial", "land": "land",
                 }
                 for kw, ptype in _TYPE_KEYWORDS.items():

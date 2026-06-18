@@ -16,42 +16,33 @@ def visitor_session(request):
     Silently captures anonymous visitor context on first page interaction.
     Uses session_id to deduplicate — safe to call multiple times.
     """
-    from .models import VisitorSession
+    from .services import queue_telemetry_event
+    from django.utils import timezone
 
-    session_id = (request.data.get("session_id") or "").strip()
+    payload = request.data.copy()
+    
+    session_id = str(payload.get("session_id") or "").strip()
     if not session_id:
         return Response({"detail": "session_id required."}, status=400)
 
-    # Capture the real IP server-side (more reliable than the frontend's ipapi.co call)
+    # Capture the real IP server-side
     ip = (
         request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
         or request.META.get("HTTP_X_REAL_IP", "")
         or request.META.get("REMOTE_ADDR", "")
     ) or None
 
-    _, created = VisitorSession.objects.get_or_create(
-        session_id=session_id,
-        defaults=dict(
-            ip_address=ip,
-            city=          request.data.get("city",          ""),
-            region=        request.data.get("region",        ""),
-            country_code=  request.data.get("country_code",  ""),
-            browser=       request.data.get("browser",       ""),
-            os=            request.data.get("os",            ""),
-            device_type=   request.data.get("device_type",   ""),
-            screen=        request.data.get("screen",        ""),
-            language=      request.data.get("language",      ""),
-            timezone=      request.data.get("timezone",      ""),
-            landing_page=  request.data.get("landing_page",  ""),
-            referrer=      request.data.get("referrer",      ""),
-            utm_source=    request.data.get("utm_source",    ""),
-            utm_medium=    request.data.get("utm_medium",    ""),
-            utm_campaign=  request.data.get("utm_campaign",  ""),
-            referral_code= request.data.get("referral_code", ""),
-        ),
-    )
+    payload["ip_address"] = ip
+    payload["timestamp"] = timezone.now().isoformat()
+    
+    # If a user is logged in, attach their ID for mapping
+    if request.user and request.user.is_authenticated:
+        payload["user_id"] = request.user.id
 
-    return Response({"captured": created}, status=201 if created else 200)
+    # Push to Redis asynchronously
+    queue_telemetry_event(payload)
+
+    return Response({"queued": True}, status=202)
 
 
 @api_view(["GET"])

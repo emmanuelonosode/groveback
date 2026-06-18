@@ -36,6 +36,8 @@ db.sqlite3
 *.key
 secrets.json
 service-account.json
+service_account.json
+client_secret.json
 
 # ── Django ────────────────────────────────────────────────────────────────────
 *.log

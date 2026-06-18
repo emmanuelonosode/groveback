@@ -12,6 +12,7 @@ class PropertyCondition(models.TextChoices):
 
 class PropertyType(models.TextChoices):
     RESIDENTIAL = "residential", "Residential"
+    APARTMENT = "apartment", "Apartment"
     COMMERCIAL = "commercial", "Commercial"
     LAND = "land", "Land"
     CONDO = "condo", "Condo"

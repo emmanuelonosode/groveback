@@ -13,7 +13,7 @@ class MeView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-
+    
 
 class AgentListView(generics.ListAPIView):
     """GET /api/v1/agents/ — public agent directory."""
