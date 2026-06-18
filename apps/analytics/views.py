@@ -4,6 +4,8 @@ from datetime import timedelta
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from django.http import JsonResponse
+from .models import Visitor, VisitorSession, PageVisit, TelemetryEvent
 
 from apps.accounts.permissions import IsManagerOrAbove
 
@@ -16,9 +18,6 @@ def visitor_session(request):
     Silently captures anonymous visitor context on first page interaction.
     Uses session_id to deduplicate — safe to call multiple times.
     """
-    from .services import queue_telemetry_event
-    from django.utils import timezone
-
     payload = request.data.copy()
     
     session_id = str(payload.get("session_id") or "").strip()
@@ -39,10 +38,94 @@ def visitor_session(request):
     if request.user and request.user.is_authenticated:
         payload["user_id"] = request.user.id
 
-    # Push to Redis asynchronously
-    queue_telemetry_event(payload)
+    # Process synchronously
+    process_single_payload(payload)
 
-    return Response({"queued": True}, status=202)
+    return JsonResponse({"status": "received"})
+
+
+def process_single_payload(data: dict):
+    fingerprint = data.get("fingerprint_id")
+    if not fingerprint:
+        return
+        
+    user_id = data.get("user_id")
+    
+    visitor, _ = Visitor.objects.get_or_create(fingerprint_id=fingerprint)
+    if user_id and not visitor.user_id:
+        visitor.user_id = user_id
+        visitor.save(update_fields=["user_id"])
+        
+    session_id = data.get("session_id")
+    if not session_id:
+        return
+        
+    session, created = VisitorSession.objects.get_or_create(
+        session_id=session_id,
+        defaults={
+            "visitor": visitor,
+            "ip_address": data.get("ip_address"),
+            "city": data.get("city", ""),
+            "region": data.get("region", ""),
+            "country_code": data.get("country_code", ""),
+            "browser": data.get("browser", ""),
+            "os": data.get("os", ""),
+            "device_type": data.get("device_type", ""),
+            "screen": data.get("screen", ""),
+            "language": data.get("language", ""),
+            "timezone": data.get("timezone", ""),
+            "landing_page": data.get("landing_page", ""),
+            "referrer": data.get("referrer", ""),
+            "utm_source": data.get("utm_source", ""),
+            "utm_medium": data.get("utm_medium", ""),
+            "utm_campaign": data.get("utm_campaign", ""),
+            "referral_code": data.get("referral_code", ""),
+        }
+    )
+    
+    if not created and visitor != session.visitor:
+        session.visitor = visitor
+        session.save(update_fields=["visitor"])
+
+    event_type = data.get("event_type")
+    
+    # Handle end session
+    if event_type == "session_end":
+        session.end_time = data.get("timestamp")
+        session.total_dwell_time = data.get("dwell_time", 0.0)
+        session.save(update_fields=["end_time", "total_dwell_time"])
+        
+    # Handle page visits
+    path = data.get("path")
+    if path and event_type == "page_view":
+        PageVisit.objects.create(
+            session=session,
+            path=path,
+            entry_time=data.get("timestamp")
+        )
+        
+    # Handle engagement updates
+    if event_type == "engagement" and path:
+        visit = PageVisit.objects.filter(session=session, path=path).order_by("-entry_time").first()
+        if visit:
+            if "max_scroll_depth" in data:
+                visit.max_scroll_depth = max(visit.max_scroll_depth, data["max_scroll_depth"])
+            if "idle_time" in data:
+                visit.idle_time = data["idle_time"]
+            visit.save(update_fields=["max_scroll_depth", "idle_time"])
+            
+    # Handle arbitrary events (clicks, etc.)
+    if event_type not in ["session_end", "page_view", "engagement", "init", None]:
+        visit = None
+        if path:
+            visit = PageVisit.objects.filter(session=session, path=path).order_by("-entry_time").first()
+            
+        TelemetryEvent.objects.create(
+            session=session,
+            page_visit=visit,
+            event_type=event_type,
+            event_data=data.get("event_data", {}),
+        )
 
 
 @api_view(["GET"])

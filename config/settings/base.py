@@ -222,11 +222,6 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.notifications.tasks.schedule_viewing_reminders",
         "schedule": crontab(minute=0),
     },
-    # Every 1 minute — flush telemetry analytics queue from Redis to PostgreSQL
-    "flush-analytics-telemetry": {
-        "task": "apps.analytics.tasks.flush_analytics_telemetry",
-        "schedule": crontab(minute="*/1"),
-    },
 }
 
 # ── Email ──────────────────────────────────────────────────────────────────────
