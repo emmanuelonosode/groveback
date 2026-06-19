@@ -177,6 +177,10 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
+    # Per-IP rate for the open telemetry beacon (apps.analytics.views.TelemetryThrottle).
+    "DEFAULT_THROTTLE_RATES": {
+        "telemetry": "120/min",
+    },
 }
 
 # ── JWT ────────────────────────────────────────────────────────────────────────

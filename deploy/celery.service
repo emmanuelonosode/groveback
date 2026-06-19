@@ -1,0 +1,28 @@
+[Unit]
+Description=Celery Worker (Hasker & Co.)
+After=network.target redis-server.service redis.service
+
+[Service]
+Type=forking
+# Replace with your Linux user (run `whoami`). Do NOT run as root.
+User=<REPLACE_USER>
+Group=<REPLACE_USER>
+EnvironmentFile=/etc/default/celery
+# Replace with the project folder containing manage.py (same as CELERYD_CHDIR).
+WorkingDirectory=<REPLACE: /full/path/to/backend>
+# systemd auto-creates these, owned by User:
+RuntimeDirectory=celery
+LogsDirectory=celery
+ExecStart=/bin/sh -c '${CELERY_BIN} -A ${CELERY_APP} multi start ${CELERYD_NODES} \
+    --pidfile=${CELERYD_PID_FILE} --logfile=${CELERYD_LOG_FILE} \
+    --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+ExecStop=/bin/sh -c '${CELERY_BIN} multi stopwait ${CELERYD_NODES} \
+    --pidfile=${CELERYD_PID_FILE} --loglevel=${CELERYD_LOG_LEVEL}'
+ExecReload=/bin/sh -c '${CELERY_BIN} -A ${CELERY_APP} multi restart ${CELERYD_NODES} \
+    --pidfile=${CELERYD_PID_FILE} --logfile=${CELERYD_LOG_FILE} \
+    --loglevel=${CELERYD_LOG_LEVEL} ${CELERYD_OPTS}'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

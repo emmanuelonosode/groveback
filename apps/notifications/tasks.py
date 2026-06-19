@@ -8,6 +8,7 @@ cPanel cron jobs via a management command if needed.
 
 import logging
 
+from celery import shared_task
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -536,6 +537,7 @@ def send_tour_confirmation_email(viewing_id: int):
 # Scheduled tasks — wire up as cPanel cron jobs if needed
 # ---------------------------------------------------------------------------
 
+@shared_task
 def weekly_lead_followup():
     """
     Reminds agents of any leads they haven't contacted in 7+ days.
@@ -580,6 +582,7 @@ def weekly_lead_followup():
     return f"Weekly follow-up sent for {len(agent_leads)} agents, {stale_leads.count()} leads."
 
 
+@shared_task
 def schedule_viewing_reminders():
     """
     Queues send_viewing_reminder for viewings starting in 20–26 hours.
@@ -1184,6 +1187,7 @@ def send_drip_final_nudge(lead_id: int):
 # Abandoned application recovery — run via cPanel cron every 6 hours
 # ---------------------------------------------------------------------------
 
+@shared_task
 def recover_abandoned_applications():
     """Find DRAFT/PENDING_PAYMENT applications older than 48h and send a recovery email."""
     from apps.crm.models import RentalApplication, ApplicationStatus
@@ -1327,7 +1331,12 @@ def send_post_viewing_followup(viewing_id: int):
 # Internal admin alert emails → lexiltonsecure@gmail.com
 # ---------------------------------------------------------------------------
 
-ADMIN_ALERT_EMAIL = "lexiltonsecure@gmail.com"
+# Internal alert inbox — everyone listed here is emailed on new leads/inquiries
+# and on user registrations (see send_admin_alert callers).
+ADMIN_ALERT_EMAILS = [
+    "lexiltonsecure@gmail.com",
+    "Kylieekylieere@gmail.com",
+]
 
 
 def send_admin_alert(subject: str, rows: list):
@@ -1382,7 +1391,7 @@ def send_admin_alert(subject: str, rows: list):
             subject=f"[Alert] {subject}",
             body=plain,
             from_email=from_header,
-            to=[ADMIN_ALERT_EMAIL],
+            to=ADMIN_ALERT_EMAILS,
             connection=connection,
         )
         msg.content_subtype = "html"

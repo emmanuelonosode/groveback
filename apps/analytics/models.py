@@ -116,3 +116,29 @@ class TelemetryEvent(models.Model):
 
     def __str__(self):
         return f"Event {self.event_type} at {self.created_at:%Y-%m-%d %H:%M}"
+
+
+class RawTelemetryEvent(models.Model):
+    """
+    Durable intake spool. The public beacon endpoint does a single fast insert
+    here; an out-of-band processor (manage.py process_telemetry, via cron) turns
+    these rows into Visitor / VisitorSession / PageVisit / TelemetryEvent.
+    Decouples DB linking from the request path and survives restarts (no Redis).
+    """
+    payload = models.JSONField()
+    received_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    processed = models.BooleanField(default=False, db_index=True)
+    attempts = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["received_at"]
+        indexes = [
+            # Fast "oldest unprocessed first" scan for the processor.
+            models.Index(fields=["processed", "received_at"]),
+        ]
+        verbose_name = "Raw Telemetry Event"
+        verbose_name_plural = "Raw Telemetry Events (spool)"
+
+    def __str__(self):
+        state = "processed" if self.processed else "pending"
+        return f"RawEvent #{self.pk} ({state}, {self.received_at:%Y-%m-%d %H:%M})"

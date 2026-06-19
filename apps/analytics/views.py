@@ -1,46 +1,106 @@
+import logging
+import random
+import re
 from django.db.models import Sum, Count, Avg, Q
 from django.utils import timezone
 from datetime import timedelta
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.throttling import SimpleRateThrottle
 from django.http import JsonResponse
-from .models import Visitor, VisitorSession, PageVisit, TelemetryEvent
-from .services import queue_telemetry_event
+from .models import Visitor, VisitorSession, PageVisit, TelemetryEvent, RawTelemetryEvent
+from .services import process_spool, unprocessed_backlog
 
 from apps.accounts.permissions import IsManagerOrAbove
 
+logger = logging.getLogger(__name__)
 
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def visitor_session(request):
-    """
-    POST /api/v1/analytics/visitors/
-    Silently captures anonymous visitor context on first page interaction.
-    Uses session_id to deduplicate — safe to call multiple times.
-    """
-    payload = request.data.copy()
-    
-    session_id = str(payload.get("session_id") or "").strip()
-    if not session_id:
-        return Response({"detail": "session_id required."}, status=400)
+# Intake guards
+MAX_EVENTS_PER_REQUEST = 50
+BACKLOG_VALVE_THRESHOLD = 2000   # if the spool grows past this (cron down), drain inline
+_BOT_RE = re.compile(r"(bot|crawl|spider|slurp|bingpreview|headless|lighthouse|pingdom|gtmetrix)", re.I)
 
-    # Capture the real IP server-side
-    ip = (
+
+def _client_ip(request):
+    return (
         request.META.get("HTTP_X_FORWARDED_FOR", "").split(",")[0].strip()
         or request.META.get("HTTP_X_REAL_IP", "")
         or request.META.get("REMOTE_ADDR", "")
     ) or None
 
-    payload["ip_address"] = ip
-    payload["timestamp"] = timezone.now().isoformat()
-    
-    # If a user is logged in, attach their ID for mapping
-    if request.user and request.user.is_authenticated:
-        payload["user_id"] = request.user.id
 
-    # Push to Redis asynchronously
-    queue_telemetry_event(payload)
+class TelemetryThrottle(SimpleRateThrottle):
+    """Per-IP throttle for the open telemetry beacon (rate from settings)."""
+    scope = "telemetry"
+
+    def get_cache_key(self, request, view):
+        ident = _client_ip(request) or "anon"
+        return self.cache_format % {"scope": self.scope, "ident": ident}
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+@throttle_classes([TelemetryThrottle])
+def visitor_session(request):
+    """
+    POST /api/v1/analytics/visitors/
+    Durable, fire-and-forget telemetry intake. Accepts a single event payload
+    or a batch {"events": [...]}. Each valid event is appended to the
+    RawTelemetryEvent spool (one fast insert); an out-of-band processor
+    (manage.py process_telemetry, via cron) links them into the structured
+    models. No model linking happens in the request path.
+    """
+    # Drop obvious bots — they only inflate the data.
+    ua = request.META.get("HTTP_USER_AGENT", "")
+    if _BOT_RE.search(ua):
+        return JsonResponse({"status": "ignored"})
+
+    raw = request.data
+    if isinstance(raw, dict) and isinstance(raw.get("events"), list):
+        events = raw["events"]
+    elif isinstance(raw, list):
+        events = raw
+    elif isinstance(raw, dict):
+        events = [raw]
+    else:
+        events = []
+
+    if not events:
+        return Response({"detail": "no events"}, status=400)
+
+    events = events[:MAX_EVENTS_PER_REQUEST]
+    ip = _client_ip(request)
+    now_iso = timezone.now().isoformat()
+    user_id = request.user.id if (request.user and request.user.is_authenticated) else None
+
+    rows = []
+    for ev in events:
+        if not isinstance(ev, dict):
+            continue
+        if not str(ev.get("session_id") or "").strip():
+            continue
+        ev["ip_address"] = ip
+        # Trust the server clock for ordering, not the client's.
+        ev["timestamp"] = now_iso
+        if user_id:
+            ev["user_id"] = user_id
+        rows.append(RawTelemetryEvent(payload=ev))
+
+    if rows:
+        try:
+            RawTelemetryEvent.objects.bulk_create(rows)
+        except Exception:
+            logger.exception("Telemetry spool insert failed")
+
+    # Self-healing valve: if the processor (cron) isn't keeping up, drain a
+    # little inline. Sampled (~3%) so it adds no per-request cost normally.
+    if random.random() < 0.03:
+        try:
+            if unprocessed_backlog() > BACKLOG_VALVE_THRESHOLD:
+                process_spool(batch_size=200)
+        except Exception:
+            logger.exception("Inline telemetry drain failed")
 
     return JsonResponse({"status": "received"})
 

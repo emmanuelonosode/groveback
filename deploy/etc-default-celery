@@ -1,0 +1,29 @@
+# ── Hasker & Co. — Celery environment file ───────────────────────────────────
+# Copy this to /etc/default/celery on the server, then fill the two <REPLACE> paths.
+#
+#   sudo cp deploy/etc-default-celery /etc/default/celery
+#   sudo nano /etc/default/celery
+
+# Celery app — this project's app lives in config/celery.py, referenced as "config".
+CELERY_APP="config"
+
+# Absolute path to the `celery` binary inside your virtualenv.
+# Find it:  source <your-venv>/bin/activate && which celery
+CELERY_BIN="<REPLACE: /full/path/to/backend/venv/bin/celery>"
+
+# Absolute path to the Django project folder (the one that contains manage.py).
+CELERYD_CHDIR="<REPLACE: /full/path/to/backend>"
+
+# ── Worker ────────────────────────────────────────────────────────────────────
+CELERYD_NODES="w1"
+CELERYD_OPTS="--concurrency=2"
+CELERYD_PID_FILE="/run/celery/%n.pid"
+CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
+CELERYD_LOG_LEVEL="INFO"
+
+# ── Beat (scheduler) ────────────────────────────────────────────────────────────
+CELERYBEAT_PID_FILE="/run/celery/beat.pid"
+CELERYBEAT_LOG_FILE="/var/log/celery/beat.log"
+
+# Django settings used by the worker/beat processes.
+export DJANGO_SETTINGS_MODULE="config.settings.production"

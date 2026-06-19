@@ -1,12 +1,19 @@
 import os
 from celery import Celery
 from celery.schedules import crontab
+from decouple import config
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 
-_REDIS = "redis://:qwjiBno7nAJiJdJW4ec@127.0.0.1:35717/0"
+# Broker comes from REDIS_URL (set in .env). Defaults to a standard local Redis
+# so a fresh VPS install works out of the box. Read via decouple (same as the
+# rest of the app) so it isn't overwritten by Django settings lazy-loading.
+_REDIS = config("REDIS_URL", default="redis://localhost:6379/0")
 
-app = Celery("hasker")
+# `include` forces these task modules to import at worker startup, so every
+# beat-scheduled task is registered deterministically (autodiscover timing can
+# otherwise miss them and beat would dispatch tasks the worker can't run).
+app = Celery("hasker", include=["apps.notifications.tasks", "apps.analytics.tasks"])
 
 # Bypass config_from_object — Django settings lazy-loading overwrites broker_url.
 # Set everything directly so Redis is locked in from the start.
@@ -31,6 +38,10 @@ app.conf.update(
         "schedule-viewing-reminders": {
             "task": "apps.notifications.tasks.schedule_viewing_reminders",
             "schedule": crontab(minute=0),
+        },
+        "process-telemetry-spool": {
+            "task": "apps.analytics.tasks.flush_analytics_telemetry",
+            "schedule": crontab(),  # every minute — drains the analytics spool
         },
     },
 )
