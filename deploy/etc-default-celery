@@ -26,4 +26,5 @@ CELERYBEAT_PID_FILE="/run/celery/beat.pid"
 CELERYBEAT_LOG_FILE="/var/log/celery/beat.log"
 
 # Django settings used by the worker/beat processes.
-export DJANGO_SETTINGS_MODULE="config.settings.production"
+# NOTE: systemd EnvironmentFile wants plain KEY=value — do NOT prefix with `export`.
+DJANGO_SETTINGS_MODULE="config.settings.production"
