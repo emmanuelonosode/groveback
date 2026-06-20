@@ -112,7 +112,9 @@ def _discounted_rent(value):
 
 
 def _load_json(path):
-    opener = gzip.open if str(path).endswith(".gz") else open
+    with open(path, "rb") as test_file:
+        magic = test_file.read(2)
+    opener = gzip.open if magic == b"\x1f\x8b" else open
     with opener(path, "rt", encoding="utf-8") as handle:
         return json.load(handle)
 
