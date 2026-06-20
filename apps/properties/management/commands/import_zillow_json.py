@@ -28,10 +28,6 @@ AMENITY_KEYWORDS = [
     ("refrigerator", "kitchen"),
     ("microwave", "kitchen"),
     ("stainless", "kitchen"),
-    ("granite", "kitchen"),
-    ("quartz", "kitchen"),
-    ("oven", "kitchen"),
-    ("range", "kitchen"),
     ("washer", "utility"),
     ("dryer", "utility"),
     ("laundry", "utility"),
@@ -40,43 +36,15 @@ AMENITY_KEYWORDS = [
     ("thermostat", "utility"),
     ("pool", "community"),
     ("fitness", "community"),
-    ("playground", "community"),
-    ("dog park", "community"),
-    ("tennis", "community"),
-    ("basketball", "community"),
-    ("trail", "community"),
-    ("gated", "community"),
     ("clubhouse", "community"),
+    ("showcase", "community"),
+    ("featured", "community"),
+    ("3d tour", "community"),
     ("garage", "community"),
-    ("yard", "community"),
-    ("patio", "community"),
     ("pet", "pet"),
     ("dog", "pet"),
     ("cat", "pet"),
 ]
-
-STATE_BY_MARKET_SLUG = {
-    "atlanta-georgia": "GA",
-    "austin-texas": "TX",
-    "charlotte-north-carolina": "NC",
-    "chicago-illinois": "IL",
-    "dallas-texas": "TX",
-    "denver-colorado": "CO",
-    "houston-texas": "TX",
-    "jacksonville-florida": "FL",
-    "las-vegas-nevada": "NV",
-    "los-angeles-california": "CA",
-    "miami-florida": "FL",
-    "minneapolis-minnesota": "MN",
-    "nashville-tennessee": "TN",
-    "orlando-florida": "FL",
-    "phoenix-arizona": "AZ",
-    "sacramento-california": "CA",
-    "salt-lake-city-utah": "UT",
-    "san-antonio-texas": "TX",
-    "seattle-washington": "WA",
-    "tampa-florida": "FL",
-}
 
 
 def _text(value):
@@ -117,32 +85,6 @@ def _load_json(path):
         return json.load(handle)
 
 
-def _city_from_address(address):
-    city = _text(address.get("city"))
-    if city:
-        return city
-    address_line = _text(address.get("address_1") or address.get("full_address"))
-    match = re.search(r"\s([A-Za-z .'-]+),\s*[A-Z]{2}\s+\d{5}", address_line)
-    return match.group(1).strip() if match else ""
-
-
-def _state_from(raw, summary):
-    address = raw.get("address") or {}
-    state = _text(address.get("state"))
-    if len(state) == 2:
-        return state.upper()
-    market_slug = _text(summary.get("market_slug") or raw.get("market_slug"))
-    return STATE_BY_MARKET_SLUG.get(market_slug, state[:2].upper())
-
-
-def _zip_from(address, slug):
-    zip_code = _text(address.get("zip_code") or address.get("postal_code"))
-    if zip_code:
-        return zip_code[:10]
-    match = re.search(r"-(\d{5})-\d+$", _text(slug))
-    return match.group(1) if match else ""
-
-
 def _category_key(name):
     lowered = name.lower()
     for keyword, category in AMENITY_KEYWORDS:
@@ -156,7 +98,7 @@ def _photo_url(photo):
         return photo if photo.startswith("http") else ""
     if not isinstance(photo, dict):
         return ""
-    for key in ("image_url", "url", "src", "imageUrl", "originalUrl", "cdnUrl", "largeUrl"):
+    for key in ("image_url", "url", "src", "thumbnail_url"):
         value = photo.get(key)
         if isinstance(value, str) and value.startswith("http"):
             return value
@@ -168,12 +110,7 @@ def _amenity_name(amenity):
         return amenity.strip()
     if not isinstance(amenity, dict):
         return ""
-    for key in ("name", "display_name", "displayName", "label", "title"):
-        value = amenity.get(key)
-        if value:
-            return str(value).strip()
-    slug = amenity.get("slug")
-    return str(slug).replace("-", " ").title().strip() if slug else ""
+    return _text(amenity.get("name") or amenity.get("displayString") or amenity.get("slug"))
 
 
 def _insert_images_raw(property_id, urls):
@@ -199,12 +136,11 @@ def _insert_images_raw(property_id, urls):
 
 
 class Command(BaseCommand):
-    help = "Import scraped Invitation Homes JSON into the database."
+    help = "Import scraped Zillow rental JSON into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument("--json", required=True, help="Path to invitationhomes_properties_latest.json or .json.gz")
-        parser.add_argument("--clear", action="store_true", help="Delete existing imported Invitation Homes rows first.")
-        parser.add_argument("--markets", default=None, help="Comma-separated market slugs to import.")
+        parser.add_argument("--json", required=True, help="Path to zillow_rentals_latest.json or .json.gz")
+        parser.add_argument("--clear", action="store_true", help="Delete existing Zillow imported rows first.")
         parser.add_argument("--limit", type=int, default=None, help="Maximum properties to import.")
         parser.add_argument("--dry-run", action="store_true", help="Validate and count without writing.")
 
@@ -218,34 +154,20 @@ class Command(BaseCommand):
         properties = payload.get("properties")
         if not isinstance(properties, list):
             raise CommandError("Expected top-level JSON key 'properties' to be a list.")
+        if options["limit"]:
+            properties = properties[: options["limit"]]
 
-        market_filter = (
-            {market.strip() for market in options["markets"].split(",") if market.strip()}
-            if options["markets"]
-            else None
-        )
-        selected = []
-        for item in properties:
-            summary = item.get("summary") or {}
-            raw = item.get("raw") or {}
-            market_slug = _text(summary.get("market_slug") or raw.get("market_slug"))
-            if market_filter and market_slug not in market_filter:
-                continue
-            selected.append(item)
-            if options["limit"] and len(selected) >= options["limit"]:
-                break
-
-        self.stdout.write(f"Selected {len(selected)} properties from JSON.")
+        self.stdout.write(f"Selected {len(properties)} Zillow properties from JSON.")
         if options["dry_run"]:
             self.stdout.write(self.style.WARNING("DRY RUN - nothing written."))
-            self.stdout.write(f"Images found: {sum(len((item.get('summary') or {}).get('photos') or []) for item in selected)}")
-            self.stdout.write(f"Amenities found: {sum(len((item.get('summary') or {}).get('amenities') or []) for item in selected)}")
+            self.stdout.write(f"Images found: {sum(len((item.get('summary') or {}).get('photos') or []) for item in properties)}")
+            self.stdout.write(f"Amenities found: {sum(len((item.get('summary') or {}).get('amenities') or []) for item in properties)}")
             return
 
         with transaction.atomic():
             if options["clear"]:
-                deleted, _ = Property.objects.filter(agent__email="agent@haskerrealtygroup.com").delete()
-                self.stdout.write(self.style.WARNING(f"Cleared {deleted} imported Invitation Homes rows."))
+                deleted, _ = Property.objects.filter(agent__email="zillow@haskerrealtygroup.com").delete()
+                self.stdout.write(self.style.WARNING(f"Cleared {deleted} existing Zillow imported rows."))
 
             categories = {}
             for key, name, icon, order in CATEGORIES:
@@ -256,12 +178,12 @@ class Command(BaseCommand):
                 categories[key] = category
 
             agent, created = User.objects.get_or_create(
-                email="agent@haskerrealtygroup.com",
+                email="zillow@haskerrealtygroup.com",
                 defaults={
-                    "first_name": "Marcus",
-                    "last_name": "Reid",
+                    "first_name": "Zillow",
+                    "last_name": "Rentals",
                     "role": Role.AGENT,
-                    "phone": "(757) 555-0101",
+                    "phone": "(757) 555-0199",
                 },
             )
             if created:
@@ -271,47 +193,47 @@ class Command(BaseCommand):
             existing_slugs = set(Property.objects.values_list("slug", flat=True))
             total_properties = total_images = total_amenities = skipped = 0
 
-            for item in selected:
+            for item in properties:
                 summary = item.get("summary") or {}
-                raw = item.get("raw") or {}
-                address = raw.get("address") or {}
-                slug = _text(summary.get("slug") or raw.get("slug"))
-                db_slug = re.sub(r"^invh-", "", slug).strip("-")
-                if not db_slug:
-                    db_slug = slugify(f"{summary.get('address') or raw.get('property_id')}")
-                if not db_slug or db_slug in existing_slugs:
+                address = summary.get("address") or {}
+                location = summary.get("map_location") or {}
+                slug = _text(summary.get("slug"))
+                if not slug:
+                    slug = f"zillow-{slugify(_text(address.get('full_address') or summary.get('property_id')))}"
+                base_slug = slug
+                counter = 1
+                while slug in existing_slugs:
+                    counter += 1
+                    slug = f"{base_slug}-{counter}"
+                if not slug:
                     skipped += 1
                     continue
 
-                beds = _int(summary.get("beds") or raw.get("beds"), 0)
-                baths = _decimal(summary.get("baths") or raw.get("baths"), Decimal("0"))
-                price = _discounted_rent(summary.get("rent") or raw.get("rent"))
-                sqft = _int(summary.get("square_footage") or raw.get("square_footage"), 0)
-                year_built = _int(summary.get("year_built") or raw.get("year_built"), None)
-                city = _city_from_address(address) or _text(summary.get("market_name") or raw.get("market_name"))
-                state = _state_from(raw, summary)
-                address_1 = _text(address.get("address_1") or summary.get("address"))
-                zip_code = _zip_from(address, slug)
-                neighborhood = _text(summary.get("neighborhood")) or _text(raw.get("portfolio_group"))
-                description = _text(summary.get("description") or raw.get("description"))
-                map_location = summary.get("map_location") or raw.get("map_location") or {}
-                latitude = _decimal(map_location.get("latitude") or map_location.get("lat"), None)
-                longitude = _decimal(map_location.get("longitude") or map_location.get("lng"), None)
-
-                bed_label = "Studio" if beds == 0 else f"{beds}-Bed"
+                beds = _int(summary.get("beds"), 0)
+                baths = _decimal(summary.get("baths"), Decimal("0"))
+                rent = _discounted_rent(summary.get("rent"))
+                sqft = _int(summary.get("square_footage"), 0)
+                year_built = _int(summary.get("year_built"), None)
+                city = _text(address.get("city") or summary.get("market_name"))
+                state = _text(address.get("state"))[:2].upper()
+                address_1 = _text(address.get("address_1") or address.get("full_address"))
+                zip_code = _text(address.get("zip_code"))[:10]
+                neighborhood = _text(summary.get("neighborhood") or city)[:100]
+                description = _text(summary.get("description"))
                 title_address = address_1 or city
+                bed_label = "Studio" if beds == 0 else f"{beds}-Bed"
                 title = f"{bed_label} House for Rent - {title_address}, {city}, {state}".strip(" ,-")
-                amenities = summary.get("amenities") or raw.get("amenities") or []
+                amenities = summary.get("amenities") or []
 
                 prop = Property.objects.create(
                     agent=agent,
-                    slug=db_slug,
+                    slug=slug,
                     title=title[:200],
-                    description=description or f"A rental home available in {city}, {state}.",
+                    description=description or f"A Zillow rental listing available in {city}, {state}.",
                     type="residential",
                     listing_type="for-rent",
                     status="available",
-                    price=price,
+                    price=rent,
                     price_label="/mo",
                     bedrooms=beds,
                     bathrooms=baths,
@@ -320,24 +242,26 @@ class Command(BaseCommand):
                     garage=1 if any("garage" in _amenity_name(a).lower() for a in amenities) else 0,
                     address=address_1[:200],
                     city=city[:100],
-                    state=state[:2],
+                    state=state,
                     zip_code=zip_code,
-                    latitude=latitude,
-                    longitude=longitude,
-                    neighborhood=neighborhood[:100],
+                    latitude=_decimal(location.get("latitude"), None),
+                    longitude=_decimal(location.get("longitude"), None),
+                    neighborhood=neighborhood,
                     condition="excellent",
                     cross_street="",
-                    virtual_tour_url=_text(summary.get("virtual_tour_url") or raw.get("virtual_tour_url")),
-                    tour_360_url=_text(summary.get("virtual_tour_url_mobile") or raw.get("virtual_tour_url_mobile")),
+                    virtual_tour_url=_text(summary.get("virtual_tour_url")),
+                    tour_360_url=_text(summary.get("virtual_tour_url_mobile")),
                     is_featured=bool((summary.get("flags") or {}).get("is_featured_listing")),
                     is_published=True,
                 )
 
-                existing_slugs.add(db_slug)
+                existing_slugs.add(slug)
                 total_properties += 1
 
-                photos = summary.get("photos") or raw.get("photos") or []
-                total_images += _insert_images_raw(prop.id, [_photo_url(photo) for photo in photos])
+                total_images += _insert_images_raw(
+                    prop.id,
+                    [_photo_url(photo) for photo in summary.get("photos") or []],
+                )
 
                 amenity_objects = []
                 seen_amenities = set()
@@ -358,11 +282,11 @@ class Command(BaseCommand):
                     total_amenities += len(amenity_objects)
 
                 if total_properties % 250 == 0:
-                    self.stdout.write(f"Imported {total_properties} properties...")
+                    self.stdout.write(f"Imported {total_properties} Zillow properties...")
 
-        self.stdout.write(self.style.SUCCESS("Invitation Homes JSON import complete."))
+        self.stdout.write(self.style.SUCCESS("Zillow JSON import complete."))
         self.stdout.write(self.style.SUCCESS(f"Properties imported: {total_properties}"))
         self.stdout.write(self.style.SUCCESS(f"Images imported: {total_images}"))
         self.stdout.write(self.style.SUCCESS(f"Amenities imported: {total_amenities}"))
         if skipped:
-            self.stdout.write(self.style.WARNING(f"Skipped existing/invalid rows: {skipped}"))
+            self.stdout.write(self.style.WARNING(f"Skipped invalid rows: {skipped}"))
