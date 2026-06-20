@@ -14,16 +14,23 @@ def _resolve_image_url(image_field):
 
     Fix: read .public_id directly (the raw stored string), check it's a
     full URL, and only fall back to .url (Cloudinary-generated) if it isn't.
+    If the CloudinaryResource stripped the format/extension, we restore it.
     """
     if not image_field:
         return None
     # CloudinaryResource stores the raw DB value in .public_id
     raw = getattr(image_field, "public_id", None)
     if raw and isinstance(raw, str) and raw.startswith("http"):
+        ext = getattr(image_field, "format", None)
+        if ext and not raw.endswith(f".{ext}"):
+            return f"{raw}.{ext}"
         return raw
     # Fallback: str() — works if SDK returns public_id from __str__
     val = str(image_field)
     if val and val.startswith("http"):
+        ext = getattr(image_field, "format", None)
+        if ext and not val.endswith(f".{ext}"):
+            return f"{val}.{ext}"
         return val
     # Last resort: Cloudinary-generated URL (only for native Cloudinary assets)
     try:

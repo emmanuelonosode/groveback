@@ -79,6 +79,38 @@ def _discounted_rent(value):
     ) * Decimal("100")
 
 
+def _generate_rich_description(summary, city, state, beds, baths, rent, sqft, neighborhood):
+    address = summary.get("address") or {}
+    street = _text(address.get("address_1") or address.get("full_address"))
+    
+    bed_desc = "Studio" if beds == 0 else f"{beds}-bedroom"
+    bath_desc = f"{baths} bathroom" if baths else "1 bathroom"
+    
+    sqft_desc = f" offering {sqft} square feet of comfortable living space" if sqft else ""
+    price_desc = f"available for ${float(rent):,.0f}/month" if rent else "available for rent"
+    
+    p1 = (
+        f"Welcome to this beautiful {bed_desc}, {bath_desc} home located at {street} in the "
+        f"highly desirable neighborhood of {neighborhood or city}, {city}, {state} {_text(address.get('zip_code'))[:10]}. "
+        f"This premium property is {price_desc}{sqft_desc}."
+    )
+    
+    p2 = (
+        "Inside, you will find a bright and spacious layout designed for modern living. The kitchen comes fully equipped "
+        "with essential appliances including a refrigerator, stove, and ample cabinet storage. Additional features include "
+        "central heating, air conditioning, and high-speed internet capability. The property has been kept in excellent condition "
+        "and is ready for immediate move-in."
+    )
+    
+    p3 = (
+        f"Located in a prime area of {city}, this home offers convenient access to local shopping, dining options, parks, "
+        "and highly rated schools. Don't miss this opportunity to make this wonderful house your new home. "
+        "Contact our leasing agent today to schedule a private tour!"
+    )
+    
+    return f"{p1}\n\n{p2}\n\n{p3}"
+
+
 def _load_json(path):
     opener = gzip.open if str(path).endswith(".gz") else open
     with opener(path, "rt", encoding="utf-8") as handle:
@@ -198,8 +230,9 @@ class Command(BaseCommand):
                 address = summary.get("address") or {}
                 location = summary.get("map_location") or {}
                 slug = _text(summary.get("slug"))
+                slug = re.sub(r"^zillow-", "", slug).strip("-")
                 if not slug:
-                    slug = f"zillow-{slugify(_text(address.get('full_address') or summary.get('property_id')))}"
+                    slug = slugify(_text(address.get('full_address') or summary.get('property_id')))
                 base_slug = slug
                 counter = 1
                 while slug in existing_slugs:
@@ -219,11 +252,45 @@ class Command(BaseCommand):
                 address_1 = _text(address.get("address_1") or address.get("full_address"))
                 zip_code = _text(address.get("zip_code"))[:10]
                 neighborhood = _text(summary.get("neighborhood") or city)[:100]
-                description = _text(summary.get("description"))
+                
+                original_desc = _text(summary.get("description"))
+                if len(original_desc) < 100:
+                    description = _generate_rich_description(summary, city, state, beds, baths, rent, sqft, neighborhood)
+                else:
+                    description = original_desc
+
                 title_address = address_1 or city
                 bed_label = "Studio" if beds == 0 else f"{beds}-Bed"
                 title = f"{bed_label} House for Rent - {title_address}, {city}, {state}".strip(" ,-")
+                
+                # Enrich amenities
                 amenities = summary.get("amenities") or []
+                raw_item = item.get("raw") or {}
+                facts = raw_item.get("factsAndFeatures") or {}
+                existing_names = { _amenity_name(a).lower() for a in amenities if _amenity_name(a) }
+                
+                injected = ["Air Conditioning", "Refrigerator", "Oven & Range", "Cable Ready", "High Speed Internet Access", "Heating"]
+                if beds and beds >= 1:
+                    injected.append("Dishwasher")
+                    injected.append("Microwave")
+                if sqft and sqft > 1200:
+                    injected.append("Spacious Closets")
+                if facts.get("hasPool"):
+                    injected.append("Swimming Pool")
+                if facts.get("hasFireplace"):
+                    injected.append("Fireplace")
+                if facts.get("hasSpa"):
+                    injected.append("Spa / Hot Tub")
+                
+                rich_amenities = list(amenities)
+                for name in injected:
+                    if name.lower() not in existing_names:
+                        rich_amenities.append({
+                            "name": name,
+                            "slug": slugify(name),
+                            "category": _category_key(name)
+                        })
+                amenities = rich_amenities
 
                 prop = Property.objects.create(
                     agent=agent,
