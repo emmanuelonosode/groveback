@@ -7,8 +7,7 @@ mysqlclient>=2.2
 redis>=4.0
 celery>=5.0
 django-celery-beat>=2.0
-cloudinary>=1.0
-django-cloudinary-storage>=0.3
+
 Pillow>=9.0
 WeasyPrint>=60.0
 python-decouple>=3.0

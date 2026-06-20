@@ -110,12 +110,12 @@ def send_verification_email(user_id: int):
 # ---------------------------------------------------------------------------
 
 def generate_invoice_pdf(invoice_id: int):
-    """Render invoice HTML → PDF via WeasyPrint → upload to Cloudinary."""
+    """Render invoice HTML → PDF via WeasyPrint → save locally."""
     try:
         from apps.transactions.models import Invoice
-        import cloudinary.uploader
         from weasyprint import HTML
-        import tempfile, os
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
 
         invoice = Invoice.objects.select_related(
             "transaction__client__lead",
@@ -124,22 +124,16 @@ def generate_invoice_pdf(invoice_id: int):
         ).get(pk=invoice_id)
 
         html_string = render_to_string("notifications/invoice_pdf.html", {"invoice": invoice})
+        pdf_bytes = HTML(string=html_string, base_url=settings.FRONTEND_URL).write_pdf()
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-            HTML(string=html_string, base_url=settings.FRONTEND_URL).write_pdf(tmp.name)
-            tmp_path = tmp.name
+        file_name = f"invoices/invoice_{invoice.invoice_number}.pdf"
+        if default_storage.exists(file_name):
+            default_storage.delete(file_name)
+        saved_name = default_storage.save(file_name, ContentFile(pdf_bytes))
+        final_url = default_storage.url(saved_name)
 
-        result = cloudinary.uploader.upload(
-            tmp_path,
-            resource_type="raw",
-            folder="hasker/invoices",
-            public_id=f"invoice_{invoice.invoice_number}",
-            overwrite=True,
-        )
-        os.unlink(tmp_path)
-
-        Invoice.objects.filter(pk=invoice_id).update(pdf=result["secure_url"])
-        return f"Invoice PDF generated: {result['secure_url']}"
+        Invoice.objects.filter(pk=invoice_id).update(pdf=final_url)
+        return f"Invoice PDF generated: {final_url}"
 
     except Exception:
         logger.exception("generate_invoice_pdf failed for invoice %s", invoice_id)
@@ -147,12 +141,12 @@ def generate_invoice_pdf(invoice_id: int):
 
 
 def generate_payment_receipt(payment_id: int):
-    """Generate a PDF receipt for a completed payment."""
+    """Generate a PDF receipt for a completed payment and save locally."""
     try:
         from apps.transactions.models import Payment
-        import cloudinary.uploader
         from weasyprint import HTML
-        import tempfile, os
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
 
         payment = Payment.objects.select_related(
             "transaction__client__lead",
@@ -160,22 +154,16 @@ def generate_payment_receipt(payment_id: int):
         ).get(pk=payment_id)
 
         html_string = render_to_string("notifications/receipt_pdf.html", {"payment": payment})
+        pdf_bytes = HTML(string=html_string, base_url=settings.FRONTEND_URL).write_pdf()
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-            HTML(string=html_string, base_url=settings.FRONTEND_URL).write_pdf(tmp.name)
-            tmp_path = tmp.name
+        file_name = f"receipts/receipt_payment_{payment.pk}.pdf"
+        if default_storage.exists(file_name):
+            default_storage.delete(file_name)
+        saved_name = default_storage.save(file_name, ContentFile(pdf_bytes))
+        final_url = default_storage.url(saved_name)
 
-        result = cloudinary.uploader.upload(
-            tmp_path,
-            resource_type="raw",
-            folder="hasker/receipts",
-            public_id=f"receipt_payment_{payment.pk}",
-            overwrite=True,
-        )
-        os.unlink(tmp_path)
-
-        Payment.objects.filter(pk=payment_id).update(receipt_pdf=result["secure_url"])
-        return f"Receipt PDF generated: {result['secure_url']}"
+        Payment.objects.filter(pk=payment_id).update(receipt_pdf=final_url)
+        return f"Receipt PDF generated: {final_url}"
 
     except Exception:
         logger.exception("generate_payment_receipt failed for payment %s", payment_id)
@@ -891,13 +879,12 @@ def send_application_submitted_email(application_id: int):
 
 
 def generate_rental_application_pdf(application_id: int):
-    """Render rental application → WeasyPrint PDF → Cloudinary → email applicant + agent."""
+    """Render rental application → WeasyPrint PDF → save locally → email applicant + agent."""
     try:
-        import tempfile
-        import os
-        import cloudinary.uploader
         from weasyprint import HTML
         from apps.crm.models import RentalApplication
+        from django.core.files.storage import default_storage
+        from django.core.files.base import ContentFile
 
         app = RentalApplication.objects.select_related(
             "rental_property", "rental_property__agent", "lead",
@@ -907,26 +894,20 @@ def generate_rental_application_pdf(application_id: int):
             "notifications/rental_application_pdf.html",
             {"app": app},
         )
+        pdf_bytes = HTML(string=html_string).write_pdf()
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-            HTML(string=html_string).write_pdf(tmp.name)
-            tmp_path = tmp.name
-
-        result = cloudinary.uploader.upload(
-            tmp_path,
-            resource_type="raw",
-            folder="hasker/rental_applications",
-            public_id=f"application_{app.pk}_{app.last_name.lower()}",
-            overwrite=True,
-        )
-        os.unlink(tmp_path)
+        file_name = f"rental_applications/application_{app.pk}_{app.last_name.lower()}.pdf"
+        if default_storage.exists(file_name):
+            default_storage.delete(file_name)
+        saved_name = default_storage.save(file_name, ContentFile(pdf_bytes))
+        final_url = default_storage.url(saved_name)
 
         RentalApplication.objects.filter(pk=application_id).update(
-            application_pdf=result["secure_url"]
+            application_pdf=final_url
         )
 
-        _send_rental_application_emails(app, result["secure_url"])
-        return f"Rental application PDF generated: {result['secure_url']}"
+        _send_rental_application_emails(app, final_url)
+        return f"Rental application PDF generated: {final_url}"
 
     except Exception:
         logger.exception("generate_rental_application_pdf failed for application %s", application_id)
@@ -982,13 +963,11 @@ def _resolve_lead_city(lead) -> str:
 
 
 def _build_property_image_urls(prop, count: int = 1) -> list:
-    """Pre-build Cloudinary image URLs for a property."""
+    """Pre-build image URLs for a property."""
     urls = []
     try:
         for img in prop.images.all()[:count]:
-            raw = str(img.image.url)
-            if "res.cloudinary.com" in raw and "/upload/" in raw:
-                raw = raw.replace("/upload/", "/upload/c_fill,q_auto,f_jpg/")
+            raw = getattr(img.image, "url", str(img.image))
             urls.append(raw)
     except Exception:
         pass

@@ -4,7 +4,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from decimal import Decimal
 from pathlib import Path
 
-import cloudinary.uploader
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 
@@ -37,20 +36,7 @@ AMENITY_CATEGORIES = [
 ]
 
 
-def _upload_image(task):
-    prop_id, order, url = task
-    stable_id = f"properties/nationwide/{prop_id}/{order}"
-    try:
-        result = cloudinary.uploader.upload(
-            url,
-            public_id=stable_id,
-            resource_type="image",
-            overwrite=False,
-            unique_filename=False,
-        )
-        return (prop_id, order, result["public_id"], None)
-    except Exception as exc:
-        return (prop_id, order, None, str(exc))
+
 
 
 class Command(BaseCommand):
@@ -181,43 +167,11 @@ class Command(BaseCommand):
         # ── 5. Upload images to Cloudinary in parallel ────────────────────────
         # public_id = properties/nationwide/{prop_id}/{order}
         # overwrite=False means re-runs reuse existing Cloudinary assets.
-        cloudinary_map: dict[tuple, str] = {}  # (prop_id, order) -> public_id
+        cloudinary_map: dict[tuple, str] = {}  # (prop_id, order) -> image_url
 
         if not skip_images:
-            tasks = [
-                (img["property_id"], img["order"], img["image"])
-                for img in raw_imgs
-            ]
-            total_tasks  = len(tasks)
-            done = failed = 0
-
-            self.stdout.write(
-                f"Uploading {total_tasks} images to Cloudinary "
-                f"({workers} parallel workers) ..."
-            )
-
-            with ThreadPoolExecutor(max_workers=workers) as pool:
-                futures = {pool.submit(_upload_image, t): t for t in tasks}
-                for future in as_completed(futures):
-                    prop_id, order, public_id, err = future.result()
-                    if public_id:
-                        cloudinary_map[(prop_id, order)] = public_id
-                        done += 1
-                    else:
-                        failed += 1
-                        self.stdout.write(self.style.WARNING(
-                            f"  Upload failed ({prop_id} order={order}): {err}"
-                        ))
-                    total_done = done + failed
-                    if total_done % 500 == 0:
-                        self.stdout.write(
-                            f"  [{total_done}/{total_tasks}] "
-                            f"uploaded={done} failed={failed}"
-                        )
-
-            self.stdout.write(
-                f"Upload complete: {done} succeeded, {failed} failed."
-            )
+            for img in raw_imgs:
+                cloudinary_map[(img["property_id"], img["order"])] = img["image"]
 
         # ── 6. Import properties ──────────────────────────────────────────────
         created_count = skipped_count = fixed_states = 0

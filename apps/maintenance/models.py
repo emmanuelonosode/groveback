@@ -1,5 +1,4 @@
 from django.db import models
-from cloudinary.models import CloudinaryField
 
 
 class MaintenanceRequest(models.Model):
@@ -32,7 +31,7 @@ class MaintenanceRequest(models.Model):
     category              = models.CharField(max_length=20, choices=Category.choices)
     priority              = models.CharField(max_length=10, choices=Priority.choices, default=Priority.MEDIUM)
     status                = models.CharField(max_length=20, choices=ReqStatus.choices, default=ReqStatus.SUBMITTED)
-    photo                 = CloudinaryField("photo", blank=True, null=True)
+    photo                 = models.ImageField("photo", upload_to="maintenance/", blank=True, null=True)
     preferred_access_time = models.CharField(max_length=200, blank=True)
     staff_notes           = models.TextField(blank=True)
     resolved_at           = models.DateTimeField(null=True, blank=True)

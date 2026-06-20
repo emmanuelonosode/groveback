@@ -363,7 +363,7 @@ class RentalApplication(models.Model):
     application_pdf = models.CharField(
         max_length=500,
         blank=True,
-        help_text="Cloudinary URL of the generated application PDF.",
+        help_text="URL of the generated application PDF.",
     )
 
     class Meta:

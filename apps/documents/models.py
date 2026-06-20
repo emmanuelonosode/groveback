@@ -1,5 +1,4 @@
 from django.db import models
-from cloudinary.models import CloudinaryField
 
 
 class DocumentType(models.TextChoices):
@@ -18,7 +17,7 @@ class ClientDocument(models.Model):
         related_name="documents",
     )
     name = models.CharField(max_length=200)
-    file = CloudinaryField("file", resource_type="raw")
+    file = models.FileField("file", upload_to="documents/")
     document_type = models.CharField(max_length=20, choices=DocumentType.choices, default=DocumentType.OTHER)
     is_signed = models.BooleanField(default=False)
     uploaded_by = models.ForeignKey(

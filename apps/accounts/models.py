@@ -3,7 +3,6 @@ from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 import secrets
-from cloudinary.models import CloudinaryField
 
 
 import logging
@@ -41,7 +40,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=20, blank=True)
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.CLIENT)
-    avatar = CloudinaryField("avatar", blank=True, null=True)
+    avatar = models.ImageField("avatar", upload_to="avatars/", blank=True, null=True)
     
     # Verification & Onboarding Fields
     is_email_verified = models.BooleanField(default=False)
@@ -183,7 +182,7 @@ class AgentProfile(models.Model):
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE, related_name="agent_profile"
     )
-    avatar = CloudinaryField("profile_photo", blank=True, null=True)
+    avatar = models.ImageField("profile_photo", upload_to="agent_avatars/", blank=True, null=True)
     bio = models.TextField(blank=True)
     license_number = models.CharField(max_length=50, blank=True)
     specialties = models.JSONField(default=list, blank=True)

@@ -145,7 +145,7 @@ class Payment(models.Model):
     proof_image = models.CharField(
         max_length=500, 
         blank=True, 
-        help_text="Cloudinary URL of the receipt/screenshot"
+        help_text="URL of the receipt/screenshot"
     )
     
     verified_by = models.ForeignKey(
@@ -159,7 +159,7 @@ class Payment(models.Model):
 
     paid_at = models.DateTimeField(null=True, blank=True)
     receipt_sent = models.BooleanField(default=False)
-    receipt_pdf = models.CharField(max_length=500, blank=True, help_text="Cloudinary URL of generated PDF receipt")
+    receipt_pdf = models.CharField(max_length=500, blank=True, help_text="URL of generated PDF receipt")
     notes = models.TextField(blank=True)
     allocated_items = models.JSONField(
         default=list,
@@ -202,7 +202,7 @@ class Invoice(models.Model):
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     tax_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total = models.DecimalField(max_digits=12, decimal_places=2)
-    pdf = models.CharField(max_length=500, blank=True, help_text="Cloudinary URL of generated PDF invoice")
+    pdf = models.CharField(max_length=500, blank=True, help_text="URL of generated PDF invoice")
     status = models.CharField(max_length=10, choices=InvoiceStatus.choices, default=InvoiceStatus.DRAFT)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -27,8 +27,6 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
     "django_filters",
-    "cloudinary",
-    "cloudinary_storage",
     "django_celery_beat",
 ]
 
@@ -131,33 +129,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Required so unfold/widgets/*.html templates in the project templates dir are found.
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
-# ── Cloudinary ─────────────────────────────────────────────────────────────────
-CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME", default="")
-CLOUDINARY_API_KEY    = config("CLOUDINARY_API_KEY", default="")
-CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", default="")
-
 # AI-powered natural-language search (optional — search degrades gracefully to the
 # regex parser when this is unset, so leaving it blank disables AI search safely).
 GEMINI_API_KEY = config("GEMINI_API_KEY", default="")
 GEMINI_MODEL   = config("GEMINI_MODEL", default="gemini-2.5-flash")
-
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
-    "API_KEY":    CLOUDINARY_API_KEY,
-    "API_SECRET": CLOUDINARY_API_SECRET,
-    "SECURE":     True,               # always return https:// URLs
-}
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-# Initialise the Cloudinary SDK immediately so cloudinary.uploader works in
-# Celery tasks and management commands (before Django's app-registry ready()).
-import cloudinary
-cloudinary.config(
-    cloud_name=CLOUDINARY_CLOUD_NAME,
-    api_key=CLOUDINARY_API_KEY,
-    api_secret=CLOUDINARY_API_SECRET,
-    secure=True,
-)
 
 # ── DRF ────────────────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {

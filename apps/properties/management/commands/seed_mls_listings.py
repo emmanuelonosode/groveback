@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-import cloudinary.uploader
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 
@@ -708,21 +707,7 @@ class Command(BaseCommand):
             if not skip_images:
                 image_objs = []
                 for img in listing["images"]:
-                    try:
-                        result = cloudinary.uploader.upload(
-                            img["url"],
-                            folder="properties/mls",
-                            resource_type="image",
-                            unique_filename=True,
-                            overwrite=False,
-                        )
-                        stored = result["public_id"]
-                        self.stdout.write(f"    ✓ Uploaded: {img['caption']}")
-                    except Exception as exc:
-                        self.stdout.write(self.style.WARNING(
-                            f"    ✗ Upload failed ({img['caption']}): {exc}"
-                        ))
-                        stored = img["url"]
+                    stored = img["url"]
 
                     image_objs.append(PropertyImage(
                         property=prop,

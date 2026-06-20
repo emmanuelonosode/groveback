@@ -151,13 +151,9 @@ class SubmitPaymentProofView(generics.CreateAPIView):
         final_proof_url = ""
         if proof_file:
             try:
-                import cloudinary.uploader
-                upload_res = cloudinary.uploader.upload(
-                    proof_file,
-                    folder="hasker/payment_proofs",
-                    resource_type="image",
-                )
-                final_proof_url = upload_res.get("secure_url", "")
+                from django.core.files.storage import default_storage
+                file_name = default_storage.save(f"payment_proofs/{proof_file.name}", proof_file)
+                final_proof_url = default_storage.url(file_name)
             except Exception as e:
                 from rest_framework.exceptions import ValidationError
                 raise ValidationError({"proof_file": f"Upload failed: {str(e)}"})

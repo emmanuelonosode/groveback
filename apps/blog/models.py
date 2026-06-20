@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.text import slugify
-from cloudinary.models import CloudinaryField
 
 
 class PostCategory(models.TextChoices):
@@ -23,7 +22,7 @@ class Post(models.Model):
                             related_name="blog_posts",
                             limit_choices_to={"is_active": True},
                         )
-    featured_image    = CloudinaryField("featured_image", blank=True, null=True)
+    featured_image    = models.ImageField("featured_image", upload_to="blog/", blank=True, null=True)
     is_published      = models.BooleanField(default=False)
     is_featured       = models.BooleanField(default=False)
     published_at      = models.DateTimeField(null=True, blank=True)
