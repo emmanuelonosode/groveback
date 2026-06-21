@@ -46,13 +46,21 @@ class PublicAgentSerializer(serializers.ModelSerializer):
         return obj.listings.filter(is_published=True, status="available").count()
 
     def get_avatar_url(self, obj):
-        # Prefer the agent profile photo; fall back to the user account avatar
+        # Prefer the agent profile photo; fall back to the user account avatar.
+        url = None
         try:
             if hasattr(obj, "agent_profile") and obj.agent_profile and obj.agent_profile.avatar:
-                return obj.agent_profile.avatar.url
+                url = obj.agent_profile.avatar.url
         except Exception:
-            pass
-        return obj.avatar_url
+            url = None
+        if not url:
+            url = obj.avatar_url
+        # Locally-stored media returns a relative "/media/..." path; make it absolute
+        # so the separate frontend domain can load it (Cloudinary URLs pass through).
+        request = self.context.get("request")
+        if url and url.startswith("/") and request is not None:
+            return request.build_absolute_uri(url)
+        return url
 
 
 class MeSerializer(serializers.ModelSerializer):
