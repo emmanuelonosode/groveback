@@ -111,6 +111,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True, read_only=True)
     amenities = PropertyAmenitySerializer(many=True, read_only=True)
     amenity_categories = serializers.SerializerMethodField()
+    recent_view_count = serializers.SerializerMethodField()
     agent = PublicAgentSerializer(read_only=True)
     latitude = serializers.FloatField(read_only=True, allow_null=True)
     longitude = serializers.FloatField(read_only=True, allow_null=True)
@@ -130,9 +131,30 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             "address", "cross_street", "city", "state", "zip_code", "latitude", "longitude", "neighborhood",
             "virtual_tour_url", "tour_360_url", "is_featured", "is_published",
             "images", "amenities", "amenity_categories", "agent", "agent_id",
-            "created_at", "updated_at",
+            "created_at", "updated_at", "recent_view_count",
         ]
         read_only_fields = ["id", "slug", "created_at", "updated_at"]
+
+    def get_recent_view_count(self, obj):
+        """Distinct visitor sessions that viewed this listing in the last 30 days.
+        Powers the 'X people viewed this home' social proof (frontend gates by a
+        minimum threshold so small numbers are never shown)."""
+        from datetime import timedelta
+        from django.db.models import Q
+        from django.utils import timezone
+        from apps.analytics.models import PageVisit
+
+        base = f"/houses-for-rent/{obj.slug}"
+        cutoff = timezone.now() - timedelta(days=30)
+        try:
+            return (
+                PageVisit.objects
+                .filter(entry_time__gte=cutoff)
+                .filter(Q(path=base) | Q(path__startswith=base + "?") | Q(path__startswith=base + "#"))
+                .values("session_id").distinct().count()
+            )
+        except Exception:
+            return 0
 
     def get_amenity_categories(self, obj):
         all_amenities = obj.amenities.select_related("category").all()
