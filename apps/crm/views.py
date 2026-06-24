@@ -256,9 +256,13 @@ class RentalApplicationCreateView(generics.CreateAPIView):
         x_forwarded = self.request.META.get("HTTP_X_FORWARDED_FOR")
         ip = x_forwarded.split(",")[0].strip() if x_forwarded else self.request.META.get("REMOTE_ADDR")
         application = serializer.save(ip_address=ip, status=ApplicationStatus.SUBMITTED)
+        # NOTE: the "Application Received" email is intentionally NOT sent here.
+        # It is sent only once the applicant pays the fee — see
+        # transactions.views.SubmitPaymentProofView — so applicants are never told
+        # their application is in before payment is made. The PDF is generated now
+        # for internal staff records.
         try:
-            from apps.notifications.tasks import send_application_submitted_email, generate_rental_application_pdf
-            send_application_submitted_email(application.id)
+            from apps.notifications.tasks import generate_rental_application_pdf
             generate_rental_application_pdf(application.id)
         except Exception:
             pass

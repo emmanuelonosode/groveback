@@ -1,12 +1,15 @@
-from rest_framework import generics
+import os
+
+from rest_framework import generics, permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
+from django.core.files.storage import default_storage
 
 from apps.accounts.permissions import IsAgentOrAbove
-from .models import Viewing
-from .serializers import ViewingSerializer
+from .models import Viewing, TourRequest, TourRequestStatus
+from .serializers import ViewingSerializer, TourRequestCreateSerializer
 
 
 class ViewingListCreateView(generics.ListCreateAPIView):
@@ -79,3 +82,66 @@ def viewing_calendar(request):
 
     serializer = ViewingSerializer(qs, many=True)
     return Response(serializer.data)
+
+
+# ── Public tour requests (lead-first + ID verification) ───────────────────────
+
+class TourRequestCreateView(generics.CreateAPIView):
+    """
+    POST /api/v1/viewings/tour-requests/ — public.
+    Step 1 of booking a self-tour: captures the lead immediately and creates the
+    tour request (status AWAITING_ID). The ID is uploaded next via verify-id.
+    """
+    permission_classes = [permissions.AllowAny]
+    serializer_class = TourRequestCreateSerializer
+    queryset = TourRequest.objects.all()
+
+
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def upload_tour_id(request, public_id):
+    """
+    POST /api/v1/viewings/tour-requests/<public_id>/verify-id/ — public.
+    Step 2: attach the government-ID image(s) to a tour request and move it to
+    PENDING_REVIEW for admin approval. Files are stored with the unguessable
+    public_id as the filename prefix.
+    """
+    try:
+        tour = TourRequest.objects.select_related("property").get(public_id=public_id)
+    except (TourRequest.DoesNotExist, ValueError):
+        return Response({"detail": "Tour request not found."}, status=404)
+
+    front = request.FILES.get("id_front")
+    back = request.FILES.get("id_back")
+    if not front:
+        return Response({"detail": "An ID photo is required."}, status=400)
+
+    def _store(file_obj, suffix):
+        ext = os.path.splitext(getattr(file_obj, "name", ""))[1].lower() or ".jpg"
+        saved = default_storage.save(f"tour_ids/{tour.public_id}_{suffix}{ext}", file_obj)
+        return default_storage.url(saved)
+
+    try:
+        tour.id_front = _store(front, "front")
+        if back:
+            tour.id_back = _store(back, "back")
+    except Exception as exc:  # noqa: BLE001
+        return Response({"detail": f"Upload failed: {exc}"}, status=400)
+
+    tour.status = TourRequestStatus.PENDING_REVIEW
+    tour.save(update_fields=["id_front", "id_back", "status", "updated_at"])
+
+    # Tell staff an ID is ready to review.
+    try:
+        from apps.notifications.tasks import send_admin_alert
+        send_admin_alert(f"Tour ID submitted — {tour.full_name}", [
+            ("Property", tour.property.title),
+            ("Preferred date", str(tour.preferred_date or "Flexible")),
+            ("Preferred time", tour.preferred_time or "Flexible"),
+            ("Phone", tour.phone or "—"),
+            ("Action", "Review ID in admin → approve to book the self-tour"),
+        ])
+    except Exception:
+        pass
+
+    return Response({"status": "received", "public_id": str(tour.public_id)})

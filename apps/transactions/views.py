@@ -165,11 +165,26 @@ class SubmitPaymentProofView(generics.CreateAPIView):
         except (ValueError, TypeError):
             allocated_items = []
 
-        serializer.save(
+        payment = serializer.save(
             proof_image=final_proof_url,
             status="PENDING_VERIFICATION",
             allocated_items=allocated_items,
         )
+
+        # When the fee for a rental application is paid, send the applicant the
+        # "Application Received" confirmation — only on the FIRST proof, so a
+        # re-submission (e.g. after a rejection) doesn't re-trigger it. We never
+        # send this at form submission; the application isn't complete until paid.
+        app = getattr(payment, "rental_application", None)
+        if app and not app.payments.exclude(pk=payment.pk).exists():
+            try:
+                from apps.notifications.tasks import send_application_submitted_email
+                send_application_submitted_email(app.id)
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception(
+                    "Application-received email failed for application %s", app.id
+                )
 
 
 @api_view(["GET"])
