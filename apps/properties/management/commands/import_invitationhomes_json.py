@@ -102,13 +102,11 @@ def _decimal(value, default=Decimal("0")):
 
 
 def _discounted_rent(value):
+    # Note: 40% price reduction applied (original * 0.60), rounded to the nearest dollar.
     original = _decimal(value, Decimal("0"))
     if original <= 0:
         return Decimal("0")
-    return ((original * Decimal("0.60")) / Decimal("100")).quantize(
-        Decimal("1"),
-        rounding=ROUND_HALF_UP,
-    ) * Decimal("100")
+    return (original * Decimal("0.60")).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
 
 
 def _load_json(path):

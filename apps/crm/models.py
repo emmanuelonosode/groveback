@@ -247,7 +247,7 @@ class ApplicationStatus(models.TextChoices):
 
 class RentalApplication(models.Model):
     # ── Application Meta ──────────────────────────────────────────────────────
-    application_fee = models.DecimalField(max_digits=10, decimal_places=2, default=100.00)
+    application_fee = models.DecimalField(max_digits=10, decimal_places=2, default=35.00)
     is_fee_paid     = models.BooleanField(default=False)
     payment_intent_id = models.CharField(max_length=200, blank=True, null=True)
 

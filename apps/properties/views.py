@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.db.models import Avg, Count, Max, Min
+from django.db.models import Avg, Count, Max, Min, OuterRef, Subquery
 from django.utils.text import slugify
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
@@ -8,8 +8,8 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Property, FavoriteProperty
-from .serializers import PropertyListSerializer, PropertyDetailSerializer, FavoritePropertySerializer
+from .models import Property, PropertyImage, FavoriteProperty
+from .serializers import PropertyListSerializer, PropertyDetailSerializer, FavoritePropertySerializer, _resolve_image_url
 from .filters import PropertyFilter
 from apps.accounts.permissions import IsAgentOrAbove
 
@@ -175,13 +175,34 @@ def property_sitemap(request):
     Excludes sold/rented/off-market to avoid wasting Google's crawl budget on dead pages.
     Used exclusively by the Next.js sitemap generator.
     """
-    qs = (
+    # Primary image per property (one query via subquery) so the sitemap can
+    # emit <image:image> entries — this is what gets listing photos into Google
+    # Images and as result thumbnails.
+    primary_image = (
+        PropertyImage.objects
+        .filter(property=OuterRef("pk"))
+        .order_by("-is_primary", "order", "id")
+        .values("image")[:1]
+    )
+    rows = (
         Property.objects
         .filter(is_published=True, status__in=["available", "under-contract"])
-        .values("slug", "updated_at")
+        .annotate(_primary_image=Subquery(primary_image))
+        .values("slug", "updated_at", "_primary_image", "title", "city", "state")
         .order_by("slug")
     )
-    return Response(list(qs))
+    out = [
+        {
+            "slug": r["slug"],
+            "updated_at": r["updated_at"],
+            "image": _resolve_image_url(r["_primary_image"]) or "",
+            "title": r["title"],
+            "city": r["city"],
+            "state": r["state"],
+        }
+        for r in rows
+    ]
+    return Response(out)
 
 
 @api_view(["POST"])

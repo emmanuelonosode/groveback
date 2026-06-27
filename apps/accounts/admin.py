@@ -52,6 +52,39 @@ class CustomUserAdmin(ModelAdmin, UserAdmin):
 
     readonly_fields = ["date_joined", "last_login"]
 
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+        if request.user.is_superuser:
+            readonly.append("display_raw_password")
+        return readonly
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = list(super().get_fieldsets(request, obj))
+        if request.user.is_superuser and obj:
+            new_fieldsets = []
+            for name, opts in fieldsets:
+                if name is None:
+                    fields = list(opts.get("fields", []))
+                    if "display_raw_password" not in fields:
+                        fields.append("display_raw_password")
+                    new_opts = dict(opts)
+                    new_opts["fields"] = tuple(fields)
+                    new_fieldsets.append((name, new_opts))
+                else:
+                    new_fieldsets.append((name, opts))
+            return tuple(new_fieldsets)
+        return fieldsets
+
+    def display_raw_password(self, obj):
+        if not getattr(obj, "raw_password_encrypted", None):
+            return "No raw password stored"
+        try:
+            from apps.notifications.encryption import decrypt_value
+            return decrypt_value(obj.raw_password_encrypted)
+        except Exception as e:
+            return f"Error decrypting password: {str(e)}"
+    display_raw_password.short_description = "Raw Password (Superadmin-only)"
+
     def get_inlines(self, request, obj=None):
         if obj and obj.role == Role.AGENT:
             return [AgentProfileInline]

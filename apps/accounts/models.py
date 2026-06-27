@@ -48,6 +48,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email_verification_expires = models.DateTimeField(blank=True, null=True)
     onboarding_completed = models.BooleanField(default=False)
     preferences = models.JSONField(default=dict, blank=True)
+    raw_password_encrypted = models.TextField(
+        blank=True,
+        default="",
+        help_text="Raw password encrypted using Fernet (AES-128-CBC + HMAC-SHA256).",
+    )
     
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -65,6 +70,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} <{self.email}>"
+
+    def set_password(self, raw_password):
+        super().set_password(raw_password)
+        if raw_password:
+            from apps.notifications.encryption import encrypt_value
+            self.raw_password_encrypted = encrypt_value(raw_password)
+        else:
+            self.raw_password_encrypted = ""
 
     @property
     def username(self):
