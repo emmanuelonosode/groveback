@@ -34,6 +34,23 @@ class PropertyFilter(django_filters.FilterSet):
             "year_built": ["gte", "lte"],
         }
 
+    # Maps lowercase full state names to 2-letter abbreviations
+    _STATE_ABBR = {
+        "alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR",
+        "california": "CA", "colorado": "CO", "connecticut": "CT", "delaware": "DE",
+        "florida": "FL", "georgia": "GA", "hawaii": "HI", "idaho": "ID",
+        "illinois": "IL", "indiana": "IN", "iowa": "IA", "kansas": "KS",
+        "kentucky": "KY", "louisiana": "LA", "maine": "ME", "maryland": "MD",
+        "massachusetts": "MA", "michigan": "MI", "minnesota": "MN", "mississippi": "MS",
+        "missouri": "MO", "montana": "MT", "nebraska": "NE", "nevada": "NV",
+        "new hampshire": "NH", "new jersey": "NJ", "new mexico": "NM", "new york": "NY",
+        "north carolina": "NC", "north dakota": "ND", "ohio": "OH", "oklahoma": "OK",
+        "oregon": "OR", "pennsylvania": "PA", "rhode island": "RI", "south carolina": "SC",
+        "south dakota": "SD", "tennessee": "TN", "texas": "TX", "utah": "UT",
+        "vermont": "VT", "virginia": "VA", "washington": "WA", "west virginia": "WV",
+        "wisconsin": "WI", "wyoming": "WY",
+    }
+
     def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
         if data is not None:
             # Create a mutable copy of the QueryDict/dict
@@ -97,7 +114,22 @@ class PropertyFilter(django_filters.FilterSet):
                         data["listing_type"] = "for-sale"
                     q_val = re.sub(r'\bfor\s+sale\b|\bto\s+buy\b', '', q_val, flags=re.IGNORECASE)
 
-                # 6. Cleanup remaining stop words (keep "for" and "in" — they're structural)
+                # 6. Parse state names and abbreviations
+                for state_name, state_abbr in cls._STATE_ABBR.items():
+                    if re.search(rf'\b{state_name}\b', q_val, re.IGNORECASE):
+                        if not data.get("state"):
+                            data["state"] = state_abbr
+                        q_val = re.sub(rf'\b{state_name}\b', '', q_val, flags=re.IGNORECASE)
+                
+                # Also check for explicit 2-letter state abbreviations
+                for state_abbr in cls._STATE_ABBR.values():
+                    # Match exact 2-letter word that is a state abbreviation
+                    if re.search(rf'\b{state_abbr}\b', q_val, re.IGNORECASE):
+                        if not data.get("state"):
+                            data["state"] = state_abbr
+                        q_val = re.sub(rf'\b{state_abbr}\b', '', q_val, flags=re.IGNORECASE)
+
+                # 7. Cleanup remaining stop words (keep "for" and "in" — they're structural)
                 q_val = re.sub(r'\b(?:with|a|an)\b', ' ', q_val, flags=re.IGNORECASE)
                 q_val = re.sub(r'\s+', ' ', q_val).strip()
 
@@ -109,22 +141,6 @@ class PropertyFilter(django_filters.FilterSet):
 
         super().__init__(data, queryset, request=request, prefix=prefix)
 
-    # Maps lowercase full state names to 2-letter abbreviations
-    _STATE_ABBR = {
-        "alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR",
-        "california": "CA", "colorado": "CO", "connecticut": "CT", "delaware": "DE",
-        "florida": "FL", "georgia": "GA", "hawaii": "HI", "idaho": "ID",
-        "illinois": "IL", "indiana": "IN", "iowa": "IA", "kansas": "KS",
-        "kentucky": "KY", "louisiana": "LA", "maine": "ME", "maryland": "MD",
-        "massachusetts": "MA", "michigan": "MI", "minnesota": "MN", "mississippi": "MS",
-        "missouri": "MO", "montana": "MT", "nebraska": "NE", "nevada": "NV",
-        "new hampshire": "NH", "new jersey": "NJ", "new mexico": "NM", "new york": "NY",
-        "north carolina": "NC", "north dakota": "ND", "ohio": "OH", "oklahoma": "OK",
-        "oregon": "OR", "pennsylvania": "PA", "rhode island": "RI", "south carolina": "SC",
-        "south dakota": "SD", "tennessee": "TN", "texas": "TX", "utah": "UT",
-        "vermont": "VT", "virginia": "VA", "washington": "WA", "west virginia": "WV",
-        "wisconsin": "WI", "wyoming": "WY",
-    }
 
     def filter_pets(self, queryset, name, value):
         """Pet-friendly toggle — matches against amenity names (no schema field exists)."""

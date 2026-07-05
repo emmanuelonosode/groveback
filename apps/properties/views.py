@@ -144,21 +144,27 @@ class AgentListingsView(generics.ListAPIView):
         )
 
 
-class MapPinsView(generics.GenericAPIView):
+class MapPinsView(generics.ListAPIView):
     """
     GET /api/v1/properties/map-pins/
     Returns lightweight map pin data, including primary image URL.
     """
     permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = PropertyFilter
+    pagination_class = None
 
-    def get(self, request, *args, **kwargs):
-        qs = (
+    def get_queryset(self):
+        return (
             Property.objects
             .filter(is_published=True)
             .exclude(latitude=None)
             .exclude(longitude=None)
             .prefetch_related("images")
         )
+
+    def list(self, request, *args, **kwargs):
+        qs = self.filter_queryset(self.get_queryset())
         out = []
         for p in qs:
             images = p.images.all()
