@@ -151,79 +151,28 @@ class PropertyFilter(django_filters.FilterSet):
         return cities
 
     def search_filter(self, queryset, name, value):
-        q_obj = (
-            Q(title__icontains=value)
-            | Q(address__icontains=value)
-            | Q(city__icontains=value)
-            | Q(neighborhood__icontains=value)
-            | Q(state__icontains=value)
-            | Q(zip_code__icontains=value)
-            | Q(description__icontains=value)
-            | Q(amenities__name__icontains=value)
-        )
-
-        known = self._known_cities()
-        known_lower = {c.lower(): c for c in known}
-        single_term = value.strip()
-
-        # Fuzzy typo tolerance: if the whole term closely matches a known city
-        # (e.g. "Atlatna" -> "Atlanta"), OR-in that city. Stdlib only.
-        if single_term and len(single_term) >= 4 and "," not in single_term:
-            close = difflib.get_close_matches(single_term.title(), known, n=1, cutoff=0.78)
-            if close:
-                q_obj |= Q(city__iexact=close[0])
-
-        # Embedded-city match: rescues phrase queries like "pet friendly in atlanta"
-        # (common when the AI parser is unavailable) by matching any known city
-        # name that appears as a word — or adjacent word pair ("san antonio") —
-        # inside the query. OR-only, so it can only broaden results, never narrow.
-        words = [w.strip(",.-").lower() for w in single_term.split()]
-        words = [w for w in words if len(w) >= 3]
-        for w in words:
-            if w in known_lower:
-                q_obj |= Q(city__iexact=known_lower[w])
-        for i in range(len(words) - 1):
-            pair = f"{words[i]} {words[i + 1]}"
-            if pair in known_lower:
-                q_obj |= Q(city__iexact=known_lower[pair])
-
-        # "Atlanta, GA" or "Atlanta, Georgia" — comma-separated
-        if ',' in value:
-            parts = [p.strip() for p in value.split(',', 1)]
-            if len(parts) == 2:
-                city_part, state_part = parts[0], parts[1]
-                q_obj |= (Q(city__icontains=city_part) & Q(state__icontains=state_part))
-                q_obj |= (Q(address__icontains=city_part) & Q(city__icontains=state_part))
-                # Also resolve full state name after the comma ("Atlanta, Georgia")
-                state_abbr = self._STATE_ABBR.get(state_part.lower())
-                if state_abbr:
-                    q_obj |= (Q(city__icontains=city_part) & Q(state__iexact=state_abbr))
-        else:
-            words = value.strip().split()
-
-            # "Atlanta GA" — city + 2-letter abbreviation, no comma
-            if len(words) >= 2:
-                last = words[-1]
-                if re.match(r'^[A-Za-z]{2}$', last):
-                    city_part = " ".join(words[:-1])
-                    state_part = last.upper()
-                    q_obj |= (Q(city__icontains=city_part) & Q(state__iexact=state_part))
-
-            # "Atlanta Georgia" — city + full state name (1 or 2 word state)
-            for n in (2, 1):
-                if len(words) >= n:
-                    state_guess = " ".join(words[-n:]).lower()
-                    abbr = self._STATE_ABBR.get(state_guess)
-                    if abbr:
-                        city_guess = " ".join(words[:-n])
-                        q_obj |= (Q(city__icontains=city_guess) & Q(state__iexact=abbr))
-                        break
-
-            # "Georgia" alone — full state name with no city
-            state_abbr = self._STATE_ABBR.get(value.strip().lower())
-            if state_abbr:
-                q_obj |= Q(state__iexact=state_abbr)
-
+        keywords = value.strip().split()
+        if not keywords:
+            return queryset
+            
+        q_obj = Q()
+        for kw in keywords:
+            kw_clean = kw.strip(",.-")
+            if not kw_clean:
+                continue
+                
+            kw_q = (
+                Q(title__icontains=kw_clean)
+                | Q(address__icontains=kw_clean)
+                | Q(city__icontains=kw_clean)
+                | Q(neighborhood__icontains=kw_clean)
+                | Q(state__icontains=kw_clean)
+                | Q(zip_code__icontains=kw_clean)
+                | Q(description__icontains=kw_clean)
+                | Q(amenities__name__icontains=kw_clean)
+            )
+            q_obj &= kw_q
+            
         return queryset.filter(q_obj).distinct()
 
     lat_min = django_filters.NumberFilter(field_name="latitude", lookup_expr="gte")
@@ -248,20 +197,30 @@ class PropertyFilter(django_filters.FilterSet):
         # No explicit sort (default / "diverse"). If the user is searching by text,
         # rank by relevance instead of the diverse interleave — they want matches
         # for their term first, not a spread across every city.
-        q_term = (self.data.get("q") or "").strip()
+        q_term = ""
+        if self.request and hasattr(self.request, "query_params"):
+            q_term = (self.request.query_params.get("q") or "").strip()
+            
         if q_term:
-            queryset = queryset.annotate(
-                _relevance=Case(
-                    When(city__iexact=q_term,       then=Value(0)),
-                    When(city__istartswith=q_term,  then=Value(1)),
-                    When(zip_code__iexact=q_term,    then=Value(1)),
-                    When(neighborhood__icontains=q_term, then=Value(2)),
-                    When(title__icontains=q_term,    then=Value(3)),
-                    default=Value(5),
+            keywords = [k.strip(",.-") for k in q_term.split() if k.strip(",.-")]
+            if not keywords:
+                return queryset.order_by("-is_featured", "-created_at")
+
+            # Calculate relevance score based on keyword matches
+            score_annotation = Value(0, output_field=IntegerField())
+            for kw in keywords:
+                score_annotation += Case(
+                    When(city__iexact=kw, then=Value(10)),
+                    When(title__icontains=kw, then=Value(5)),
+                    When(neighborhood__icontains=kw, then=Value(4)),
+                    When(city__icontains=kw, then=Value(3)),
+                    When(description__icontains=kw, then=Value(1)),
+                    default=Value(0),
                     output_field=IntegerField(),
                 )
-            )
-            return queryset.order_by("_relevance", "-is_featured", "price")
 
-        # No text query → diverse interleave (default browse page).
-        return queryset.order_by("city", "state", "-bedrooms", "price")
+            queryset = queryset.annotate(_relevance_score=score_annotation)
+            return queryset.order_by("-_relevance_score", "-is_featured", "price")
+
+        # No text query → globally diverse interleave (default browse page).
+        return queryset.order_by("-is_featured", "-created_at")

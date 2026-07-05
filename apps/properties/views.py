@@ -147,8 +147,7 @@ class AgentListingsView(generics.ListAPIView):
 class MapPinsView(generics.GenericAPIView):
     """
     GET /api/v1/properties/map-pins/
-    Returns only the fields needed to render map dots — no images, no amenities.
-    Uses .values() to skip serializer overhead entirely.
+    Returns lightweight map pin data, including primary image URL.
     """
     permission_classes = [permissions.AllowAny]
 
@@ -158,12 +157,27 @@ class MapPinsView(generics.GenericAPIView):
             .filter(is_published=True)
             .exclude(latitude=None)
             .exclude(longitude=None)
-            .values(
-                "slug", "price", "price_label", "latitude", "longitude",
-                "bedrooms", "bathrooms", "city", "state", "listing_type",
-            )
+            .prefetch_related("images")
         )
-        return Response(list(qs))
+        out = []
+        for p in qs:
+            images = p.images.all()
+            img = next((i for i in images if i.is_primary), None) or next(iter(images), None)
+            img_url = _resolve_image_url(img.image) if img and img.image else None
+            out.append({
+                "slug": p.slug,
+                "price": p.price,
+                "price_label": p.price_label,
+                "latitude": p.latitude,
+                "longitude": p.longitude,
+                "bedrooms": p.bedrooms,
+                "bathrooms": p.bathrooms,
+                "city": p.city,
+                "state": p.state,
+                "listing_type": p.listing_type,
+                "image_url": img_url,
+            })
+        return Response(out)
 
 
 @api_view(["GET"])
