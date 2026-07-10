@@ -203,7 +203,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--json", required=True, help="Path to invitationhomes_properties_latest.json or .json.gz")
-        parser.add_argument("--clear", action="store_true", help="Delete existing imported Invitation Homes rows first.")
+        parser.add_argument("--clear", action="store_true", help="Sync existing imported rows: homes missing from the feed are marked rented (not deleted), returning homes re-activated.")
         parser.add_argument("--markets", default=None, help="Comma-separated market slugs to import.")
         parser.add_argument("--limit", type=int, default=None, help="Maximum properties to import.")
         parser.add_argument("--dry-run", action="store_true", help="Validate and count without writing.")
@@ -242,10 +242,41 @@ class Command(BaseCommand):
             self.stdout.write(f"Amenities found: {sum(len((item.get('summary') or {}).get('amenities') or []) for item in selected)}")
             return
 
+        # Slugs present in the incoming feed — used by --clear to sync instead of delete.
+        feed_slugs = set()
+        for item in selected:
+            summary = item.get("summary") or {}
+            raw = item.get("raw") or {}
+            slug = _text(summary.get("slug") or raw.get("slug"))
+            db_slug = re.sub(r"^invh-", "", slug).strip("-")
+            if not db_slug:
+                db_slug = slugify(f"{summary.get('address') or raw.get('property_id')}")
+            if db_slug:
+                feed_slugs.add(db_slug)
+
         with transaction.atomic():
             if options["clear"]:
-                deleted, _ = Property.objects.filter(agent__email="agent@haskerrealtygroup.com").delete()
-                self.stdout.write(self.style.WARNING(f"Cleared {deleted} imported Invitation Homes rows."))
+                # SEO-safe sync: never delete rows (deleting turns every delisted
+                # home into a permanent 404 in Google). Instead, mark homes that
+                # left the feed as "rented" — the page stays live with a
+                # "currently rented + similar homes" banner and is dropped from
+                # the sitemap; unpublish_stale_listings retires it after 60 days.
+                delisted = (
+                    Property.objects
+                    .filter(agent__email="agent@haskerrealtygroup.com")
+                    .exclude(slug__in=feed_slugs)
+                    .exclude(status__in=["rented", "sold"])
+                    .update(status="rented")
+                )
+                # Homes that came back into the feed get re-activated.
+                relisted = (
+                    Property.objects
+                    .filter(agent__email="agent@haskerrealtygroup.com", slug__in=feed_slugs, status="rented")
+                    .update(status="available", is_published=True)
+                )
+                self.stdout.write(self.style.WARNING(
+                    f"Synced Invitation Homes rows: {delisted} delisted (marked rented), {relisted} re-activated."
+                ))
 
             categories = {}
             for key, name, icon, order in CATEGORIES:

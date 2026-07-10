@@ -206,6 +206,12 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.analytics.tasks.flush_analytics_telemetry",
         "schedule": crontab(minute="*/1"),
     },
+    # Daily 4 AM — unpublish rented/sold listings older than the 60-day grace
+    # period (pages 404 after this; until then they show the "rented" banner)
+    "unpublish-stale-listings": {
+        "task": "apps.properties.tasks.unpublish_stale_listings",
+        "schedule": crontab(hour=4, minute=0),
+    },
 }
 
 # ── Email ──────────────────────────────────────────────────────────────────────

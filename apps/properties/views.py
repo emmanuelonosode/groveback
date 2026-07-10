@@ -67,11 +67,15 @@ class PropertyListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Public users only see published properties
-        if not self.request.user or not self.request.user.is_authenticated:
-            return qs.filter(is_published=True)
-        if self.request.user.role == "CLIENT":
-            return qs.filter(is_published=True)
+        # Public users only see published, active listings. Rented/sold rows stay
+        # published for a 60-day grace period (SEO: detail pages keep serving a
+        # "no longer available" banner) but must never appear in lists/search.
+        if (
+            not self.request.user
+            or not self.request.user.is_authenticated
+            or self.request.user.role == "CLIENT"
+        ):
+            return qs.filter(is_published=True, status__in=["available", "under-contract"])
         return qs
 
 
@@ -85,6 +89,16 @@ class PropertyDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "GET":
             return [permissions.AllowAny()]
         return [IsAgentOrAbove()]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Anonymous/client users must never see unpublished drafts. Rented/sold
+        # listings stay visible while published (60-day grace period) — the
+        # frontend shows the "no longer available" banner for them.
+        user = self.request.user
+        if not user or not user.is_authenticated or getattr(user, "role", "CLIENT") == "CLIENT":
+            return qs.filter(is_published=True)
+        return qs
 
 
 class FeaturedPropertiesView(generics.ListAPIView):
@@ -285,9 +299,14 @@ def city_stats(request):
     Returns distinct cities that have at least one published rental listing.
     Used by the Next.js front-end for programmatic SEO page generation.
     """
+    # Count only active inventory — rented/sold rows stay published during their
+    # 60-day SEO grace period but must not inflate city counts (city pages and
+    # the sitemap key off these numbers).
+    _active = dict(is_published=True, listing_type__in=["for-rent", "for-lease"],
+                   status__in=["available", "under-contract"])
     qs = (
         Property.objects
-        .filter(is_published=True, listing_type__in=["for-rent", "for-lease"])
+        .filter(**_active)
         .values("city", "state")
         .annotate(
             count=Count("id"),
@@ -301,7 +320,7 @@ def city_stats(request):
     lt_map: dict = defaultdict(set)
     for row in (
         Property.objects
-        .filter(is_published=True, listing_type__in=["for-rent", "for-lease"])
+        .filter(**_active)
         .values("city", "state", "listing_type")
         .distinct()
     ):
