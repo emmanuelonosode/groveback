@@ -24,8 +24,8 @@ class PropertyFilter(django_filters.FilterSet):
             "listing_type": ["exact"],
             "status": ["exact"],
             "condition": ["exact"],
-            "city": ["exact", "icontains"],
-            "state": ["exact", "icontains"],
+            "city": ["exact", "icontains", "iexact"],
+            "state": ["exact", "icontains", "iexact"],
             "zip_code": ["exact"],
             "is_featured": ["exact"],
             "is_published": ["exact"],
@@ -59,6 +59,18 @@ class PropertyFilter(django_filters.FilterSet):
             
             if q_val:
                 original_q = q_val
+
+                # 0. Fuzzy city replacement in the query string
+                words = q_val.split()
+                replaced_words = []
+                for word in words:
+                    word_clean = word.strip(",.-")
+                    fuzzy_city = self._get_fuzzy_city_static(word_clean)
+                    if fuzzy_city:
+                        replaced_words.append(fuzzy_city)
+                    else:
+                        replaced_words.append(word)
+                q_val = " ".join(replaced_words)
                 
                 # 1. Parse Bedrooms (e.g. "2 bed", "3 bedrooms", "1 bd")
                 bed_match = re.search(r'(\d+)\s*(?:bed|beds|bedroom|bedrooms|bd|bds)\b', q_val, re.IGNORECASE)
@@ -115,14 +127,14 @@ class PropertyFilter(django_filters.FilterSet):
                     q_val = re.sub(r'\bfor\s+sale\b|\bto\s+buy\b', '', q_val, flags=re.IGNORECASE)
 
                 # 6. Parse state names and abbreviations
-                for state_name, state_abbr in cls._STATE_ABBR.items():
+                for state_name, state_abbr in self._STATE_ABBR.items():
                     if re.search(rf'\b{state_name}\b', q_val, re.IGNORECASE):
                         if not data.get("state"):
                             data["state"] = state_abbr
                         q_val = re.sub(rf'\b{state_name}\b', '', q_val, flags=re.IGNORECASE)
                 
                 # Also check for explicit 2-letter state abbreviations
-                for state_abbr in cls._STATE_ABBR.values():
+                for state_abbr in self._STATE_ABBR.values():
                     # Match exact 2-letter word that is a state abbreviation
                     if re.search(rf'\b{state_abbr}\b', q_val, re.IGNORECASE):
                         if not data.get("state"):
@@ -132,6 +144,16 @@ class PropertyFilter(django_filters.FilterSet):
                 # 7. Cleanup remaining stop words (keep "for" and "in" — they're structural)
                 q_val = re.sub(r'\b(?:with|a|an)\b', ' ', q_val, flags=re.IGNORECASE)
                 q_val = re.sub(r'\s+', ' ', q_val).strip()
+
+                # 8. Fuzzy city matching ONLY if the query consists of a single word remaining
+                remaining_words = q_val.split()
+                if len(remaining_words) == 1:
+                    word_clean = remaining_words[0].strip(",.-")
+                    fuzzy_city = self._get_fuzzy_city_static(word_clean)
+                    if fuzzy_city:
+                        if not data.get("city__iexact"):
+                            data["city__iexact"] = fuzzy_city
+                        q_val = ""
 
                 if q_val != original_q:
                     if q_val:
@@ -166,30 +188,54 @@ class PropertyFilter(django_filters.FilterSet):
             cache.set("property_known_cities", cities, 300)
         return cities
 
+    @classmethod
+    def _get_fuzzy_city_static(cls, term):
+        if len(term) < 4:
+            return None
+        known = cls._known_cities()
+        matches = difflib.get_close_matches(term.title(), known, n=1, cutoff=0.8)
+        return matches[0] if matches else None
+
     def search_filter(self, queryset, name, value):
-        keywords = value.strip().split()
+        keywords = [k.strip(",.-") for k in value.strip().split() if k.strip(",.-")]
         if not keywords:
             return queryset
             
-        q_obj = Q()
+        # 1. Try strict matching (ALL keywords must match - AND query)
+        q_and = Q()
         for kw in keywords:
-            kw_clean = kw.strip(",.-")
-            if not kw_clean:
-                continue
-                
             kw_q = (
-                Q(title__icontains=kw_clean)
-                | Q(address__icontains=kw_clean)
-                | Q(city__icontains=kw_clean)
-                | Q(neighborhood__icontains=kw_clean)
-                | Q(state__icontains=kw_clean)
-                | Q(zip_code__icontains=kw_clean)
-                | Q(description__icontains=kw_clean)
-                | Q(amenities__name__icontains=kw_clean)
+                Q(title__icontains=kw)
+                | Q(address__icontains=kw)
+                | Q(city__icontains=kw)
+                | Q(neighborhood__icontains=kw)
+                | Q(state__icontains=kw)
+                | Q(zip_code__icontains=kw)
+                | Q(description__icontains=kw)
+                | Q(amenities__name__icontains=kw)
             )
-            q_obj &= kw_q
+            q_and &= kw_q
             
-        return queryset.filter(q_obj).distinct()
+        and_qs = queryset.filter(q_and).distinct()
+        if and_qs.exists():
+            return and_qs
+
+        # 2. Relaxed matching (ANY keyword matches - OR query)
+        q_or = Q()
+        for kw in keywords:
+            kw_q = (
+                Q(title__icontains=kw)
+                | Q(address__icontains=kw)
+                | Q(city__icontains=kw)
+                | Q(neighborhood__icontains=kw)
+                | Q(state__icontains=kw)
+                | Q(zip_code__icontains=kw)
+                | Q(description__icontains=kw)
+                | Q(amenities__name__icontains=kw)
+            )
+            q_or |= kw_q
+            
+        return queryset.filter(q_or).distinct()
 
     lat_min = django_filters.NumberFilter(field_name="latitude", lookup_expr="gte")
     lat_max = django_filters.NumberFilter(field_name="latitude", lookup_expr="lte")
