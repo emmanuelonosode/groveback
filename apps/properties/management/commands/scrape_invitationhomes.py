@@ -917,8 +917,8 @@ class Command(BaseCommand):
 
             # ── Clear existing invh properties ─────────────────────────────────
             if options["clear"] and not dry_run:
-                count = Property.objects.filter(cross_street="invh").count()
-                Property.objects.filter(cross_street="invh").delete()
+                count = Property.objects.filter(agent__email="agent@haskerrealtygroup.com").count()
+                Property.objects.filter(agent__email="agent@haskerrealtygroup.com").delete()
                 self.stdout.write(self.style.WARNING(f"Cleared {count} existing invh properties."))
 
             # ── Ensure amenity categories ──────────────────────────────────────
@@ -983,13 +983,13 @@ class Command(BaseCommand):
                 for prop in props_raw:
                     slug = prop.get("slug", "")
 
-                    # Build our DB slug — prefix "invh-" for namespacing
-                    our_slug = f"invh-{slug}" if slug else ""
+                    # Build our DB slug — no prefix, keep it clean
+                    our_slug = slug if slug else ""
                     if not our_slug:
                         our_slug = slugify(
-                            f"invh {prop.get('address','')} {prop.get('zip_code','')}"
+                            f"{prop.get('address','')} {prop.get('zip_code','')}"
                         )
-                    if not our_slug or our_slug == "invh-":
+                    if not our_slug:
                         continue  # can't build a usable slug
 
                     if our_slug in all_existing:
@@ -1098,7 +1098,7 @@ class Command(BaseCommand):
                             longitude    = lng,
                             neighborhood = mkt_city,
                             condition    = "good",
-                            cross_street = "invh",
+                            cross_street = "",
                             is_published = True,
                             is_featured  = False,
                         )
