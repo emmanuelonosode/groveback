@@ -140,10 +140,24 @@ class UserPaymentListView(generics.ListAPIView):
         ).select_related("rental_application", "transaction", "invoice").order_by("-created_at")
 
 
+class AllowAnonymousApplicationFeeProof(permissions.BasePermission):
+    """
+    Guests may submit payment proof for a rental-application fee — the account
+    step now happens AFTER payment, so applicants are anonymous at this point.
+    Every other proof type (invoices/transactions in the tenant portal) still
+    requires authentication.
+    """
+
+    def has_permission(self, request, view):
+        if request.user and request.user.is_authenticated:
+            return True
+        return bool(request.data.get("rental_application"))
+
+
 class SubmitPaymentProofView(generics.CreateAPIView):
     """POST /api/v1/transactions/my-payments/submit-proof/ — User submits receipt for an invoice."""
     serializer_class = PaymentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowAnonymousApplicationFeeProof]
 
     def perform_create(self, serializer):
         proof_file = self.request.FILES.get("proof_file")

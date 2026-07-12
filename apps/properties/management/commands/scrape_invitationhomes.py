@@ -14,6 +14,7 @@ Usage:
     python manage.py scrape_invitationhomes --clear
     python manage.py scrape_invitationhomes --skip-detail
 """
+from __future__ import annotations
 
 import json
 import logging
@@ -377,17 +378,21 @@ def _parse_microdata_address(soup) -> tuple[str, str, str, str]:
     city   = _text(soup.find(attrs={"itemprop": "addressLocality"}))
     state  = _text(soup.find(attrs={"itemprop": "addressRegion"}))
     zip_c  = _text(soup.find(attrs={"itemprop": "postalCode"}))
-    if street:
+    if street and "Main Street" not in street:
         return street, city, state, zip_c
 
     # JSON-LD structured data
     for tag in soup.find_all("script", type="application/ld+json"):
         try:
             ld = json.loads(tag.string or "")
-            items = ld if isinstance(ld, list) else [ld]
+            items = ld.get("@graph", []) if isinstance(ld, dict) and "@graph" in ld else (ld if isinstance(ld, list) else [ld])
             for item in items:
+                if isinstance(item, dict) and item.get("@type") == "Organization":
+                    continue
                 addr = item.get("address") or {}
                 if isinstance(addr, dict) and addr.get("streetAddress"):
+                    if "Main Street" in str(addr.get("streetAddress")):
+                        continue
                     return (
                         addr.get("streetAddress", ""),
                         addr.get("addressLocality", ""),
