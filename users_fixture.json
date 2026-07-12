@@ -1,0 +1,238 @@
+[
+{
+  "model": "accounts.customuser",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$g5z8XfiyZAxEQk5vDhKAy8$xTYVGH+/6aP2kS9N/WMtOupgjtuhVqAlWVbVfaxv954=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "agent@hasker.com",
+    "first_name": "DeAnna",
+    "last_name": "Roberts",
+    "phone": "",
+    "role": "AGENT",
+    "avatar": "",
+    "is_email_verified": false,
+    "email_verification_code": null,
+    "email_verification_expires": null,
+    "onboarding_completed": false,
+    "preferences": {},
+    "raw_password_encrypted": "gAAAAABqTOvdnQQlq4S1yVXGFY-BE7hIg3fRG3rO9YT-DO4WPjqe4DzaFvMY5V3cEZiOmba74wD9pAjLKLGeyGWfCsMMvFdieg==",
+    "is_active": true,
+    "is_staff": false,
+    "date_joined": "2026-07-07T12:06:51.025Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$qb1xjPLcNSnpP8YoiddCKp$uRpQTnr3RC5d3fQY1muI/nQMEc0KA/0OJuRSFGNPtuM=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "sarah.connor@haskerrealtygroup.com",
+    "first_name": "Sarah",
+    "last_name": "Connor",
+    "phone": "713-555-0199",
+    "role": "AGENT",
+    "avatar": "",
+    "is_email_verified": true,
+    "email_verification_code": null,
+    "email_verification_expires": null,
+    "onboarding_completed": true,
+    "preferences": {},
+    "raw_password_encrypted": "gAAAAABqTRTYv8fKfyRdwNpWvsvIZc852zoyvs2kUpV5NBGMUlkgO0wJF1ira7a0gV8RGbOjNlFfZbH-3kakKMKXUTBuEnN8lgJFt6uhIlQsVD3EwibRCxE=",
+    "is_active": true,
+    "is_staff": false,
+    "date_joined": "2026-07-07T15:01:44.150Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$ao8WN54MlBKHHyH47Dv4Zu$k3qY8ITlIBQLLswo5nXHiqywE3+HJJX3idTz5sJl1jQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "james.carter@haskerrealtygroup.com",
+    "first_name": "James",
+    "last_name": "Carter",
+    "phone": "281-555-0144",
+    "role": "AGENT",
+    "avatar": "",
+    "is_email_verified": true,
+    "email_verification_code": null,
+    "email_verification_expires": null,
+    "onboarding_completed": true,
+    "preferences": {},
+    "raw_password_encrypted": "gAAAAABqTRTYbfmyQtcxDhMXxSMKt2zcOHgc_JOJwXyJrxdg1eBYZexBGX5LYQU4HiBINItOEl-p8RcDHx4J6a2zlvq32W1phyHn7Yyihyb36vMNzOHxzoE=",
+    "is_active": true,
+    "is_staff": false,
+    "date_joined": "2026-07-07T15:01:44.370Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$RVZq07UDODzlTwLFDVJwfY$UYUS5Nj49cH9eIVbpAtkM9LtasX+LygyX2NAIBf7bPI=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "michael.chang@haskerrealtygroup.com",
+    "first_name": "Michael",
+    "last_name": "Chang",
+    "phone": "832-555-0188",
+    "role": "AGENT",
+    "avatar": "",
+    "is_email_verified": true,
+    "email_verification_code": null,
+    "email_verification_expires": null,
+    "onboarding_completed": true,
+    "preferences": {},
+    "raw_password_encrypted": "gAAAAABqTRTYvqxTWZ-WdcXcTkuaGMH2sClD_XF9NgNQA4wUGFosAFiu0jWuQ8wWb_H1U3yjorLFTaJE5NGI3rRQfCBfdocyWCKa9is_znrYkQHuy5GPpzU=",
+    "is_active": true,
+    "is_staff": false,
+    "date_joined": "2026-07-07T15:01:44.555Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$F9eNLqnd2h6HU1U3Yv4c8X$DL2ofUyb3UgI02DiNBRwFfO1kuptPr+2qJCr1TCaq88=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "jessica.alba@haskerrealtygroup.com",
+    "first_name": "Jessica",
+    "last_name": "Alba",
+    "phone": "713-555-0177",
+    "role": "AGENT",
+    "avatar": "",
+    "is_email_verified": true,
+    "email_verification_code": null,
+    "email_verification_expires": null,
+    "onboarding_completed": true,
+    "preferences": {},
+    "raw_password_encrypted": "gAAAAABqTRTY2nH3jBy2pcpqsnlgO2XJR2_XusT269YwRd9_u5mdMLslgEU89QBJt_QMqmo_x72UHALkdnCgUYoC8IKsdDJ1-TEcdXhYsd6sdhg-WBoxwDE=",
+    "is_active": true,
+    "is_staff": false,
+    "date_joined": "2026-07-07T15:01:44.766Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.customuser",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$600000$flIImElw0EBAqDL3BpJicV$Jgs3kU4erMrPOknmCX3x9pnPInOm0wiyM90z12H0Az8=",
+    "last_login": null,
+    "is_superuser": false,
+    "email": "agent@haskerrealtygroup.com",
+    "first_name": "Marcus",
+    "last_name": "Reid",
+    "phone": "(757) 555-0101",
+    "role": "AGENT",
+    "avatar": "",
+    "is_email_verified": false,
+    "email_verification_code": null,
+    "email_verification_expires": null,
+    "onboarding_completed": false,
+    "preferences": {},
+    "raw_password_encrypted": "gAAAAABqU8Hy_3wkydEFhlReXCc7xltmhgu9Tt4mydeyvfGXDreg-Df3ogBJLD5pCNeJvGMMzHXKHodbkcx7vvBppOz1wk784w==",
+    "is_active": true,
+    "is_staff": false,
+    "date_joined": "2026-07-12T16:33:54.450Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.agentprofile",
+  "pk": 1,
+  "fields": {
+    "user": 2,
+    "avatar": "",
+    "bio": "",
+    "license_number": "PFG/PENN",
+    "specialties": [],
+    "languages": [],
+    "social_links": {},
+    "commission_rate": "3.00",
+    "total_sales": "0.00",
+    "years_experience": 0
+  }
+},
+{
+  "model": "accounts.agentprofile",
+  "pk": 2,
+  "fields": {
+    "user": 3,
+    "avatar": "",
+    "bio": "Hi, I am Sarah, your dedicated real estate advisor with Hasker & Co. Realty Group.",
+    "license_number": "LIC-393821",
+    "specialties": [],
+    "languages": [],
+    "social_links": {},
+    "commission_rate": "3.00",
+    "total_sales": "0.00",
+    "years_experience": 5
+  }
+},
+{
+  "model": "accounts.agentprofile",
+  "pk": 3,
+  "fields": {
+    "user": 4,
+    "avatar": "",
+    "bio": "Hi, I am James, your dedicated real estate advisor with Hasker & Co. Realty Group.",
+    "license_number": "LIC-493821",
+    "specialties": [],
+    "languages": [],
+    "social_links": {},
+    "commission_rate": "3.00",
+    "total_sales": "0.00",
+    "years_experience": 5
+  }
+},
+{
+  "model": "accounts.agentprofile",
+  "pk": 4,
+  "fields": {
+    "user": 5,
+    "avatar": "",
+    "bio": "Hi, I am Michael, your dedicated real estate advisor with Hasker & Co. Realty Group.",
+    "license_number": "LIC-593821",
+    "specialties": [],
+    "languages": [],
+    "social_links": {},
+    "commission_rate": "3.00",
+    "total_sales": "0.00",
+    "years_experience": 5
+  }
+},
+{
+  "model": "accounts.agentprofile",
+  "pk": 5,
+  "fields": {
+    "user": 6,
+    "avatar": "",
+    "bio": "Hi, I am Jessica, your dedicated real estate advisor with Hasker & Co. Realty Group.",
+    "license_number": "LIC-693821",
+    "specialties": [],
+    "languages": [],
+    "social_links": {},
+    "commission_rate": "3.00",
+    "total_sales": "0.00",
+    "years_experience": 5
+  }
+}
+]
