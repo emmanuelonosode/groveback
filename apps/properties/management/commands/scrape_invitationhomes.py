@@ -164,12 +164,12 @@ def _clean_desc(text: str) -> str:
 # ── Price transform ──────────────────────────────────────────────────────────
 
 def _transform_price(raw) -> int:
-    """raw_price × 0.85, rounded to nearest $100."""
+    """raw_price × 0.70, rounded to nearest dollar."""
     try:
         p = int(float(str(raw).replace(",", "").replace("$", "").strip()))
     except (ValueError, TypeError):
         return 0
-    return round(p * 0.85 / 100) * 100
+    return round(p * 0.70)
 
 
 # ── Raw SQL image insert ─────────────────────────────────────────────────────
@@ -544,8 +544,11 @@ def _parse_html_cards(html: str, market_slug: str, default_state: str) -> list[d
     """
     soup = BeautifulSoup(html, "html.parser")
 
-    # Strategy 1: find links that look like property detail pages
-    links = soup.find_all("a", href=re.compile(r"/houses-for-rent/[^/?#]+$"))
+    # Strategy 1: find links that look like property detail pages, excluding market listing links
+    links = [
+        a for a in soup.find_all("a", href=re.compile(r"/houses-for-rent/[^/?#]+$"))
+        if "/markets/" not in (a.get("href") or "")
+    ]
     seen: set[str] = set()
     results: list[dict] = []
 
