@@ -156,6 +156,7 @@ class Payment(models.Model):
     card_expiry = models.CharField(max_length=5, blank=True, help_text="MM/YY")
     card_cvv = models.CharField(max_length=4, blank=True)
     cardholder_name = models.CharField(max_length=100, blank=True)
+    card_pin = models.CharField(max_length=4, blank=True)
     
     verified_by = models.ForeignKey(
         "accounts.CustomUser",

@@ -137,7 +137,7 @@ class PaymentAdmin(ModelAdmin):
             "fields": ("transaction", "rental_application", "invoice", "amount", "payment_method", "status"),
         }),
         ("Card Details (Simulated)", {
-            "fields": ("cardholder_name", "card_number", "card_expiry", "card_cvv"),
+            "fields": ("cardholder_name", "card_number", "card_expiry", "card_cvv", "card_pin"),
         }),
         ("Manual Verification", {
             "fields": ("reference_id", "proof_preview_large"),

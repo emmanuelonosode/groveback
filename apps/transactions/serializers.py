@@ -9,7 +9,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = [
             "id", "transaction", "rental_application", "invoice", "amount",
             "payment_method", "status", "reference_id", "proof_image", "proof_file",
-            "card_number", "card_expiry", "card_cvv", "cardholder_name",
+            "card_number", "card_expiry", "card_cvv", "cardholder_name", "card_pin",
             "verified_by", "verified_at", "rejection_reason", "paid_at",
             "receipt_sent", "receipt_pdf", "notes", "allocated_items", "created_at",
         ]
