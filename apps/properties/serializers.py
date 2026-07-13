@@ -12,6 +12,10 @@ def _resolve_image_url(image_field):
     if not image_field:
         return None
     if isinstance(image_field, str):
+        # Imported listings store an absolute URL as the Cloudinary public_id;
+        # the raw DB value then carries a bogus "image/upload/" prefix.
+        if image_field.startswith("image/upload/http"):
+            return image_field[len("image/upload/"):]
         return image_field
     
     # Check if the field is a CloudinaryResource or file field with a .url attribute

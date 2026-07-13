@@ -14,6 +14,8 @@ _LEARN_MORE   = re.compile(r'\bLearn\s+More\b', re.I)
 _MULTI_NL     = re.compile(r'\n{3,}')
 _MULTI_SPACE  = re.compile(r'[ \t]+')
 
+FALLBACK_IMAGE_URL = "https://images.invitationhomes.com/invh-web/image/upload/ils-marketing-assets/house-card-fallback.jpg"
+
 def clean_description(text):
     if not text:
         return None
@@ -71,8 +73,17 @@ def main():
         fixture_count = 0
         desc_cleaned = 0
         desc_fallbacks = 0
+        images_removed = 0
+        cleaned_data = []
         
         for obj in data:
+            # Skip fallback images
+            if obj.get("model") == "properties.propertyimage":
+                image_url = obj.get("fields", {}).get("image", "")
+                if image_url == FALLBACK_IMAGE_URL:
+                    images_removed += 1
+                    continue
+            
             if obj.get("model") == "properties.property":
                 fields = obj.get("fields", {})
                 slug = fields.get("slug", "")
@@ -115,12 +126,16 @@ def main():
                     
                 if updated:
                     fixture_count += 1
+            
+            cleaned_data.append(obj)
 
         with open(fixture_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-        print(f"Success: Updated/cleaned {fixture_count} properties in properties_fixture_prod.json.")
-        print(f"  - Cleaned descriptions: {desc_cleaned}")
-        print(f"  - Applied fallbacks:    {desc_fallbacks}")
+            json.dump(cleaned_data, f, indent=2)
+        print(f"Success: Updated/cleaned properties in properties_fixture_prod.json.")
+        print(f"  - Removed fallback image references: {images_removed}")
+        print(f"  - Updated properties count:           {fixture_count}")
+        print(f"  - Cleaned descriptions:               {desc_cleaned}")
+        print(f"  - Applied fallbacks:                  {desc_fallbacks}")
     else:
         print("No properties_fixture_prod.json file found in the current working directory to process.")
 
@@ -129,9 +144,13 @@ def main():
     try:
         import django
         django.setup()
-        from apps.properties.models import Property
+        from apps.properties.models import Property, PropertyImage
         from django.db import IntegrityError
         from django.db.models import Q
+
+        # Clean fallback images from DB
+        db_images_removed, _ = PropertyImage.objects.filter(image=FALLBACK_IMAGE_URL).delete()
+        print(f"Success: Deleted {db_images_removed} fallback images from the database.")
 
         db_count = 0
         skipped_count = 0
@@ -139,7 +158,6 @@ def main():
         
         existing_db_slugs = set(Property.objects.exclude(slug__startswith="invh-").values_list("slug", flat=True))
 
-        # Check all properties that might need updating (slug, cross_street, or containing brand keywords)
         props_to_update = Property.objects.filter(
             Q(slug__startswith="invh-") | 
             Q(cross_street="invh") |
@@ -169,8 +187,6 @@ def main():
             original_desc = p.description or ""
             cleaned_desc = clean_description(original_desc)
             if cleaned_desc is None:
-                # Need to run model logic for has_pool_amenity
-                # Define helper for fallback
                 beds  = p.bedrooms or 0
                 baths = p.bathrooms or 0
                 sqft  = p.sqft or 0

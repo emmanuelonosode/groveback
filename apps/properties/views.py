@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from django.db.models import Avg, Count, Max, Min, OuterRef, Subquery
+from django.db.models import Avg, Count, Max, Min, OuterRef, Q, Subquery
 from django.utils.text import slugify
 from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
@@ -304,27 +304,83 @@ def city_stats(request):
     # the sitemap key off these numbers).
     _active = dict(is_published=True, listing_type__in=["for-rent", "for-lease"],
                    status__in=["available", "under-contract"])
+    active = Property.objects.filter(**_active)
     qs = (
-        Property.objects
-        .filter(**_active)
+        active
         .values("city", "state")
         .annotate(
             count=Count("id"),
             avg_price=Avg("price"),
             min_price=Min("price"),
             max_price=Max("price"),
+            # sqft=0 means "unknown", not a 0 sq ft home — filtered aggregates
+            # compile to CASE WHEN, portable across MySQL and SQLite.
+            min_sqft=Min("sqft", filter=Q(sqft__gt=0)),
+            max_sqft=Max("sqft", filter=Q(sqft__gt=0)),
+            avg_sqft=Avg("sqft", filter=Q(sqft__gt=0)),
+            newest_listed=Max("created_at"),
+            last_updated=Max("updated_at"),
         )
         .order_by("-count")
     )
 
     lt_map: dict = defaultdict(set)
-    for row in (
-        Property.objects
-        .filter(**_active)
-        .values("city", "state", "listing_type")
-        .distinct()
-    ):
+    for row in active.values("city", "state", "listing_type").distinct():
         lt_map[(row["city"], row["state"])].add(row["listing_type"])
+
+    # Per-city facts for unique landing-page content. Grouped in Python rather
+    # than GROUP_CONCAT/ArrayAgg so the same code runs on MySQL and SQLite.
+    bed_map: dict = defaultdict(dict)
+    for row in active.values("city", "state", "bedrooms").annotate(n=Count("id")):
+        if row["bedrooms"]:
+            bed_map[(row["city"], row["state"])][str(row["bedrooms"])] = row["n"]
+
+    type_map: dict = defaultdict(dict)
+    for row in active.values("city", "state", "type").annotate(n=Count("id")):
+        if row["type"]:
+            type_map[(row["city"], row["state"])][row["type"]] = row["n"]
+
+    zip_map: dict = defaultdict(list)
+    for row in (
+        active.exclude(zip_code="")
+        .values("city", "state", "zip_code")
+        .annotate(n=Count("id"))
+        .order_by("-n", "zip_code")
+    ):
+        zip_map[(row["city"], row["state"])].append(row["zip_code"])
+
+    hood_map: dict = defaultdict(list)
+    for row in (
+        active.exclude(neighborhood="")
+        .values("city", "state", "neighborhood")
+        .annotate(n=Count("id"))
+        .order_by("-n", "neighborhood")
+    ):
+        hood_map[(row["city"], row["state"])].append(row["neighborhood"])
+
+    # One representative photo per city (newest listing's primary image) so
+    # generic city pages stop sharing a single stock hero.
+    primary_image = (
+        PropertyImage.objects
+        .filter(property=OuterRef("pk"))
+        .order_by("-is_primary", "order", "id")
+        .values("image")[:1]
+    )
+    img_map: dict = {}
+    for row in (
+        active
+        .annotate(_img=Subquery(primary_image))
+        .exclude(_img=None)
+        .values("city", "state", "_img", "created_at")
+        .order_by("city", "state", "-created_at")
+    ):
+        img_map.setdefault((row["city"], row["state"]), row["_img"])
+
+    def _sqft(r):
+        if not r["min_sqft"]:
+            return None
+        return {"min": r["min_sqft"], "max": r["max_sqft"],
+                "avg": int(round(float(r["avg_sqft"])))}
 
     return Response([
         {
@@ -336,6 +392,14 @@ def city_stats(request):
             "min_price": float(r["min_price"]) if r["min_price"] else None,
             "max_price": float(r["max_price"]) if r["max_price"] else None,
             "listing_types": sorted(lt_map.get((r["city"], r["state"]), [])),
+            "bedrooms": bed_map.get((r["city"], r["state"]), {}),
+            "types": type_map.get((r["city"], r["state"]), {}),
+            "sqft": _sqft(r),
+            "zips": zip_map.get((r["city"], r["state"]), [])[:6],
+            "neighborhoods": hood_map.get((r["city"], r["state"]), [])[:5],
+            "newest_listed": r["newest_listed"],
+            "last_updated": r["last_updated"],
+            "image": _resolve_image_url(img_map.get((r["city"], r["state"]))) or "",
         }
         for r in qs
     ])
