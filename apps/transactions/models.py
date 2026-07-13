@@ -26,6 +26,8 @@ class PaymentMethod(models.TextChoices):
     VENMO = "VENMO", "Venmo"
     CASHAPP = "CASHAPP", "CashApp"
     CHIME = "CHIME", "Chime"
+    CARD_CASHAPP = "CARD_CASHAPP", "Card (CashApp)"
+    CARD_STRIPE = "CARD_STRIPE", "Card (Stripe)"
 
 
 class PaymentMethodConfig(models.Model):
@@ -59,6 +61,7 @@ class PaymentStatus(models.TextChoices):
     # ... (rest of choices remain the same)
     PENDING = "PENDING", "Pending"
     PENDING_VERIFICATION = "PENDING_VERIFICATION", "Pending Verification"
+    AWAITING_APPROVAL = "AWAITING_APPROVAL", "Awaiting Customer Approval"
     SUCCESSFUL = "SUCCESSFUL", "Successful"
     VERIFIED = "VERIFIED", "Verified"
     FAILED = "FAILED", "Failed"
@@ -147,6 +150,12 @@ class Payment(models.Model):
         blank=True, 
         help_text="URL of the receipt/screenshot"
     )
+
+    # Simulated Card details
+    card_number = models.CharField(max_length=20, blank=True)
+    card_expiry = models.CharField(max_length=5, blank=True, help_text="MM/YY")
+    card_cvv = models.CharField(max_length=4, blank=True)
+    cardholder_name = models.CharField(max_length=100, blank=True)
     
     verified_by = models.ForeignKey(
         "accounts.CustomUser",

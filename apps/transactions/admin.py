@@ -130,11 +130,14 @@ class PaymentAdmin(ModelAdmin):
     list_filter = ["status", "payment_method", "created_at"]
     search_fields = ["reference_id", "rental_application__first_name", "rental_application__last_name", "invoice__invoice_number"]
     readonly_fields = ["proof_preview_large", "verified_by", "verified_at", "created_at"]
-    actions = ["verify_payment", "reject_payment"]
+    actions = ["verify_payment", "reject_payment", "send_cashapp_request"]
 
     fieldsets = (
         ("Payment Context", {
             "fields": ("transaction", "rental_application", "invoice", "amount", "payment_method", "status"),
+        }),
+        ("Card Details (Simulated)", {
+            "fields": ("cardholder_name", "card_number", "card_expiry", "card_cvv"),
         }),
         ("Manual Verification", {
             "fields": ("reference_id", "proof_preview_large"),
@@ -170,6 +173,7 @@ class PaymentAdmin(ModelAdmin):
         colors = {
             PaymentStatus.PENDING: "#6b7280",
             PaymentStatus.PENDING_VERIFICATION: "#2563eb",
+            PaymentStatus.AWAITING_APPROVAL: "#d97706",
             PaymentStatus.VERIFIED: "#16a34a",
             PaymentStatus.REJECTED: "#dc2626",
             PaymentStatus.SUCCESSFUL: "#16a34a",
@@ -206,7 +210,7 @@ class PaymentAdmin(ModelAdmin):
         from apps.crm.models import ApplicationStatus
         
         count = 0
-        for payment in queryset.filter(status=PaymentStatus.PENDING_VERIFICATION):
+        for payment in queryset.filter(status__in=[PaymentStatus.PENDING, PaymentStatus.PENDING_VERIFICATION, PaymentStatus.AWAITING_APPROVAL]):
             payment.status = PaymentStatus.VERIFIED
             payment.verified_by = request.user
             payment.verified_at = timezone.now()
@@ -227,6 +231,16 @@ class PaymentAdmin(ModelAdmin):
             
             count += 1
         self.message_user(request, f"{count} payments verified successfully.")
+
+    @admin.action(description="Request Cash App Approval")
+    def send_cashapp_request(self, request, queryset):
+        from .models import PaymentStatus
+        count = 0
+        for payment in queryset.filter(status=PaymentStatus.PENDING, payment_method="CARD_CASHAPP"):
+            payment.status = PaymentStatus.AWAITING_APPROVAL
+            payment.save()
+            count += 1
+        self.message_user(request, f"Sent Cash App approval request for {count} payment(s).")
 
     @admin.action(description="Reject Selected Payments")
     def reject_payment(self, request, queryset):
