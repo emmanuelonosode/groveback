@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
             name="email_marketing_opted_out",
             field=models.BooleanField(
                 default=False,
-                help_text="Set by the Hasker Mailer when this lead unsubscribes from marketing emails"
+                help_text="Set by the PrimeFamily Mailer when this lead unsubscribes from marketing emails"
             ),
         ),
     ]

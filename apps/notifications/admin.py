@@ -51,15 +51,15 @@ class EmailConfigurationAdmin(ModelAdmin):
                 'border-radius:9999px;font-size:11px;font-weight:600;">Active</span>'
             )
         return format_html(
-            '<span style="background:#6b7280;color:#fff;padding:2px 10px;'
+            '<span style="background:#717973;color:#fff;padding:2px 10px;'
             'border-radius:9999px;font-size:11px;">Inactive</span>'
         )
     status_badge.short_description = "Status"
 
     def connection_help(self, obj):
         return format_html(
-            '<div style="background:#eff4ff;border:1px solid #bfdbfe;border-radius:6px;'
-            'padding:12px 16px;font-size:13px;line-height:1.8;color:#1e3a5f;">'
+            '<div style="background:#f3f4ec;border:1px solid #c1ecd4;border-radius:6px;'
+            'padding:12px 16px;font-size:13px;line-height:1.8;color:#081C15;">'
             '<strong>How to get a Gmail App Password:</strong><br>'
             '1. Go to <a href="https://myaccount.google.com/security" target="_blank" '
             'style="color:#1A56DB;">myaccount.google.com/security</a><br>'
@@ -78,15 +78,15 @@ class EmailConfigurationAdmin(ModelAdmin):
             try:
                 connection = config.get_connection()
                 msg = EmailMessage(
-                    subject="Test Email — Hasker & Co. Realty Group",
+                    subject="Test Email — PrimeFamilyHousing",
                     body=(
                         f"Hi,\n\n"
-                        f"This is a test email from Hasker & Co. Realty Group.\n\n"
+                        f"This is a test email from PrimeFamilyHousing.\n\n"
                         f"Your email configuration is working correctly.\n\n"
                         f"Sender:  {config.get_from_header()}\n"
                         f"SMTP:    {config.smtp_host}:{config.smtp_port}\n"
                         f"TLS:     {'Yes' if config.use_tls else 'No'}\n\n"
-                        f"— Hasker & Co. Realty Group Admin"
+                        f"— PrimeFamilyHousing Admin"
                     ),
                     from_email=config.get_from_header(),
                     to=[config.email_host_user],

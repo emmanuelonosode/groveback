@@ -1,6 +1,6 @@
 """
 Django signals for the CRM app.
-Fires real-time webhook events to the Hasker Mailer when key CRM events occur,
+Fires real-time webhook events to the PrimeFamily Mailer when key CRM events occur,
 so the Mailer can automatically tag contacts and enroll them in drip sequences.
 """
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def _fire_mailer_webhook(event: str, email: str, name: str = "", phone: str = "", tags: Optional[list] = None, property_slug: Optional[str] = None, source: str = "", message: str = ""):
     """
-    Fire a webhook to the Hasker Mailer in a background thread.
+    Fire a webhook to the PrimeFamily Mailer in a background thread.
     Never blocks the main Django request.
     """
     def _send():
@@ -193,7 +193,35 @@ def on_user_verified(sender, instance, created, **kwargs):
             tags=["Portal User", "Verified"],
         )
 
+        # ── Automatically create invoice for deferred application fee ──
+        try:
+            from apps.crm.models import RentalApplication
+            from apps.transactions.models import Invoice, InvoiceStatus
+            from django.utils import timezone
 
+            unpaid_apps = RentalApplication.objects.filter(email=instance.email, is_fee_paid=False)
+            for app in unpaid_apps:
+                existing_invoice = Invoice.objects.filter(user=instance, title="Application Screening Fee").exists()
+                if not existing_invoice:
+                    Invoice.objects.create(
+                        user=instance,
+                        title="Application Screening Fee",
+                        description=f"Deferred screening fee for application ID #{app.id}.",
+                        issued_date=timezone.now().date(),
+                        due_date=timezone.now().date(),
+                        subtotal=app.application_fee,
+                        total=app.application_fee,
+                        status=InvoiceStatus.SENT,
+                        line_items=[{
+                            "description": "Application Screening Fee",
+                            "quantity": 1,
+                            "unit_price": float(app.application_fee),
+                            "total": float(app.application_fee)
+                        }]
+                    )
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Failed to create deferred application fee invoice")
 def connect_signals():
     """
     Connect all signal handlers using the real model classes.

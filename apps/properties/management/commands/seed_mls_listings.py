@@ -586,7 +586,7 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--agent-email",
-            default="admin@haskerrealtygroup.com",
+            default="admin@primefamilyhousing.com",
             help="Email of the agent to assign to all listings.",
         )
         parser.add_argument(
@@ -755,5 +755,5 @@ class Command(BaseCommand):
         if not is_published:
             self.stdout.write(self.style.WARNING(
                 "\nListings are unpublished. Review in admin, then set is_published=True to go live.\n"
-                "Admin: https://admin.haskerrealtygroup.com/admin/properties/property/"
+                "Admin: https://admin.primefamilyhousing.com/admin/properties/property/"
             ))

@@ -200,7 +200,7 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             if options["clear"]:
-                deleted, _ = Property.objects.filter(agent__email="zillow@haskerrealtygroup.com").delete()
+                deleted, _ = Property.objects.filter(agent__email="zillow@primefamilyhousing.com").delete()
                 self.stdout.write(self.style.WARNING(f"Cleared {deleted} existing Zillow imported rows."))
 
             categories = {}
@@ -212,7 +212,7 @@ class Command(BaseCommand):
                 categories[key] = category
 
             agent, created = User.objects.get_or_create(
-                email="zillow@haskerrealtygroup.com",
+                email="zillow@primefamilyhousing.com",
                 defaults={
                     "first_name": "Zillow",
                     "last_name": "Rentals",

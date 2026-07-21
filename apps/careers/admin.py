@@ -42,13 +42,13 @@ class JobApplicationAdmin(ModelAdmin):
 
     def status_badge(self, obj):
         colors = {
-            ApplicationStatus.SUBMITTED:           "#2563eb",  # blue
+            ApplicationStatus.SUBMITTED:           "#012d1d",  # blue
             ApplicationStatus.UNDER_REVIEW:        "#d97706",  # amber
             ApplicationStatus.INTERVIEW_SCHEDULED: "#7c3aed",  # purple
             ApplicationStatus.HIRED:               "#16a34a",  # green
             ApplicationStatus.REJECTED:            "#dc2626",  # red
         }
-        color = colors.get(obj.status, "#6b7280")
+        color = colors.get(obj.status, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 10px;border-radius:9999px;font-size:11px;font-weight:600">{}</span>',
             color, obj.get_status_display(),

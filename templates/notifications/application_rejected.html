@@ -1,73 +1,77 @@
 {% extends "notifications/email_base.html" %}
 
-{% block subject %}Update on Your Application — Hasker &amp; Co. Realty Group{% endblock %}
+{% block subject %}An Update on Your Application — PrimeFamilyHousing{% endblock %}
+
+{% block hero_image %}
+<tr>
+  <td style="padding:0;font-size:0;line-height:0;">
+    <img src="{{ frontend_url }}/illustrations/email-header-welcome.png" alt=""
+         width="672" style="display:block;width:100%;max-width:672px;height:128px;object-fit:cover;opacity:0.85;" />
+  </td>
+</tr>
+{% endblock %}
 
 {% block content %}
-  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#1E3A5F;line-height:1.3;">
-    Hi {{ app.first_name }},
-  </p>
+  <!-- Empathetic header -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    <tr>
+      <td align="center" style="padding:0 0 24px 0;">
+        <span style="font-size:30px;line-height:36px;color:#717973;">&#9993;</span>
+        <p style="margin:8px 0 0 0;font-family:'Montserrat',Arial,sans-serif;font-size:24px;line-height:32px;font-weight:600;color:#081C15;">An Update on Your Application</p>
+      </td>
+    </tr>
+  </table>
 
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
-    Thank you for your interest in renting with <strong>Hasker &amp; Co. Realty Group</strong> and for taking the time to submit your application.
-  </p>
-
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
-    After careful review, we regret to inform you that your application for
-    {% if app.rental_property %}<strong>{{ app.rental_property.title }}</strong>{% else %}the property you applied for{% endif %}
-    was not successful at this time.
+  <!-- Message -->
+  <p style="margin:0 0 12px 0;font-size:16px;line-height:26px;color:#414844;">Dear {{ app.first_name|default:"Applicant" }},</p>
+  <p style="margin:0 0 28px 0;font-size:16px;line-height:26px;color:#414844;">
+    Thank you for your interest in renting with PrimeFamilyHousing and for taking the time to apply. After careful review, we&apos;re unable to move forward with your application{% if app.rental_property %} for <strong style="color:#081C15;">{{ app.rental_property.title }}</strong>{% endif %} at this time. We know this isn&apos;t the news you hoped for, and we truly appreciate the opportunity to consider you.
   </p>
 
   <!-- Divider -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
-    <tr>
-      <td style="height:1px;background-color:#f1f5f9;font-size:0;line-height:0;">&nbsp;</td>
-    </tr>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
+    <tr><td style="border-top:1px solid #d5dad3;font-size:0;line-height:0;">&nbsp;</td></tr>
   </table>
 
-  <p style="margin:0 0 12px 0;font-size:15px;font-weight:700;color:#1E3A5F;">We Encourage You to Keep Searching</p>
-
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
-    We have a wide range of rental properties available across multiple cities. A different listing may be a great fit for your needs.
-  </p>
-
-  <!-- Illustration -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 20px 0;text-align:center;">
+  <!-- Encouragement callout -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4ec;border:1px solid #c1c8c2;border-radius:12px;margin:0 0 24px 0;">
     <tr>
-      <td>
-        <img src="{{ frontend_url }}/illustrations/feature-for-rent.png" alt="Browse available rentals" width="240" height="240" style="display:inline-block;width:240px;height:auto;max-width:100%;" />
+      <td align="center" style="padding:28px 28px;">
+        <p style="margin:0 0 12px 0;font-family:'Montserrat',Arial,sans-serif;font-size:20px;line-height:26px;font-weight:600;color:#1a1c18;">Your Perfect Home is Out There</p>
+        <p style="margin:0 auto 22px;font-size:15px;line-height:24px;color:#414844;max-width:400px;">
+          While this specific property wasn&apos;t the right fit, our portfolio of family-friendly homes is constantly growing. We encourage you to keep exploring.
+        </p>
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+          <tr>
+            <td style="background-color:#012d1d;border-radius:8px;">
+              <a href="{{ frontend_url }}/houses-for-rent" style="display:inline-block;padding:13px 30px;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">
+                Browse Available Rentals
+              </a>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
 
-  <!-- CTA button -->
-  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px 0;">
+  <!-- We're here to help -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #c1c8c2;border-radius:8px;">
     <tr>
-      <td style="background-color:#2563EB;border-radius:6px;">
-        <a href="{{ frontend_url }}/houses-for-rent" style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:0.3px;">
-          Browse Available Rentals
-        </a>
+      <td style="padding:16px 20px;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+          <tr>
+            <td width="30" valign="top" style="font-size:20px;color:#BC6C25;">&#9757;</td>
+            <td valign="top">
+              <p style="margin:0 0 3px 0;font-size:13px;font-weight:700;color:#081C15;">We&apos;re Here to Help</p>
+              <p style="margin:0;font-size:13px;line-height:18px;color:#414844;">
+                Questions about our criteria or want guidance on your next application? Reach out to our team at
+                <a href="mailto:info@primefamilyhousing.com" style="color:#012d1d;text-decoration:none;">info@primefamilyhousing.com</a>
+                or <a href="tel:+17572082767" style="color:#012d1d;text-decoration:none;">(757) 208-2767</a>.
+              </p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
-
-  <p style="margin:0 0 16px 0;font-size:14px;color:#64748b;line-height:1.7;">
-    If you have any questions or would like to speak with one of our agents about other available options, please don't hesitate to reach out. We are here to help you find the right home.
-  </p>
-
-  <table cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:16px 0 28px 0;width:100%;">
-    <tr>
-      <td style="padding:16px 20px;font-size:13px;color:#475569;line-height:2;">
-        <strong style="color:#1E3A5F;display:block;margin-bottom:4px;">Contact Our Leasing Team</strong>
-        <a href="tel:+17572082767" style="color:#2563EB;text-decoration:none;font-weight:600;">+1 (757) 208-2767</a>
-        &nbsp;&nbsp;·&nbsp;&nbsp;
-        <a href="mailto:info@haskerrealtygroup.com" style="color:#2563EB;text-decoration:none;font-weight:600;">info@haskerrealtygroup.com</a>
-      </td>
-    </tr>
-  </table>
-
-  <p style="margin:0;font-size:14px;color:#334155;">
-    Thank you again for considering Hasker &amp; Co. Realty Group. We wish you the very best in your search.<br><br>
-    Sincerely,<br>
-    <strong style="color:#1E3A5F;">The Hasker &amp; Co. Realty Group Team</strong>
-  </p>
 {% endblock %}

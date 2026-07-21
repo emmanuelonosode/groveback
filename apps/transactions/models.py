@@ -33,7 +33,7 @@ class PaymentMethod(models.TextChoices):
 class PaymentMethodConfig(models.Model):
     method = models.CharField(max_length=20, choices=PaymentMethod.choices, unique=True)
     display_name = models.CharField(max_length=50, help_text='e.g. "Venmo", "Cash App"')
-    handle = models.CharField(max_length=200, blank=True, help_text='e.g. "@HaskerRealty" or "payments@haskerrealtygroup.com"')
+    handle = models.CharField(max_length=200, blank=True, help_text='e.g. "@PrimeFamilyHousing" or "payments@primefamilyhousing.com"')
     is_active = models.BooleanField(default=True)
     extra_instructions = models.TextField(blank=True, help_text="Optional note shown to tenants (e.g. 'Use Friends & Family')")
     updated_at = models.DateTimeField(auto_now=True)

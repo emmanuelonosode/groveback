@@ -2,7 +2,9 @@ from .base import *  # noqa
 from decouple import config, Csv
 
 
-DEBUG = True
+# NEVER default to True in production. Override only via an explicit env var
+# (DEBUG=true) for short-lived debugging, and turn it straight back off.
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 # MySQL on this host doesn't have timezone tables installed, so CONVERT_TZ
 # would return NULL and break date_hierarchy in the admin. Using UTC means
@@ -11,10 +13,10 @@ TIME_ZONE = "UTC"
 
 # Hardcoded production domains to prevent DisallowedHost errors
 ALLOWED_HOSTS = [
-    "admin.haskerrealtygroup.com",
-    "www.haskerrealtygroup.com",
-    "haskerrealtygroup.com",
-    "api.haskerrealtygroup.com",
+    "admin.primefamilyhousing.com",
+    "www.primefamilyhousing.com",
+    "primefamilyhousing.com",
+    "api.primefamilyhousing.com",
     "localhost",
     "127.0.0.1",
 ]
@@ -43,15 +45,15 @@ CSRF_COOKIE_SECURE = True
 
 # Required for admin login & forms in production SSL
 CSRF_TRUSTED_ORIGINS = [
-    "https://admin.haskerrealtygroup.com",
-    "https://www.haskerrealtygroup.com",
-    "https://haskerrealtygroup.com",
+    "https://admin.primefamilyhousing.com",
+    "https://www.primefamilyhousing.com",
+    "https://primefamilyhousing.com",
 ]
 
 # CORS fallbacks for production
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
-    default="https://www.haskerrealtygroup.com,https://haskerrealtygroup.com",
+    default="https://www.primefamilyhousing.com,https://primefamilyhousing.com",
     cast=Csv()
 )
 
@@ -70,7 +72,7 @@ else:
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="Hasker & Co. <info@haskerrealtygroup.com>")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="PrimeFamilyHousing <info@primefamilyhousing.com>")
 
 SENTRY_DSN = config("SENTRY_DSN", default="")
 if SENTRY_DSN:
@@ -78,6 +80,9 @@ if SENTRY_DSN:
     sentry_sdk.init(dsn=SENTRY_DSN, traces_sample_rate=0.2)
 
 import os
+# Ensure the log directory exists — the FileHandler below crashes on startup
+# otherwise (fresh deploys won't have logs/).
+os.makedirs(os.path.join(BASE_DIR, "logs"), exist_ok=True)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

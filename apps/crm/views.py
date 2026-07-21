@@ -16,6 +16,7 @@ from .serializers import (
     LeadActivitySerializer, LeadAssignSerializer, ClientSerializer,
     RentalApplicationCreateSerializer, RentalApplicationAdminSerializer,
     RentalApplicationLatestProfileSerializer, RentalApplicationDraftSerializer,
+    UserRentalApplicationSerializer,
 )
 
 
@@ -238,14 +239,22 @@ class ClientDetailView(generics.RetrieveUpdateAPIView):
 # ── Rental Application Views ───────────────────────────────────────────────────
 
 class UserRentalApplicationListView(generics.ListAPIView):
-    """GET /api/v1/leads/apply/my-applications/ — User's own applications."""
-    serializer_class = RentalApplicationAdminSerializer
+    """GET /api/v1/leads/apply/my-applications/ — User's own applications.
+
+    Returns the applied-for home (full details + photo), the assigned agent,
+    and a move-in cost breakdown so the tenant portal can show everything the
+    applicant needs about the property they applied for.
+    """
+    serializer_class = UserRentalApplicationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return RentalApplication.objects.filter(
-            email=self.request.user.email
-        ).select_related("rental_property").order_by("-submitted_at")
+        return (
+            RentalApplication.objects.filter(email=self.request.user.email)
+            .select_related("rental_property", "rental_property__agent")
+            .prefetch_related("rental_property__images")
+            .order_by("-submitted_at")
+        )
 
 class RentalApplicationCreateView(generics.CreateAPIView):
     """POST /api/v1/leads/apply/ — public form submission."""

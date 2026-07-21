@@ -1,6 +1,6 @@
 {% extends "notifications/email_base.html" %}
 
-{% block subject %}Action Required: Payment Proof Not Verified — Hasker & Co.{% endblock %}
+{% block subject %}Action Required: Payment Proof Not Verified — PrimeFamilyHousing{% endblock %}
 
 {% block content %}
   <!-- Spot illustration -->
@@ -15,44 +15,44 @@
   <!-- Status badge -->
   <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
     <tr>
-      <td style="background-color:#fee2e2;border-radius:20px;padding:6px 16px;">
-        <span style="font-size:12px;font-weight:700;color:#dc2626;letter-spacing:0.5px;">&#9888; PROOF NOT VERIFIED</span>
+      <td style="background-color:#ffdad6;border-radius:20px;padding:6px 16px;">
+        <span style="font-size:12px;font-weight:700;color:#ba1a1a;letter-spacing:0.5px;">&#9888; PROOF NOT VERIFIED</span>
       </td>
     </tr>
   </table>
 
-  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#1E3A5F;line-height:1.3;">
+  <p style="margin:0 0 20px 0;font-family:'Montserrat',Arial,sans-serif;font-size:22px;font-weight:700;color:#081C15;line-height:1.3;">
     Hi {{ recipient_name }},
   </p>
 
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
     Unfortunately, we were unable to verify your payment proof. Please re-submit a clear screenshot of your completed transfer to resolve this.
   </p>
 
   <!-- Payment summary card -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:20px 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f9faf2;border:1px solid #e2e3db;border-radius:6px;margin:20px 0;">
     <tr>
       <td style="padding:24px;">
-        <p style="margin:0 0 12px 0;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Payment Details</p>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;color:#475569;line-height:2;">
+        <p style="margin:0 0 12px 0;font-size:11px;font-weight:700;color:#717973;text-transform:uppercase;letter-spacing:1px;">Payment Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;color:#414844;line-height:2;">
           <tr>
-            <td style="color:#94a3b8;font-weight:600;">Status</td>
-            <td style="color:#dc2626;font-weight:700;text-align:right;">Rejected</td>
+            <td style="color:#a7a895;font-weight:600;">Status</td>
+            <td style="color:#ba1a1a;font-weight:700;text-align:right;">Rejected</td>
           </tr>
           <tr>
-            <td style="color:#94a3b8;font-weight:600;">Amount</td>
-            <td style="color:#1E3A5F;font-weight:700;text-align:right;">${{ payment.amount|floatformat:2 }}</td>
+            <td style="color:#a7a895;font-weight:600;">Amount</td>
+            <td style="color:#081C15;font-weight:700;text-align:right;">${{ payment.amount|floatformat:2 }}</td>
           </tr>
           {% if payment.invoice %}
           <tr>
-            <td style="color:#94a3b8;font-weight:600;">Invoice</td>
-            <td style="color:#1E3A5F;text-align:right;">{{ payment.invoice.invoice_number }}</td>
+            <td style="color:#a7a895;font-weight:600;">Invoice</td>
+            <td style="color:#081C15;text-align:right;">{{ payment.invoice.invoice_number }}</td>
           </tr>
           {% endif %}
           {% if payment.rejection_reason %}
           <tr>
-            <td style="color:#94a3b8;font-weight:600;vertical-align:top;">Reason</td>
-            <td style="color:#334155;text-align:right;">{{ payment.rejection_reason }}</td>
+            <td style="color:#a7a895;font-weight:600;vertical-align:top;">Reason</td>
+            <td style="color:#414844;text-align:right;">{{ payment.rejection_reason }}</td>
           </tr>
           {% endif %}
         </table>
@@ -60,14 +60,14 @@
     </tr>
   </table>
 
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
     Common reasons for rejection include: blurry or cropped screenshots, the transfer amount not matching the invoice total, or an unrecognised sender name.
   </p>
 
   <!-- Action CTA -->
   <table cellpadding="0" cellspacing="0" border="0" style="margin:12px 0;width:100%;">
     <tr>
-      <td align="center" style="background-color:#2563EB;border-radius:8px;">
+      <td align="center" style="background-color:#012d1d;border-radius:8px;">
         <a href="{{ frontend_url }}/portal/payments" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;width:100%;text-align:center;">
           Re-Submit Payment Proof
         </a>
@@ -75,13 +75,13 @@
     </tr>
   </table>
 
-  <p style="margin:20px 0 0 0;font-size:14px;color:#334155;line-height:1.7;">
+  <p style="margin:20px 0 0 0;font-size:14px;color:#414844;line-height:1.7;">
     If you believe this is an error or need assistance, please reply to this email or contact us at
-    <a href="mailto:info@haskerrealtygroup.com" style="color:#2563EB;">info@haskerrealtygroup.com</a>.
+    <a href="mailto:info@primefamilyhousing.com" style="color:#012d1d;">info@primefamilyhousing.com</a>.
   </p>
 
-  <p style="margin:32px 0 0 0;font-size:14px;color:#334155;">
+  <p style="margin:32px 0 0 0;font-size:14px;color:#414844;">
     Best regards,<br>
-    <strong style="color:#1E3A5F;">The Hasker &amp; Co. Realty Group Team</strong>
+    <strong style="color:#081C15;">The PrimeFamilyHousing Team</strong>
   </p>
 {% endblock %}

@@ -148,12 +148,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             except Exception:
                 pass
 
-            subject = f"{self.email_verification_code} is your Hasker & Co. verification code"
+            subject = f"{self.email_verification_code} is your PrimeFamilyHousing verification code"
             body = render_to_string(
                 "notifications/email_verification.html",
                 {
                     "user": self,
-                    "frontend_url": getattr(settings, "FRONTEND_URL", "https://www.haskerrealtygroup.com"),
+                    "frontend_url": getattr(settings, "FRONTEND_URL", "https://www.primefamilyhousing.com"),
                 },
             )
             msg = EmailMessage(

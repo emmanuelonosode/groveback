@@ -19,7 +19,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--site-url",
             type=str,
-            help="Specify a custom site URL/sc-domain for Google Search Console (e.g. sc-domain:haskerrealtygroup.com). If not provided, it will automatically search verified sites.",
+            help="Specify a custom site URL/sc-domain for Google Search Console (e.g. sc-domain:primefamilyhousing.com). If not provided, it will automatically search verified sites.",
         )
         parser.add_argument(
             "--inspect-limit",
@@ -149,18 +149,18 @@ class Command(BaseCommand):
         # 5. Select target site
         target_site = options.get("site_url")
         if not target_site:
-            # Look for haskerrealtygroup.com matches
-            hasker_domains = [
+            # Look for primefamilyhousing.com matches
+            pfh_domains = [
                 e.get("siteUrl") for e in site_entries 
-                if "haskerrealtygroup.com" in e.get("siteUrl")
+                if "primefamilyhousing.com" in e.get("siteUrl")
             ]
-            if hasker_domains:
-                # Prefer domain properties (sc-domain:haskerrealtygroup.com)
-                domain_props = [d for d in hasker_domains if d.startswith("sc-domain:")]
+            if pfh_domains:
+                # Prefer domain properties (sc-domain:primefamilyhousing.com)
+                domain_props = [d for d in pfh_domains if d.startswith("sc-domain:")]
                 if domain_props:
                     target_site = domain_props[0]
                 else:
-                    target_site = hasker_domains[0]
+                    target_site = pfh_domains[0]
             else:
                 # Fallback to the first verified site
                 target_site = site_entries[0].get("siteUrl")
@@ -195,7 +195,7 @@ class Command(BaseCommand):
             self.stdout.write(f"Warning: Could not fetch search analytics: {e}")
 
         # 8. Define URLs to Inspect
-        base_domain = "https://haskerrealtygroup.com"
+        base_domain = "https://primefamilyhousing.com"
         # Gather key URLs
         urls_to_inspect = [
             f"{base_domain}/",

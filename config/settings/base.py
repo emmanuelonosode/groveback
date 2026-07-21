@@ -221,23 +221,23 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
-DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="info@haskerrealtygroup.com")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="info@primefamilyhousing.com")
 
 
 # ── Frontend ───────────────────────────────────────────────────────────────────
 FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:3003")
 
-# ── Hasker Mailer Integration ──────────────────────────────────────────────────
+# ── PrimeFamily Mailer Integration ──────────────────────────────────────────────────
 # Shared secret key for the /api/v1/mailer/* sync endpoints
 MAILER_SYNC_KEY = config("MAILER_SYNC_KEY", default="")
-# Base URL of the deployed Hasker Mailer application
+# Base URL of the deployed PrimeFamily Mailer application
 MAILER_APP_URL = config("MAILER_APP_URL", default="http://localhost:3001")
 
 
 # ── Django Unfold Admin ────────────────────────────────────────────────────────
 UNFOLD = {
-    "SITE_TITLE": "Hasker & Co. Realty Group",
-    "SITE_HEADER": "Hasker & Co. Realty Group",
+    "SITE_TITLE": "PrimeFamilyHousing",
+    "SITE_HEADER": "PrimeFamilyHousing",
     "SITE_SUBHEADER": "CRM & Operations Dashboard",
     "SITE_URL": FRONTEND_URL,
     "SITE_ICON": None,

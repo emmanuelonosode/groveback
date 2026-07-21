@@ -1,4 +1,4 @@
-Hasker & Co. Realty Group — Viewing Reminder
+PrimeFamilyHousing — Viewing Reminder
 =========================================
 
 This is a reminder for your upcoming property viewing.
@@ -11,7 +11,7 @@ Agent:    {{ viewing.agent.full_name }}
 Notes: {{ viewing.notes }}
 {% endif %}
 
-If you need to reschedule, please contact us at info@haskerrealtygroup.com.
+If you need to reschedule, please contact us at info@primefamilyhousing.com.
 
 ---
-Hasker & Co. Realty Group | info@haskerrealtygroup.com
+PrimeFamilyHousing | info@primefamilyhousing.com

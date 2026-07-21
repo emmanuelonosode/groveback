@@ -1,5 +1,5 @@
 """
-Email functions for Hasker & Co. Realty Group.
+Email functions for PrimeFamilyHousing.
 
 All functions run synchronously — no Celery worker required.
 For scheduled tasks (weekly_lead_followup, etc.) wire them up as
@@ -82,7 +82,7 @@ def send_verification_email(user_id: int):
             return "No OTP code set — skipped."
 
         from_header, connection = _get_email_sender()
-        subject = f"{user.email_verification_code} is your Hasker & Co. verification code"
+        subject = f"{user.email_verification_code} is your PrimeFamilyHousing verification code"
 
         body = render_to_string("notifications/email_verification.html", {
             "user": user,
@@ -246,7 +246,7 @@ def send_job_application_notification(application_id: int):
             "notifications/job_application_confirmation.html", {"app": app}
         )
         msg_confirm = EmailMessage(
-            subject=f"Application received — {app.role_title} | Hasker & Co. Realty Group",
+            subject=f"Application received — {app.role_title} | PrimeFamilyHousing",
             body=confirmation_body,
             from_email=from_header,
             to=[app.email],
@@ -259,7 +259,7 @@ def send_job_application_notification(application_id: int):
             CustomUser.objects.filter(role=Role.MANAGER, is_active=True)
             .values_list("email", flat=True)
         )
-        staff_recipients = list(set(manager_emails + ["careers@haskerrealtygroup.com"]))
+        staff_recipients = list(set(manager_emails + ["careers@primefamilyhousing.com"]))
 
         alert_body = render_to_string(
             "notifications/job_application_staff_alert.html", {"app": app}
@@ -289,7 +289,7 @@ def send_job_rejection_email(application_id: int):
         app = JobApplication.objects.get(pk=application_id)
         from_header, connection = _get_email_sender()
 
-        subject = f"Re: Your application for {app.role_title} — Hasker & Co. Realty Group"
+        subject = f"Re: Your application for {app.role_title} — PrimeFamilyHousing"
         body = render_to_string(
             "notifications/job_application_rejection.html", {"app": app}
         )
@@ -347,7 +347,7 @@ def send_payment_submitted_email(payment_id: int):
         recipient_email, recipient_name = result
 
         from_header, connection = _get_email_sender()
-        subject = "Payment Received & Pending Verification — Hasker & Co."
+        subject = "Payment Received & Pending Verification — PrimeFamilyHousing"
         body = render_to_string("notifications/payment_submitted.html", {
             "payment": payment,
             "recipient_name": recipient_name,
@@ -382,7 +382,7 @@ def send_payment_verified_email(payment_id: int):
         recipient_email, recipient_name = result
 
         from_header, connection = _get_email_sender()
-        subject = "Payment Verified — Hasker & Co. Realty Group"
+        subject = "Payment Verified — PrimeFamilyHousing"
         body = render_to_string("notifications/payment_verified.html", {
             "payment": payment,
             "recipient_name": recipient_name,
@@ -417,7 +417,7 @@ def send_payment_rejected_email(payment_id: int):
         recipient_email, recipient_name = result
 
         from_header, connection = _get_email_sender()
-        subject = "Action Required: Payment Proof Not Verified — Hasker & Co."
+        subject = "Action Required: Payment Proof Not Verified — PrimeFamilyHousing"
         body = render_to_string("notifications/payment_rejected.html", {
             "payment": payment,
             "recipient_name": recipient_name,
@@ -685,9 +685,9 @@ def send_lead_acknowledgment_email(lead_id: int):
                 })
 
         subject = (
-            f"{prop.title} is Available — Hasker & Co. Realty Group"
+            f"{prop.title} is Available — PrimeFamilyHousing"
             if prop else
-            "We received your inquiry — Hasker & Co. Realty Group"
+            "We received your inquiry — PrimeFamilyHousing"
         )
 
         from_header, connection = _get_email_sender()
@@ -763,7 +763,7 @@ def send_application_rejected_email(application_id: int):
         app = RentalApplication.objects.select_related("rental_property").get(pk=application_id)
 
         from_header, connection = _get_email_sender()
-        subject = "Update on Your Application — Hasker & Co. Realty Group"
+        subject = "Update on Your Application — PrimeFamilyHousing"
         body = render_to_string("notifications/application_rejected.html", {
             "app": app,
             "frontend_url": settings.FRONTEND_URL,
@@ -826,7 +826,7 @@ def send_application_under_review_email(application_id: int):
         app = RentalApplication.objects.select_related("rental_property").get(pk=application_id)
 
         from_header, connection = _get_email_sender()
-        subject = "Your Application Is Under Review — Hasker & Co. Realty Group"
+        subject = "Your Application Is Under Review — PrimeFamilyHousing"
         body = render_to_string("notifications/application_under_review.html", {
             "app": app,
             "frontend_url": settings.FRONTEND_URL,
@@ -856,7 +856,7 @@ def send_application_submitted_email(application_id: int):
         app = RentalApplication.objects.select_related("rental_property").get(pk=application_id)
 
         from_header, connection = _get_email_sender()
-        subject = "Your Application Has Been Received — Hasker & Co. Realty Group"
+        subject = "Your Application Has Been Received — PrimeFamilyHousing"
         body = render_to_string("notifications/application_submitted.html", {
             "app": app,
             "frontend_url": settings.FRONTEND_URL,
@@ -1343,9 +1343,9 @@ def send_admin_alert(subject: str, rows: list):
              font-family:'Helvetica Neue',Arial,sans-serif;">
   <table style="max-width:520px;margin:0 auto;background:#fff;border:1px solid #e8e8e8;">
     <tr>
-      <td style="background:#0B1F3A;padding:20px 28px;">
+      <td style="background:#081C15;padding:20px 28px;">
         <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:2px;
-                  text-transform:uppercase;color:#64748b">Hasker &amp; Co. — Internal Alert</p>
+                  text-transform:uppercase;color:#717973">PrimeFamilyHousing — Internal Alert</p>
         <p style="margin:0;font-size:16px;font-weight:700;color:#fff">{subject}</p>
       </td>
     </tr>

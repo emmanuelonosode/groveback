@@ -36,7 +36,7 @@ urlpatterns = [
     path("api/v1/documents/", include("apps.documents.urls")),
     path("api/v1/maintenance/", include("apps.maintenance.urls")),
 
-    # ── Hasker Mailer Integration ───────────────────────────────────────────
+    # ── PrimeFamily Mailer Integration ───────────────────────────────────────────
     # Secure sync API — protected by X-Mailer-Key header
     path("api/v1/mailer/", include("apps.crm.mailer_urls")),
 

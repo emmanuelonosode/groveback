@@ -263,7 +263,7 @@ class Command(BaseCommand):
                 # the sitemap; unpublish_stale_listings retires it after 60 days.
                 delisted = (
                     Property.objects
-                    .filter(agent__email="agent@haskerrealtygroup.com")
+                    .filter(agent__email="agent@primefamilyhousing.com")
                     .exclude(slug__in=feed_slugs)
                     .exclude(status__in=["rented", "sold"])
                     .update(status="rented")
@@ -271,7 +271,7 @@ class Command(BaseCommand):
                 # Homes that came back into the feed get re-activated.
                 relisted = (
                     Property.objects
-                    .filter(agent__email="agent@haskerrealtygroup.com", slug__in=feed_slugs, status="rented")
+                    .filter(agent__email="agent@primefamilyhousing.com", slug__in=feed_slugs, status="rented")
                     .update(status="available", is_published=True)
                 )
                 self.stdout.write(self.style.WARNING(
@@ -287,7 +287,7 @@ class Command(BaseCommand):
                 categories[key] = category
 
             agent, created = User.objects.get_or_create(
-                email="agent@haskerrealtygroup.com",
+                email="agent@primefamilyhousing.com",
                 defaults={
                     "first_name": "Marcus",
                     "last_name": "Reid",

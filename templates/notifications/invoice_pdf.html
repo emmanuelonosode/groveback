@@ -5,35 +5,35 @@
   <title>Invoice {{ invoice.invoice_number }}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1a1a1a; padding: 0; font-size: 14px; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1a1c18; padding: 0; font-size: 14px; }
     /* Top header band */
-    .header-band { background: #1E3A5F; padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
+    .header-band { background: #081C15; padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
     .wordmark { display: flex; align-items: center; gap: 14px; }
     .wordmark-text .name { font-size: 19px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px; line-height: 1.2; }
-    .wordmark-text .sub { font-size: 9px; font-weight: 400; color: #2563EB; letter-spacing: 2.8px; text-transform: uppercase; margin-top: 3px; }
-    .accent-bar { height: 4px; background: #2563EB; }
+    .wordmark-text .sub { font-size: 9px; font-weight: 400; color: #012d1d; letter-spacing: 2.8px; text-transform: uppercase; margin-top: 3px; }
+    .accent-bar { height: 4px; background: #012d1d; }
     /* Content area */
     .content { padding: 40px 48px; }
     .invoice-title-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
-    .invoice-label { font-size: 32px; font-weight: 800; color: #1E3A5F; letter-spacing: -1px; text-transform: uppercase; }
+    .invoice-label { font-size: 32px; font-weight: 800; color: #081C15; letter-spacing: -1px; text-transform: uppercase; }
     .invoice-meta { text-align: right; }
-    .invoice-meta .inv-number { font-size: 15px; font-weight: 700; color: #1E3A5F; }
+    .invoice-meta .inv-number { font-size: 15px; font-weight: 700; color: #081C15; }
     .invoice-meta p { color: #555; margin-top: 5px; font-size: 13px; }
-    .divider { border: none; border-top: 2px solid #1E3A5F; margin: 0 0 28px 0; }
+    .divider { border: none; border-top: 2px solid #081C15; margin: 0 0 28px 0; }
     .parties { display: flex; justify-content: space-between; margin-bottom: 36px; gap: 20px; }
     .party h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; margin-bottom: 8px; font-weight: 700; }
     .party p { line-height: 1.65; font-size: 13px; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
-    thead th { background: #1E3A5F; color: white; padding: 11px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
+    thead th { background: #081C15; color: white; padding: 11px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; }
     tbody td { padding: 11px 14px; border-bottom: 1px solid #eee; font-size: 13px; }
     tbody tr:last-child td { border-bottom: none; }
-    tbody tr:nth-child(even) td { background: #f9fafb; }
+    tbody tr:nth-child(even) td { background: #f9faf2; }
     .totals { margin-left: auto; width: 300px; }
     .totals table { margin-bottom: 0; }
     .totals td { padding: 7px 14px; font-size: 13px; }
-    .totals .grand-total td { font-weight: 800; font-size: 16px; border-top: 2px solid #1E3A5F; padding-top: 12px; color: #1E3A5F; }
-    .footer { margin-top: 48px; padding: 16px 48px; border-top: 1px solid #e2e8f0; font-size: 11px; color: #888; text-align: center; background: #f8fafc; }
-    .status-badge { display: inline-block; padding: 5px 14px; border-radius: 99px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; background: #dcfce7; color: #166534; }
+    .totals .grand-total td { font-weight: 800; font-size: 16px; border-top: 2px solid #081C15; padding-top: 12px; color: #081C15; }
+    .footer { margin-top: 48px; padding: 16px 48px; border-top: 1px solid #e2e3db; font-size: 11px; color: #888; text-align: center; background: #f9faf2; }
+    .status-badge { display: inline-block; padding: 5px 14px; border-radius: 99px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; background: #c1ecd4; color: #2E7D32; }
   </style>
 </head>
 <body>
@@ -41,17 +41,17 @@
   <div class="header-band">
     <div class="wordmark">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
-        <circle cx="22" cy="22" r="22" fill="#1E3A5F" stroke="#2563EB" stroke-width="1.5"/>
+        <circle cx="22" cy="22" r="22" fill="#081C15" stroke="#012d1d" stroke-width="1.5"/>
         <g transform="translate(22,22) scale(0.173) translate(-160,-160)">
-          <polygon points="76,160 160,56 244,160 160,264" fill="#2563EB"/>
+          <polygon points="76,160 160,56 244,160 160,264" fill="#012d1d"/>
           <polygon points="120,160 160,104 200,160" fill="#FFFFFF"/>
           <rect x="124" y="160" width="72" height="50" rx="4" fill="#FFFFFF"/>
-          <rect x="146" y="170" width="28" height="40" rx="4" fill="#2563EB"/>
+          <rect x="146" y="170" width="28" height="40" rx="4" fill="#012d1d"/>
         </g>
       </svg>
       <div class="wordmark-text">
-        <div class="name">HASKER &amp; CO.</div>
-        <div class="sub">REALTY GROUP</div>
+        <div class="name">PrimeFamilyHousing</div>
+        <div class="sub">Homes for Families</div>
       </div>
     </div>
     <div style="text-align:right;">
@@ -76,8 +76,8 @@
     <div class="parties">
     <div class="party">
       <h4>From</h4>
-      <p><strong>Hasker &amp; Co. Realty Group</strong></p>
-      <p>info@haskerrealtygroup.com</p>
+      <p><strong>PrimeFamilyHousing</strong></p>
+      <p>info@primefamilyhousing.com</p>
     </div>
     <div class="party">
       <h4>Billed To</h4>
@@ -129,7 +129,7 @@
   </div><!-- /content -->
 
   <div class="footer">
-    <strong>Hasker &amp; Co. Realty Group</strong> &bull; info@haskerrealtygroup.com &bull; All amounts in USD &bull; Equal Housing Opportunity
+    <strong>PrimeFamilyHousing</strong> &bull; info@primefamilyhousing.com &bull; All amounts in USD &bull; Equal Housing Opportunity
   </div>
 </body>
 </html>

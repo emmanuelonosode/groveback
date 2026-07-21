@@ -4,10 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>{% block subject %}{{ subject|default:"New Listings — Hasker &amp; Co." }}{% endblock %}</title>
+  <title>{% block subject %}{{ subject|default:"New Listings — PrimeFamilyHousing" }}{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet" />
   <!--[if mso]><style>* { font-family: Arial, sans-serif !important; }</style><![endif]-->
   <style>
     body  { margin: 0; padding: 0; background-color: #E8E5DC; }
@@ -40,28 +40,28 @@
     <td align="center" style="padding:48px 16px 80px;" class="email-outer">
 
       <!-- ── EMAIL CARD ─────────────────────────────────── -->
-      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #F1F5F9;box-shadow:0 12px 40px rgba(11,31,58,0.08),0 2px 6px rgba(11,31,58,0.04);">
+      <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background-color:#ffffff;border:1px solid #f3f4ec;box-shadow:0 12px 40px rgba(8,28,21,0.08),0 2px 6px rgba(8,28,21,0.04);">
 
         <!-- ═══ HEADER ═══════════════════════════════════ -->
         <tr>
-          <td bgcolor="#ffffff" style="padding:22px 32px 18px;border-bottom:1px solid #F1F5F9;" class="header-cell">
+          <td bgcolor="#ffffff" style="padding:22px 32px 18px;border-bottom:1px solid #f3f4ec;" class="header-cell">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <!-- Brand logo -->
                 <td style="vertical-align:middle;">
                   <img
                     src="{{ frontend_url }}/logo/logo.png"
-                    alt="Hasker &amp; Co. Realty Group"
+                    alt="PrimeFamilyHousing"
                     height="38"
                     style="display:block;height:38px;width:auto;max-width:180px;"
                   />
                 </td>
                 <!-- Navigation links (hidden on mobile) -->
                 <td align="right" style="vertical-align:middle;" class="nav-hide">
-                  <span style="font-family:'DM Sans',Arial,sans-serif;font-size:12px;font-weight:500;color:#475569;">
-                    <a href="{{ frontend_url }}/houses-for-rent" style="color:#475569;text-decoration:none;margin-left:22px;">Browse</a>
-                    <a href="{{ frontend_url }}/apply" style="color:#475569;text-decoration:none;margin-left:22px;">Apply</a>
-                    <a href="mailto:info@haskerrealtygroup.com" style="color:#475569;text-decoration:none;margin-left:22px;">Contact</a>
+                  <span style="font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:500;color:#414844;">
+                    <a href="{{ frontend_url }}/houses-for-rent" style="color:#414844;text-decoration:none;margin-left:22px;">Browse</a>
+                    <a href="{{ frontend_url }}/apply" style="color:#414844;text-decoration:none;margin-left:22px;">Apply</a>
+                    <a href="mailto:info@primefamilyhousing.com" style="color:#414844;text-decoration:none;margin-left:22px;">Contact</a>
                   </span>
                 </td>
               </tr>
@@ -75,7 +75,7 @@
             <!-- Welcome banner illustration -->
             <img
               src="{{ frontend_url }}/illustrations/email-header-welcome.png"
-              alt="Welcome to Hasker &amp; Co. Realty Group"
+              alt="Welcome to PrimeFamilyHousing"
               width="600"
               style="display:block;width:100%;height:auto;max-width:600px;"
             />
@@ -84,22 +84,22 @@
               <tr>
                 <td align="center" style="padding:36px 32px 40px;" class="hero-text">
                   <!-- Eyebrow label -->
-                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#2563EB;">
+                  <p style="margin:0;font-family:'Source Sans 3',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#012d1d;">
                     {{ eyebrow|default:"New Listings &middot; This Week" }}
                   </p>
                   <!-- Serif headline -->
-                  <h1 style="margin:14px 0 12px;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-weight:700;font-size:38px;line-height:1.1;letter-spacing:-0.02em;color:#1E3A5F;" class="hero-h1">
+                  <h1 style="margin:14px 0 12px;font-family:'Montserrat',Georgia,'Times New Roman',serif;font-weight:700;font-size:38px;line-height:1.1;letter-spacing:-0.02em;color:#081C15;" class="hero-h1">
                     {{ hero_headline|default:"Good homes. Ready when you are." }}
                   </h1>
                   <!-- Body paragraph -->
-                  <p style="margin:0 auto;font-family:'DM Sans',Arial,sans-serif;font-size:15px;line-height:1.625;color:#475569;max-width:460px;">
-                    {{ hero_body|default:"New properties just listed across Hasker cities. Fair prices, no surprises, decisions in 24&nbsp;hours." }}
+                  <p style="margin:0 auto;font-family:'Source Sans 3',Arial,sans-serif;font-size:15px;line-height:1.625;color:#414844;max-width:460px;">
+                    {{ hero_body|default:"New properties just listed across PrimeFamilyHousing cities. Fair prices, no surprises, decisions in 24&nbsp;hours." }}
                   </p>
                   <!-- CTA button -->
                   <table cellpadding="0" cellspacing="0" border="0" style="margin:26px auto 0;">
                     <tr>
-                      <td bgcolor="#1E3A5F" style="border-radius:2px;">
-                        <a href="{{ cta_url|default:frontend_url }}" style="display:inline-block;font-family:'DM Sans',Arial,sans-serif;font-weight:500;font-size:14px;letter-spacing:0.05em;color:#ffffff;text-decoration:none;padding:14px 26px;">
+                      <td bgcolor="#081C15" style="border-radius:2px;">
+                        <a href="{{ cta_url|default:frontend_url }}" style="display:inline-block;font-family:'Source Sans 3',Arial,sans-serif;font-weight:500;font-size:14px;letter-spacing:0.05em;color:#ffffff;text-decoration:none;padding:14px 26px;">
                           {{ cta_text|default:"Browse New Rentals" }} &rarr;
                         </a>
                       </td>
@@ -113,13 +113,13 @@
 
         <!-- ═══ TRUST PILLARS ════════════════════════════ -->
         <tr>
-          <td bgcolor="#ffffff" style="padding:56px 32px;border-top:1px solid #F1F5F9;" class="trust-cell">
+          <td bgcolor="#ffffff" style="padding:56px 32px;border-top:1px solid #f3f4ec;" class="trust-cell">
             <!-- Section heading -->
             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
               <tr>
                 <td align="center">
-                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#2563EB;">Why Hasker &amp; Co.</p>
-                  <h2 style="margin:10px 0 0;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:26px;line-height:1.25;color:#1E3A5F;">Built on trust, since 2012.</h2>
+                  <p style="margin:0;font-family:'Source Sans 3',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#012d1d;">Why PrimeFamilyHousing</p>
+                  <h2 style="margin:10px 0 0;font-family:'Montserrat',Georgia,serif;font-weight:700;font-size:26px;line-height:1.25;color:#081C15;">Built on trust, since 2012.</h2>
                 </td>
               </tr>
             </table>
@@ -129,20 +129,20 @@
                 <!-- No hidden fees -->
                 <td align="center" valign="top" style="width:33.33%;padding:0 6px;" class="pillar-cell">
                   <img src="{{ frontend_url }}/illustrations/spot-shield.png" alt="" width="88" height="88" style="display:block;margin:0 auto 12px;width:88px;height:88px;" />
-                  <h3 style="margin:0 0 4px;font-family:'DM Sans',Arial,sans-serif;font-weight:600;font-size:14px;color:#1E3A5F;">No hidden fees</h3>
-                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">What you see is what you pay. Every time.</p>
+                  <h3 style="margin:0 0 4px;font-family:'Source Sans 3',Arial,sans-serif;font-weight:600;font-size:14px;color:#081C15;">No hidden fees</h3>
+                  <p style="margin:0;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:1.5;color:#414844;">What you see is what you pay. Every time.</p>
                 </td>
                 <!-- Families housed -->
                 <td align="center" valign="top" style="width:33.33%;padding:0 6px;" class="pillar-cell">
                   <img src="{{ frontend_url }}/illustrations/spot-handshake.png" alt="" width="88" height="88" style="display:block;margin:0 auto 12px;width:88px;height:88px;" />
-                  <h3 style="margin:0 0 4px;font-family:'DM Sans',Arial,sans-serif;font-weight:600;font-size:14px;color:#1E3A5F;">2,000+ families</h3>
-                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">Housed across 12 cities since we opened.</p>
+                  <h3 style="margin:0 0 4px;font-family:'Source Sans 3',Arial,sans-serif;font-weight:600;font-size:14px;color:#081C15;">2,000+ families</h3>
+                  <p style="margin:0;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:1.5;color:#414844;">Housed across 12 cities since we opened.</p>
                 </td>
                 <!-- 24h decisions -->
                 <td align="center" valign="top" style="width:33.33%;padding:0 6px;" class="pillar-cell">
                   <img src="{{ frontend_url }}/illustrations/spot-clock.png" alt="" width="88" height="88" style="display:block;margin:0 auto 12px;width:88px;height:88px;" />
-                  <h3 style="margin:0 0 4px;font-family:'DM Sans',Arial,sans-serif;font-weight:600;font-size:14px;color:#1E3A5F;">24-hour decisions</h3>
-                  <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.5;color:#475569;">Apply online — we'll have your answer the next day.</p>
+                  <h3 style="margin:0 0 4px;font-family:'Source Sans 3',Arial,sans-serif;font-weight:600;font-size:14px;color:#081C15;">24-hour decisions</h3>
+                  <p style="margin:0;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:1.5;color:#414844;">Apply online — we'll have your answer the next day.</p>
                 </td>
               </tr>
             </table>
@@ -153,26 +153,26 @@
         {% if listing_title %}
         <tr>
           <td style="padding:0 32px 56px;" class="listing-outer">
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #F1F5F9;border-radius:2px;overflow:hidden;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #f3f4ec;border-radius:2px;overflow:hidden;">
               <!-- Image row — full width, brand-light blue bg -->
               <tr>
-                <td bgcolor="#EFF4FF" align="center" style="padding:32px 0;">
+                <td bgcolor="#f3f4ec" align="center" style="padding:32px 0;">
                   <img src="{{ frontend_url }}/illustrations/spot-house.png" alt="" width="140" height="140" style="display:block;margin:0 auto;width:140px;height:140px;" />
                 </td>
               </tr>
               <!-- Details row -->
               <tr>
                 <td style="padding:24px 28px;" class="listing-meta">
-                  <span style="display:inline-block;background-color:#DBEAFE;color:#2563EB;font-family:'DM Sans',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-bottom:10px;">Featured &middot; New</span>
-                  <h3 style="margin:0 0 4px;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:20px;line-height:1.2;color:#1E3A5F;">{{ listing_title }}</h3>
+                  <span style="display:inline-block;background-color:#c1ecd4;color:#012d1d;font-family:'Source Sans 3',Arial,sans-serif;font-size:10px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;padding:3px 8px;border-radius:2px;margin-bottom:10px;">Featured &middot; New</span>
+                  <h3 style="margin:0 0 4px;font-family:'Montserrat',Georgia,serif;font-weight:700;font-size:20px;line-height:1.2;color:#081C15;">{{ listing_title }}</h3>
                   {% if listing_address %}
-                  <p style="margin:0 0 14px;font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#475569;">{{ listing_address }}</p>
+                  <p style="margin:0 0 14px;font-family:'Source Sans 3',Arial,sans-serif;font-size:13px;color:#414844;">{{ listing_address }}</p>
                   {% endif %}
                   {% if listing_price %}
-                  <div style="font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:24px;color:#1E3A5F;margin-bottom:4px;">${{ listing_price }}/mo</div>
+                  <div style="font-family:'Montserrat',Georgia,serif;font-weight:700;font-size:24px;color:#081C15;margin-bottom:4px;">${{ listing_price }}/mo</div>
                   {% endif %}
                   {% if listing_details %}
-                  <div style="font-family:'DM Sans',Arial,sans-serif;font-size:12px;color:#64748B;letter-spacing:0.05em;">{{ listing_details }}</div>
+                  <div style="font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;color:#717973;letter-spacing:0.05em;">{{ listing_details }}</div>
                   {% endif %}
                 </td>
               </tr>
@@ -183,7 +183,7 @@
 
         <!-- ═══ APPLY CTA STRIP ══════════════════════════ -->
         <tr>
-          <td bgcolor="#1E3A5F" align="center" style="padding:40px 32px;" class="apply-cell">
+          <td bgcolor="#081C15" align="center" style="padding:40px 32px;" class="apply-cell">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
               <!-- Illustration row -->
               <tr>
@@ -194,12 +194,12 @@
               <!-- Copy row -->
               <tr>
                 <td align="center">
-                  <p style="margin:0 0 8px;font-family:'DM Sans',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#A9C5F6;">Quick application</p>
-                  <h3 style="margin:0 0 16px;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:24px;line-height:1.2;color:#ffffff;">Apply in 10 minutes.<br>Decisions in 24 hours.</h3>
+                  <p style="margin:0 0 8px;font-family:'Source Sans 3',Arial,sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3em;text-transform:uppercase;color:#A9C5F6;">Quick application</p>
+                  <h3 style="margin:0 0 16px;font-family:'Montserrat',Georgia,serif;font-weight:700;font-size:24px;line-height:1.2;color:#ffffff;">Apply in 10 minutes.<br>Decisions in 24 hours.</h3>
                   <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
                     <tr>
                       <td style="border-bottom:1px solid rgba(255,255,255,0.35);padding-bottom:2px;">
-                        <a href="{{ apply_url|default:frontend_url }}/apply" style="font-family:'DM Sans',Arial,sans-serif;font-weight:500;font-size:14px;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">
+                        <a href="{{ apply_url|default:frontend_url }}/apply" style="font-family:'Source Sans 3',Arial,sans-serif;font-weight:500;font-size:14px;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">
                           Start your application &rarr;
                         </a>
                       </td>
@@ -213,37 +213,37 @@
 
         <!-- ═══ FOOTER ════════════════════════════════════ -->
         <tr>
-          <td bgcolor="#FBF9F4" align="center" style="padding:36px 32px 32px;border-top:1px solid #F1F5F9;" class="footer-cell">
+          <td bgcolor="#FBF9F4" align="center" style="padding:36px 32px 32px;border-top:1px solid #f3f4ec;" class="footer-cell">
             <!-- Brand wordmark -->
-            <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:800;font-size:13px;letter-spacing:-0.02em;color:#1E3A5F;">HASKER &amp; CO. REALTY GROUP</div>
-            <div style="font-family:'DM Sans',Arial,sans-serif;font-size:11px;color:#64748B;margin:6px 0 18px;letter-spacing:0.02em;">Good Homes. Fair Prices. No Surprises.</div>
+            <div style="font-family:'Montserrat','Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.02em;color:#081C15;">PrimeFamilyHousing</div>
+            <div style="font-family:'Source Sans 3',Arial,sans-serif;font-size:11px;color:#717973;margin:6px 0 18px;letter-spacing:0.02em;">Good Homes. Fair Prices. No Surprises.</div>
 
             <!-- Social links -->
-            <p style="margin:0 0 18px;font-family:'DM Sans',Arial,sans-serif;font-size:12px;color:#94A3B8;">
-              <a href="https://www.instagram.com/haskerrealtygroup/" style="color:#64748B;text-decoration:none;">Instagram</a>
+            <p style="margin:0 0 18px;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;color:#a7a895;">
+              <a href="https://www.instagram.com/primefamilyhousing/" style="color:#717973;text-decoration:none;">Instagram</a>
               &nbsp;&middot;&nbsp;
-              <a href="https://www.facebook.com/haskerrealtygroup" style="color:#64748B;text-decoration:none;">Facebook</a>
+              <a href="https://www.facebook.com/primefamilyhousing" style="color:#717973;text-decoration:none;">Facebook</a>
               &nbsp;&middot;&nbsp;
-              <a href="https://www.linkedin.com/company/hasker-realty-group" style="color:#64748B;text-decoration:none;">LinkedIn</a>
+              <a href="https://www.linkedin.com/company/primefamilyhousing" style="color:#717973;text-decoration:none;">LinkedIn</a>
             </p>
 
             <!-- Divider rule -->
-            <div style="width:40px;height:1px;background-color:#CBD5E1;margin:0 auto 16px;"></div>
+            <div style="width:40px;height:1px;background-color:#c1c8c2;margin:0 auto 16px;"></div>
 
             <!-- Physical address -->
-            <p style="margin:0 0 14px;font-family:'DM Sans',Arial,sans-serif;font-size:11px;color:#64748B;line-height:1.6;">
+            <p style="margin:0 0 14px;font-family:'Source Sans 3',Arial,sans-serif;font-size:11px;color:#717973;line-height:1.6;">
               240 Oceanfront Way, Suite 300<br>
               Virginia Beach, VA 23451 &nbsp;&bull;&nbsp; (757) 208-2767
             </p>
 
             <!-- Legal / unsubscribe -->
-            <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:10px;color:#94A3B8;line-height:1.8;">
-              You're receiving this because you joined our list at haskerrealtygroup.com.<br>
-              <a href="#" style="color:#64748B;text-decoration:none;">Manage preferences</a>
+            <p style="margin:0;font-family:'Source Sans 3',Arial,sans-serif;font-size:10px;color:#a7a895;line-height:1.8;">
+              You're receiving this because you joined our list at primefamilyhousing.com.<br>
+              <a href="#" style="color:#717973;text-decoration:none;">Manage preferences</a>
               &nbsp;&middot;&nbsp;
-              <a href="#" style="color:#64748B;text-decoration:none;">Unsubscribe</a>
+              <a href="#" style="color:#717973;text-decoration:none;">Unsubscribe</a>
               &nbsp;&middot;&nbsp;
-              <a href="{{ frontend_url }}/privacy" style="color:#64748B;text-decoration:none;">Privacy</a>
+              <a href="{{ frontend_url }}/privacy" style="color:#717973;text-decoration:none;">Privacy</a>
             </p>
           </td>
         </tr>

@@ -299,6 +299,88 @@ class RentalApplicationAdminSerializer(serializers.ModelSerializer):
         return obj.lead.full_name if obj.lead else None
 
 
+class UserRentalApplicationSerializer(serializers.ModelSerializer):
+    """
+    Portal-facing view of a tenant's own application: the home they applied for
+    (full details + photo), the assigned agent, and a move-in cost breakdown.
+    """
+    full_name      = serializers.CharField(read_only=True)
+    status_display = serializers.CharField(source="get_status_display", read_only=True)
+    property_title = serializers.CharField(source="rental_property.title", read_only=True, default=None)
+    property_detail = serializers.SerializerMethodField()
+    agent           = serializers.SerializerMethodField()
+    cost_breakdown  = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RentalApplication
+        fields = [
+            "id", "status", "status_display", "full_name",
+            "move_in_date", "intended_stay_duration", "months_rent_upfront",
+            "application_fee", "is_fee_paid", "submitted_at",
+            "property_title", "property_detail", "agent", "cost_breakdown",
+        ]
+
+    def get_property_detail(self, obj):
+        if not obj.rental_property_id:
+            return None
+        # Reuse the tested list serializer (image URLs, price, beds/baths, address…)
+        from apps.properties.serializers import PropertyListSerializer
+        return PropertyListSerializer(obj.rental_property, context=self.context).data
+
+    def get_agent(self, obj):
+        prop = obj.rental_property
+        if not prop or not prop.agent_id:
+            return None
+        from apps.accounts.serializers import PublicAgentSerializer
+        return PublicAgentSerializer(prop.agent, context=self.context).data
+
+    def get_cost_breakdown(self, obj):
+        """
+        Estimated move-in costs. Rent comes from the applied property; the
+        security deposit follows the standard one-month convention. Amounts are
+        plain numbers so the portal can format them.
+        """
+        from decimal import Decimal
+        prop = obj.rental_property
+        if not prop:
+            return None
+        rent   = Decimal(prop.price or 0)
+        months = obj.months_rent_upfront or 1
+        deposit = rent  # standard: one month's rent
+        fee    = Decimal(obj.application_fee or 0)
+
+        first_rent = rent * months
+        total = first_rent + deposit + fee
+
+        def f(v):
+            return float(round(Decimal(v), 2))
+
+        items = [
+            {
+                "label": "First month's rent" if months == 1 else f"Rent upfront ({months} months)",
+                "detail": f"${f(rent):,.2f}/mo" if months > 1 else "",
+                "amount": f(first_rent),
+            },
+            {
+                "label": "Security deposit",
+                "detail": "Equal to one month's rent",
+                "amount": f(deposit),
+            },
+            {
+                "label": "Application fee",
+                "detail": "Paid" if obj.is_fee_paid else "Due",
+                "amount": f(fee),
+            },
+        ]
+        return {
+            "monthly_rent": f(rent),
+            "months_upfront": months,
+            "items": items,
+            "total": f(total),
+            "currency": "USD",
+        }
+
+
 class ReferrerSerializer(serializers.ModelSerializer):
     payout_count = serializers.SerializerMethodField()
     total_earned = serializers.SerializerMethodField()

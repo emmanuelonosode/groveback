@@ -1,4 +1,4 @@
-Hasker & Co. Realty Group — Weekly Lead Follow-up Reminder
+PrimeFamilyHousing — Weekly Lead Follow-up Reminder
 =======================================================
 
 Hi {{ agent.first_name }},
@@ -17,4 +17,4 @@ Please follow up with these leads as soon as possible.
 Log in to the CRM to view full details and update their status.
 
 ---
-Hasker & Co. Realty Group | info@haskerrealtygroup.com
+PrimeFamilyHousing | info@primefamilyhousing.com

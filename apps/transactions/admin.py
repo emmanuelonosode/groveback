@@ -96,13 +96,13 @@ class TransactionAdmin(ModelAdmin):
 
     def status_badge(self, obj):
         colors = {
-            TransactionStatus.PENDING: "#6b7280",
-            TransactionStatus.DEPOSIT_PAID: "#2563eb",
+            TransactionStatus.PENDING: "#717973",
+            TransactionStatus.DEPOSIT_PAID: "#012d1d",
             TransactionStatus.IN_PROGRESS: "#d97706",
             TransactionStatus.COMPLETED: "#16a34a",
             TransactionStatus.CANCELLED: "#dc2626",
         }
-        color = colors.get(obj.status, "#6b7280")
+        color = colors.get(obj.status, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:9999px;font-size:11px">{}</span>',
             color, obj.get_status_display()
@@ -171,14 +171,14 @@ class PaymentAdmin(ModelAdmin):
     def status_badge(self, obj):
         from .models import PaymentStatus
         colors = {
-            PaymentStatus.PENDING: "#6b7280",
-            PaymentStatus.PENDING_VERIFICATION: "#2563eb",
+            PaymentStatus.PENDING: "#717973",
+            PaymentStatus.PENDING_VERIFICATION: "#012d1d",
             PaymentStatus.AWAITING_APPROVAL: "#d97706",
             PaymentStatus.VERIFIED: "#16a34a",
             PaymentStatus.REJECTED: "#dc2626",
             PaymentStatus.SUCCESSFUL: "#16a34a",
         }
-        color = colors.get(obj.status, "#6b7280")
+        color = colors.get(obj.status, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:9999px;font-size:11px">{}</span>',
             color, obj.get_status_display()
@@ -313,12 +313,12 @@ class InvoiceAdmin(ModelAdmin):
 
     def status_badge(self, obj):
         colors = {
-            InvoiceStatus.DRAFT: "#6b7280",
-            InvoiceStatus.SENT: "#2563eb",
+            InvoiceStatus.DRAFT: "#717973",
+            InvoiceStatus.SENT: "#012d1d",
             InvoiceStatus.PAID: "#16a34a",
             InvoiceStatus.VOID: "#dc2626",
         }
-        color = colors.get(obj.status, "#6b7280")
+        color = colors.get(obj.status, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:9999px;font-size:11px">{}</span>',
             color, obj.get_status_display()

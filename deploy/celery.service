@@ -1,5 +1,5 @@
 [Unit]
-Description=Celery Worker (Hasker & Co.)
+Description=Celery Worker (PrimeFamilyHousing)
 After=network.target redis-server.service redis.service
 
 [Service]

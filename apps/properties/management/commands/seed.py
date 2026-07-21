@@ -712,18 +712,18 @@ class Command(BaseCommand):
 
         # ── 2. Users (get_or_create — never bulk-delete) ───────────────────
         admin, _ = User.objects.get_or_create(
-            email="admin@haskerrealtygroup.com",
-            defaults={"first_name": "Admin", "last_name": "Hasker"},
+            email="admin@primefamilyhousing.com",
+            defaults={"first_name": "Admin", "last_name": "PrimeFamilyHousing"},
         )
         if not admin.has_usable_password():
             admin.set_password("Admin1234!")
         admin.is_staff = True
         admin.is_superuser = True
         admin.save()
-        self.stdout.write(self.style.SUCCESS("  admin@haskerrealtygroup.com / Admin1234!"))
+        self.stdout.write(self.style.SUCCESS("  admin@primefamilyhousing.com / Admin1234!"))
 
         agent, _ = User.objects.get_or_create(
-            email="agent@haskerrealtygroup.com",
+            email="agent@primefamilyhousing.com",
             defaults={
                 "first_name": "Marcus",
                 "last_name":  "Reid",
@@ -734,7 +734,7 @@ class Command(BaseCommand):
         if not agent.has_usable_password():
             agent.set_password("Agent1234!")
             agent.save()
-        self.stdout.write(self.style.SUCCESS("  agent@haskerrealtygroup.com / Agent1234!"))
+        self.stdout.write(self.style.SUCCESS("  agent@primefamilyhousing.com / Agent1234!"))
 
         tenant, _ = User.objects.get_or_create(
             email="tenant@test.com",
@@ -792,8 +792,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Amenities  : {total_amenities}"))
         self.stdout.write("")
         self.stdout.write("Accounts:")
-        self.stdout.write("  Superuser : admin@haskerrealtygroup.com / Admin1234!")
-        self.stdout.write("  Agent     : agent@haskerrealtygroup.com / Agent1234!")
+        self.stdout.write("  Superuser : admin@primefamilyhousing.com / Admin1234!")
+        self.stdout.write("  Agent     : agent@primefamilyhousing.com / Agent1234!")
         self.stdout.write("  Tenant    : tenant@test.com / Tenant1234!")
         self.stdout.write("")
         self.stdout.write("Admin:  http://127.0.0.1:8000/admin/")

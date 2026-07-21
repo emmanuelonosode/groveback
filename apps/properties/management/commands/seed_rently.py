@@ -463,7 +463,7 @@ class Command(BaseCommand):
 
         # ── Agent ─────────────────────────────────────────────────────────────
         agent, created = User.objects.get_or_create(
-            email="agent@haskerrealtygroup.com",
+            email="agent@primefamilyhousing.com",
             defaults={
                 "first_name": "Marcus", "last_name": "Reid",
                 "role": Role.AGENT, "phone": "(757) 555-0101",

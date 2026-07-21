@@ -1,156 +1,157 @@
 {% extends "notifications/email_base.html" %}
+{% load humanize %}
 
 {% block subject %}Congratulations — Your Application Has Been Approved{% endblock %}
 
-{% block hero_image %}
-<tr>
-  <td style="background-color:#ffffff;padding:0;border-bottom:1px solid #ebebeb;">
-    <img
-      src="{{ frontend_url }}/illustrations/email-header-welcome.png"
-      alt="Welcome to your new home"
-      width="580"
-      style="display:block;width:100%;max-width:580px;height:auto;"
-    />
-  </td>
-</tr>
-{% endblock %}
-
 {% block content %}
-  <!-- Approval badge -->
-  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
+  <!-- ── Approval header card ─────────────────────────────── -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff;border:1px solid #c1c8c2;border-radius:12px;overflow:hidden;margin:0 0 24px 0;">
+    <!-- Green banner -->
     <tr>
-      <td style="background-color:#dcfce7;border-radius:20px;padding:6px 16px;">
-        <span style="font-size:12px;font-weight:700;color:#15803d;letter-spacing:0.5px;">&#10003; APPLICATION APPROVED</span>
+      <td bgcolor="#1b4332" align="center" style="padding:36px 24px;">
+        <!-- White check circle -->
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 16px;">
+          <tr>
+            <td width="60" height="60" align="center" valign="middle" style="width:60px;height:60px;background-color:#ffffff;border-radius:50%;">
+              <span style="font-size:32px;line-height:60px;color:#1b4332;font-weight:700;">&#10003;</span>
+            </td>
+          </tr>
+        </table>
+        <!-- Pill -->
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 12px;">
+          <tr>
+            <td style="background-color:#E9EDC6;border-radius:9999px;padding:5px 14px;">
+              <span style="font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#414844;">Application Approved</span>
+            </td>
+          </tr>
+        </table>
+        <!-- Title -->
+        <p style="margin:0;font-family:'Montserrat',Arial,sans-serif;font-size:32px;line-height:40px;font-weight:700;color:#ffffff;">Welcome to your new home!</p>
+      </td>
+    </tr>
+    <!-- Body -->
+    <tr>
+      <td style="padding:28px 32px 32px;">
+        <p style="margin:0 0 24px 0;font-size:18px;line-height:28px;color:#414844;text-align:center;">
+          Congratulations! We are thrilled to inform you that your application{% if app.rental_property %} for <strong style="color:#081C15;">{{ app.rental_property.title }}</strong>{% endif %} has been approved. You&apos;re just a few steps away from getting your keys.
+        </p>
+        {% if app.rental_property.agent %}
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+          <tr>
+            <td style="background-color:#012d1d;border-radius:8px;">
+              <a href="tel:{{ app.rental_property.agent.phone }}" style="display:inline-block;padding:13px 26px;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">
+                Review Lease Agreement &nbsp;&rarr;
+              </a>
+            </td>
+          </tr>
+        </table>
+        {% endif %}
       </td>
     </tr>
   </table>
 
-  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#1E3A5F;line-height:1.3;">
-    Congratulations, {{ app.first_name }}!
-  </p>
-
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
-    We are pleased to inform you that your rental application for the property below has been <strong style="color:#15803d;">approved</strong>. Welcome to the Hasker &amp; Co. family!
-  </p>
-
-  <!-- Property summary card -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eff4ff;border:1px solid #bfdbfe;border-radius:6px;margin:20px 0;">
+  <!-- ── Bento: Property Details + Next Steps ─────────────── -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
     <tr>
-      <td style="padding:20px 24px;">
-        <p style="margin:0 0 12px 0;font-size:11px;font-weight:700;color:#2563EB;letter-spacing:1.5px;text-transform:uppercase;">Property Details</p>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:13px;color:#475569;line-height:2;">
-          {% if app.rental_property %}
+      <!-- Property Details -->
+      <td width="50%" valign="top" style="padding:0 8px 0 0;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff;border:1px solid #c1c8c2;border-radius:12px;height:100%;">
           <tr>
-            <td style="width:140px;color:#94a3b8;font-weight:600;">Property</td>
-            <td style="color:#1E3A5F;font-weight:700;">{{ app.rental_property.title }}</td>
-          </tr>
-          <tr>
-            <td style="color:#94a3b8;font-weight:600;">Address</td>
-            <td style="color:#1E3A5F;">{{ app.rental_property.address }}, {{ app.rental_property.city }}, {{ app.rental_property.state }} {{ app.rental_property.zip_code }}</td>
-          </tr>
-          {% if app.rental_property.agent %}
-          <tr>
-            <td style="color:#94a3b8;font-weight:600;">Your Agent</td>
-            <td style="color:#1E3A5F;">{{ app.rental_property.agent.get_full_name }}</td>
-          </tr>
-          <tr>
-            <td style="color:#94a3b8;font-weight:600;">Agent Phone</td>
-            <td style="color:#1E3A5F;">{{ app.rental_property.agent.phone|default:"Contact office" }}</td>
-          </tr>
-          {% endif %}
-          {% endif %}
-          <tr>
-            <td style="color:#94a3b8;font-weight:600;">Intended Move-In</td>
-            <td style="color:#1E3A5F;">{{ app.move_in_date|date:"F j, Y" }}</td>
-          </tr>
-          <tr>
-            <td style="color:#94a3b8;font-weight:600;">Application Ref</td>
-            <td style="color:#1E3A5F;">#{{ app.pk|stringformat:"05d" }}</td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+            <td style="padding:24px;">
+              <p style="margin:0 0 20px 0;font-family:'Montserrat',Arial,sans-serif;font-size:20px;line-height:28px;font-weight:600;color:#081C15;">Property Details</p>
 
-  <!-- Next steps -->
-  <p style="margin:24px 0 12px 0;font-size:15px;font-weight:700;color:#1E3A5F;">Your Next Steps</p>
-
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-
-    <!-- Step 1 -->
-    <tr>
-      <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
-        <table cellpadding="0" cellspacing="0" border="0" width="100%">
-          <tr>
-            <td style="width:36px;vertical-align:top;">
-              <span style="display:inline-block;background-color:#2563EB;color:#fff;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;">1</span>
-            </td>
-            <td style="vertical-align:top;">
-              <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#1E3A5F;">Review &amp; Sign Your Lease</p>
-              <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">Your agent will send you a lease agreement to review. Please read it carefully and sign electronically or in person at our office.</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-
-    <!-- Step 2 -->
-    <tr>
-      <td style="padding:12px 0;border-bottom:1px solid #f1f5f9;vertical-align:top;">
-        <table cellpadding="0" cellspacing="0" border="0" width="100%">
-          <tr>
-            <td style="width:36px;vertical-align:top;">
-              <span style="display:inline-block;background-color:#2563EB;color:#fff;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;">2</span>
-            </td>
-            <td style="vertical-align:top;">
-              <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#1E3A5F;">Pay Your Security Deposit</p>
-              <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">
-                Your security deposit secures the property. Accepted payment methods:<br>
-                &nbsp;&nbsp;• <strong>Check or money order</strong> payable to "Hasker &amp; Co. Realty Group"<br>
-                &nbsp;&nbsp;• <strong>ACH bank transfer</strong> via our secure tenant portal (details provided by your agent)<br>
-                Your agent will confirm the exact amount and payment instructions.
+              <!-- Address -->
+              <p style="margin:0 0 2px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;color:#1a1c18;">Address</p>
+              <p style="margin:0 0 16px 0;font-size:14px;line-height:20px;color:#414844;">
+                {% if app.rental_property %}{{ app.rental_property.address }}, {{ app.rental_property.city }}, {{ app.rental_property.state }} {{ app.rental_property.zip_code }}{% else %}Provided with your lease{% endif %}
               </p>
+              <!-- Move-in -->
+              <p style="margin:0 0 2px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;color:#1a1c18;">Move-in Date</p>
+              <p style="margin:0 0 16px 0;font-size:14px;line-height:20px;color:#414844;">{{ app.move_in_date|date:"F j, Y" }}</p>
+              <!-- Rent -->
+              <p style="margin:0 0 2px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;color:#1a1c18;">Monthly Rent</p>
+              <p style="margin:0 0 20px 0;font-size:14px;line-height:20px;color:#414844;">{% if app.rental_property.price %}${{ app.rental_property.price|floatformat:2|intcomma }}{% else %}See lease{% endif %}</p>
+
+              {% if app.rental_property.agent %}
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #c1c8c2;">
+                <tr>
+                  <td style="padding-top:16px;">
+                    <p style="margin:0 0 12px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;color:#1a1c18;">Your Dedicated Agent</p>
+                    <table cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td width="48" valign="middle" style="padding-right:14px;">
+                          <table cellpadding="0" cellspacing="0" border="0">
+                            <tr><td width="48" height="48" align="center" valign="middle" style="width:48px;height:48px;background-color:#c1ecd4;border-radius:50%;font-family:'Montserrat',Arial,sans-serif;font-size:15px;font-weight:700;color:#012d1d;">{{ app.rental_property.agent.first_name.0 }}{{ app.rental_property.agent.last_name.0 }}</td></tr>
+                          </table>
+                        </td>
+                        <td valign="middle">
+                          <p style="margin:0 0 2px 0;font-size:15px;font-weight:600;color:#1a1c18;">{{ app.rental_property.agent.get_full_name }}</p>
+                          <a href="mailto:{{ app.rental_property.agent.email }}" style="font-size:13px;color:#012d1d;text-decoration:none;">Contact Agent &rarr;</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              {% endif %}
             </td>
           </tr>
         </table>
       </td>
-    </tr>
 
-    <!-- Step 3 -->
-    <tr>
-      <td style="padding:12px 0;vertical-align:top;">
-        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+      <!-- Next Steps -->
+      <td width="50%" valign="top" style="padding:0 0 0 8px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4ec;border:1px solid #c1c8c2;border-radius:12px;height:100%;">
           <tr>
-            <td style="width:36px;vertical-align:top;">
-              <span style="display:inline-block;background-color:#2563EB;color:#fff;font-size:12px;font-weight:700;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;">3</span>
-            </td>
-            <td style="vertical-align:top;">
-              <p style="margin:0 0 4px 0;font-size:14px;font-weight:700;color:#1E3A5F;">Schedule Your Key Handover</p>
-              <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;">Contact your agent to arrange your move-in appointment. Keys will be handed over in person at the property on your move-in date.</p>
+            <td style="padding:24px;">
+              <p style="margin:0 0 20px 0;font-family:'Montserrat',Arial,sans-serif;font-size:20px;line-height:28px;font-weight:600;color:#081C15;">Next Steps</p>
+
+              <!-- Step 1 (active) -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px 0;">
+                <tr>
+                  <td width="32" valign="top" style="padding-right:14px;">
+                    <table cellpadding="0" cellspacing="0" border="0"><tr><td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background-color:#012d1d;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#ffffff;">1</td></tr></table>
+                  </td>
+                  <td valign="top">
+                    <p style="margin:0 0 3px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#1a1c18;">Sign Lease Agreement</p>
+                    <p style="margin:0;font-size:12px;line-height:16px;color:#414844;">Review and electronically sign your lease documents within 48 hours to secure the property.</p>
+                  </td>
+                </tr>
+              </table>
+              <!-- Step 2 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px 0;">
+                <tr>
+                  <td width="32" valign="top" style="padding-right:14px;">
+                    <table cellpadding="0" cellspacing="0" border="0"><tr><td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background-color:#e2e3db;border:1px solid #c1c8c2;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#414844;">2</td></tr></table>
+                  </td>
+                  <td valign="top">
+                    <p style="margin:0 0 3px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#1a1c18;">Pay Security Deposit</p>
+                    <p style="margin:0;font-size:12px;line-height:16px;color:#414844;">Submit your initial deposit{% if app.rental_property.price %} of ${{ app.rental_property.price|floatformat:2|intcomma }}{% endif %} via our secure payment portal.</p>
+                  </td>
+                </tr>
+              </table>
+              <!-- Step 3 -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td width="32" valign="top" style="padding-right:14px;">
+                    <table cellpadding="0" cellspacing="0" border="0"><tr><td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background-color:#e2e3db;border:1px solid #c1c8c2;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#414844;">3</td></tr></table>
+                  </td>
+                  <td valign="top">
+                    <p style="margin:0 0 3px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#1a1c18;">Key Handover</p>
+                    <p style="margin:0;font-size:12px;line-height:16px;color:#414844;">Schedule a time with your agent to complete the walkthrough and receive your keys on move-in day.</p>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
         </table>
       </td>
     </tr>
-
   </table>
 
-  <!-- Contact agent CTA -->
-  {% if app.rental_property.agent %}
-  <table cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 8px 0;">
-    <tr>
-      <td style="background-color:#2563EB;border-radius:6px;">
-        <a href="tel:{{ app.rental_property.agent.phone }}" style="display:inline-block;padding:12px 28px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;">
-          Call Your Agent — {{ app.rental_property.agent.get_full_name }}
-        </a>
-      </td>
-    </tr>
-  </table>
-  {% endif %}
-
-  <p style="margin:20px 0 0 0;font-size:14px;color:#334155;">
-    Congratulations again — we look forward to welcoming you to your new home!<br><br>
-    Warm regards,<br>
-    <strong style="color:#1E3A5F;">The Hasker &amp; Co. Realty Group Team</strong>
+  <!-- Support note -->
+  <p style="margin:0;font-size:12px;line-height:18px;color:#414844;text-align:center;">
+    If you have any questions or need assistance, please don&apos;t hesitate to reach out to our support team at
+    <a href="tel:+17572082767" style="color:#012d1d;text-decoration:none;">(757) 208-2767</a>.
   </p>
 {% endblock %}

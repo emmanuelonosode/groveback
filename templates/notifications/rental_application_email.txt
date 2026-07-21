@@ -1,6 +1,6 @@
 Dear {{ app.first_name }},
 
-Thank you for submitting your rental application to Hasker & Co. Realty Group.
+Thank you for submitting your rental application to PrimeFamilyHousing.
 
 APPLICATION DETAILS
 -------------------
@@ -17,8 +17,8 @@ Your completed application PDF is attached to this email for your records.
 If you have any questions, please don't hesitate to contact us.
 
 Warm regards,
-Hasker & Co. Realty Group
-info@haskerrealtygroup.com
+PrimeFamilyHousing
+info@primefamilyhousing.com
 
 ---
 This is an automated confirmation email. Please do not reply to this message.

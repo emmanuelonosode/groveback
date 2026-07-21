@@ -1,80 +1,92 @@
 {% extends "notifications/email_base.html" %}
+{% load humanize %}
 
-{% block subject %}Payment Verified — Hasker & Co. Realty Group{% endblock %}
+{% block subject %}Payment Verified — PrimeFamilyHousing{% endblock %}
+
+{% block hero_image %}
+<tr>
+  <td style="padding:0;font-size:0;line-height:0;">
+    <img src="{{ frontend_url }}/illustrations/email-header-welcome.png" alt=""
+         width="672" style="display:block;width:100%;max-width:672px;height:180px;object-fit:cover;" />
+  </td>
+</tr>
+{% endblock %}
 
 {% block content %}
-  <!-- Spot illustration -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;text-align:center;">
+  <!-- Success pill -->
+  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px 0;">
     <tr>
-      <td>
-        <img src="{{ frontend_url }}/illustrations/spot-shield.png" alt="" width="80" height="80" style="display:inline-block;width:80px;height:80px;" />
+      <td style="background-color:#e6f4ea;border-radius:9999px;padding:6px 14px;">
+        <span style="font-family:'Source Sans 3',Arial,sans-serif;font-size:13px;font-weight:600;color:#2E7D32;">&#10003;&nbsp; Payment Verified</span>
       </td>
     </tr>
   </table>
 
-  <!-- Status badge -->
-  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
-    <tr>
-      <td style="background-color:#dcfce7;border-radius:20px;padding:6px 16px;">
-        <span style="font-size:12px;font-weight:700;color:#15803d;letter-spacing:0.5px;">&#10003; PAYMENT VERIFIED</span>
-      </td>
-    </tr>
-  </table>
-
-  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#1E3A5F;line-height:1.3;">
-    Great news, {{ recipient_name }}!
+  <!-- Greeting -->
+  <p style="margin:0 0 14px 0;font-family:'Montserrat',Arial,sans-serif;font-size:32px;line-height:40px;font-weight:700;color:#012d1d;">
+    Great news{% if recipient_name %}, {{ recipient_name }}{% endif %}!
+  </p>
+  <p style="margin:0 0 28px 0;font-size:18px;line-height:28px;color:#414844;">
+    We have successfully received and verified your payment. Your account is up to date, and we&apos;re thrilled to help you find your family&apos;s next home.
   </p>
 
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
-    Your payment has been successfully verified and applied to your account. You can now see the updated status in your profile.
-  </p>
-
-  <!-- Payment summary card -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;margin:20px 0;">
+  <!-- Verified payment details -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4ec;border:1px solid #c1c8c2;border-radius:12px;margin:0 0 28px 0;">
     <tr>
       <td style="padding:24px;">
-        <p style="margin:0 0 12px 0;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Verified Payment Details</p>
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;color:#475569;line-height:2;">
+        <p style="margin:0 0 18px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#414844;">Verified Payment Details</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr>
-            <td style="color:#94a3b8;font-weight:600;">Status</td>
-            <td style="color:#15803d;font-weight:700;text-align:right;">Completed</td>
+            <td width="50%" valign="top" style="padding:0 12px 18px 0;">
+              <p style="margin:0 0 4px 0;font-size:12px;color:#717973;">Amount</p>
+              <p style="margin:0;font-family:'Montserrat',Arial,sans-serif;font-size:22px;font-weight:700;color:#012d1d;">${{ payment.amount|floatformat:2|intcomma }}</p>
+            </td>
+            <td width="50%" valign="top" style="padding:0 0 18px 0;">
+              <p style="margin:0 0 4px 0;font-size:12px;color:#717973;">Status</p>
+              <p style="margin:0;font-size:15px;font-weight:600;color:#2E7D32;">&#10003; Completed</p>
+            </td>
           </tr>
           <tr>
-            <td style="color:#94a3b8;font-weight:600;">Amount</td>
-            <td style="color:#1E3A5F;font-weight:700;text-align:right;">${{ payment.amount|floatformat:2 }}</td>
-          </tr>
-          {% if payment.invoice %}
-          <tr>
-            <td style="color:#94a3b8;font-weight:600;">Invoice Paid</td>
-            <td style="color:#1E3A5F;text-align:right;">{{ payment.invoice.invoice_number }}</td>
-          </tr>
-          {% endif %}
-          <tr>
-            <td style="color:#94a3b8;font-weight:600;">Verified At</td>
-            <td style="color:#1E3A5F;text-align:right;">{{ payment.verified_at|date:"F j, Y, g:i a" }}</td>
+            <td width="50%" valign="top" style="padding:0 12px 0 0;">
+              <p style="margin:0 0 4px 0;font-size:12px;color:#717973;">Verified At</p>
+              <p style="margin:0;font-size:14px;color:#1a1c18;">{{ payment.verified_at|date:"M j, Y, g:i a"|default:"Just now" }}</p>
+            </td>
+            <td width="50%" valign="top" style="padding:0;">
+              <p style="margin:0 0 4px 0;font-size:12px;color:#717973;">Reference ID</p>
+              <p style="margin:0;font-size:14px;color:#1a1c18;">{% if payment.invoice %}{{ payment.invoice.invoice_number }}{% else %}{{ payment.reference_id|default:"—" }}{% endif %}</p>
+            </td>
           </tr>
         </table>
       </td>
     </tr>
   </table>
 
-  <p style="margin:0 0 24px 0;font-size:15px;color:#334155;line-height:1.7;">
-    Thank you for your prompt payment. If this was for a rental application, our team will proceed with the next steps of the review process.
-  </p>
-
-  <!-- Action CTA -->
-  <table cellpadding="0" cellspacing="0" border="0" style="margin:12px 0;width:100%;">
+  <!-- CTAs -->
+  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px 0;">
     <tr>
-      <td align="center" style="background-color:#2563EB;border-radius:8px;">
-        <a href="{{ frontend_url }}/portal/profile" style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;width:100%;text-align:center;">
-          View My Profile
-        </a>
+      <td style="padding-right:10px;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background-color:#012d1d;border-radius:8px;">
+              <a href="{{ frontend_url }}/portal/dashboard" style="display:inline-block;padding:13px 26px;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">Track Application</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td>
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="border:1px solid #012d1d;border-radius:8px;">
+              <a href="{{ frontend_url }}/portal/profile" style="display:inline-block;padding:12px 26px;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#012d1d;text-decoration:none;">View My Profile</a>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
 
-  <p style="margin:32px 0 0 0;font-size:14px;color:#334155;">
-    Best regards,<br>
-    <strong style="color:#1E3A5F;">The Hasker &amp; Co. Realty Group Team</strong>
+  <p style="margin:0;font-size:15px;color:#414844;">
+    Warmly,<br>
+    <strong style="color:#081C15;">The PrimeFamilyHousing Team</strong>
   </p>
 {% endblock %}

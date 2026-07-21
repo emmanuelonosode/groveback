@@ -1,5 +1,5 @@
 """
-Mailer Sync API views for Hasker Mail Sender integration.
+Mailer Sync API views for PrimeFamily Mail Sender integration.
 
 Endpoints:
   GET  /api/v1/mailer/contacts/   — Export contacts (Leads + Clients + Portal Users) as JSON
@@ -50,7 +50,7 @@ def _build_contact(email, name, phone="", tags=None, source=None, budget_min=Non
 def mailer_contacts(request):
     """
     GET /api/v1/mailer/contacts/
-    Exports a combined contact list of Leads, Clients, and Portal Users for the Hasker Mailer.
+    Exports a combined contact list of Leads, Clients, and Portal Users for the PrimeFamily Mailer.
 
     Query params:
       - page         (int, default 1)
@@ -188,7 +188,7 @@ def mailer_contacts(request):
 def mailer_webhook(request):
     """
     POST /api/v1/mailer/webhook/
-    Receives email engagement events from the Hasker Mailer and logs them
+    Receives email engagement events from the PrimeFamily Mailer and logs them
     as LeadActivity records in the Hargrove CRM.
 
     Body: { event: "email_opened"|"link_clicked", email, campaignId, url?, timestamp }

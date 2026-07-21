@@ -95,10 +95,10 @@ class LeadAdmin(ModelAdmin):
             MoveInTimeline.ASAP:          "#16a34a",
             MoveInTimeline.ONE_THREE:     "#0891b2",
             MoveInTimeline.THREE_SIX:     "#7c3aed",
-            MoveInTimeline.SIX_PLUS:      "#6b7280",
-            MoveInTimeline.JUST_BROWSING: "#9ca3af",
+            MoveInTimeline.SIX_PLUS:      "#717973",
+            MoveInTimeline.JUST_BROWSING: "#a7a895",
         }
-        color = colors.get(obj.move_in_timeline, "#6b7280")
+        color = colors.get(obj.move_in_timeline, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:9999px;font-size:11px;white-space:nowrap">{}</span>',
             color, obj.get_move_in_timeline_display()
@@ -138,7 +138,7 @@ class LeadAdmin(ModelAdmin):
 
     def status_badge(self, obj):
         colors = {
-            LeadStatus.NEW: "#2563eb",
+            LeadStatus.NEW: "#012d1d",
             LeadStatus.CONTACTED: "#7c3aed",
             LeadStatus.QUALIFIED: "#0891b2",
             LeadStatus.VIEWING: "#d97706",
@@ -146,7 +146,7 @@ class LeadAdmin(ModelAdmin):
             LeadStatus.CONVERTED: "#16a34a",
             LeadStatus.LOST: "#dc2626",
         }
-        color = colors.get(obj.status, "#6b7280")
+        color = colors.get(obj.status, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:9999px;font-size:11px">{}</span>',
             color, obj.get_status_display()
@@ -340,16 +340,16 @@ class RentalApplicationAdmin(ModelAdmin):
 
     def status_badge(self, obj):
         colors = {
-            ApplicationStatus.DRAFT:                "#9ca3af",
-            ApplicationStatus.PENDING_PAYMENT:      "#f59e0b",
-            ApplicationStatus.PENDING_VERIFICATION: "#2563eb",
+            ApplicationStatus.DRAFT:                "#a7a895",
+            ApplicationStatus.PENDING_PAYMENT:      "#BC6C25",
+            ApplicationStatus.PENDING_VERIFICATION: "#012d1d",
             ApplicationStatus.SUBMITTED:            "#8b5cf6",
             ApplicationStatus.REVIEWED:             "#14b8a6",
-            ApplicationStatus.APPROVED:             "#10b981",
+            ApplicationStatus.APPROVED:             "#2E7D32",
             ApplicationStatus.REJECTED:             "#ef4444",
             ApplicationStatus.PAYMENT_FAILED:       "#ef4444",
         }
-        color = colors.get(obj.status, "#6b7280")
+        color = colors.get(obj.status, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;'
             'border-radius:9999px;font-size:11px">{}</span>',
@@ -516,7 +516,7 @@ class ReferrerAdmin(ModelAdmin):
 
     def code_badge(self, obj):
         return format_html(
-            '<code style="background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:4px;font-weight:700">{}</code>',
+            '<code style="background:#f3f4ec;color:#1d4ed8;padding:2px 8px;border-radius:4px;font-weight:700">{}</code>',
             obj.code,
         )
     code_badge.short_description = "Code"
@@ -570,12 +570,12 @@ class ReferralPayoutAdmin(ModelAdmin):
 
     def status_badge(self, obj):
         colors = {
-            ReferralStatus.PENDING:   "#f59e0b",
-            ReferralStatus.CONVERTED: "#2563eb",
+            ReferralStatus.PENDING:   "#BC6C25",
+            ReferralStatus.CONVERTED: "#012d1d",
             ReferralStatus.PAID:      "#16a34a",
-            ReferralStatus.VOID:      "#9ca3af",
+            ReferralStatus.VOID:      "#a7a895",
         }
-        color = colors.get(obj.status, "#6b7280")
+        color = colors.get(obj.status, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:9999px;font-size:11px">{}</span>',
             color, obj.get_status_display(),

@@ -13,7 +13,7 @@ _REDIS = config("REDIS_URL", default="redis://localhost:6379/0")
 # `include` forces these task modules to import at worker startup, so every
 # beat-scheduled task is registered deterministically (autodiscover timing can
 # otherwise miss them and beat would dispatch tasks the worker can't run).
-app = Celery("hasker", include=["apps.notifications.tasks", "apps.analytics.tasks"])
+app = Celery("primefamilyhousing", include=["apps.notifications.tasks", "apps.analytics.tasks"])
 
 # Bypass config_from_object — Django settings lazy-loading overwrites broker_url.
 # Set everything directly so Redis is locked in from the start.

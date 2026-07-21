@@ -15,7 +15,7 @@ from django.utils.text import slugify
 
 AGENTS = [
     {
-        "email": "sarah.johnson@haskerrealtygroup.com",
+        "email": "sarah.johnson@primefamilyhousing.com",
         "first_name": "Sarah",
         "last_name": "Johnson",
         "phone": "+1-310-555-0101",
@@ -30,7 +30,7 @@ AGENTS = [
         },
     },
     {
-        "email": "michael.chen@haskerrealtygroup.com",
+        "email": "michael.chen@primefamilyhousing.com",
         "first_name": "Michael",
         "last_name": "Chen",
         "phone": "+1-310-555-0102",
@@ -45,7 +45,7 @@ AGENTS = [
         },
     },
     {
-        "email": "emily.rodriguez@haskerrealtygroup.com",
+        "email": "emily.rodriguez@primefamilyhousing.com",
         "first_name": "Emily",
         "last_name": "Rodriguez",
         "phone": "+1-310-555-0103",
@@ -555,16 +555,16 @@ class Command(BaseCommand):
             CustomUser.objects.filter(role__in=[Role.AGENT, Role.MANAGER]).delete()
 
         # --- Admin ---
-        if not CustomUser.objects.filter(email="admin@haskerrealtygroup.com").exists():
+        if not CustomUser.objects.filter(email="admin@primefamilyhousing.com").exists():
             admin = CustomUser.objects.create_superuser(
-                email="admin@haskerrealtygroup.com",
+                email="admin@primefamilyhousing.com",
                 password="Admin@123!",
                 first_name="Admin",
-                last_name="Hasker & Co.",
+                last_name="PrimeFamilyHousing",
             )
             admin.role = Role.ADMIN
             admin.save()
-            self.stdout.write(self.style.SUCCESS("Created admin: admin@haskerrealtygroup.com / Admin@123!"))
+            self.stdout.write(self.style.SUCCESS("Created admin: admin@primefamilyhousing.com / Admin@123!"))
         else:
             self.stdout.write("Admin already exists — skipping.")
 
@@ -629,8 +629,8 @@ class Command(BaseCommand):
         self.stdout.write("")
         self.stdout.write(self.style.SUCCESS("=" * 60))
         self.stdout.write(self.style.SUCCESS("Seed complete! Login credentials:"))
-        self.stdout.write(self.style.SUCCESS("  Admin: admin@haskerrealtygroup.com / Admin@123!"))
-        self.stdout.write(self.style.SUCCESS("  Agent: sarah.johnson@haskerrealtygroup.com / Agent@123!"))
+        self.stdout.write(self.style.SUCCESS("  Admin: admin@primefamilyhousing.com / Admin@123!"))
+        self.stdout.write(self.style.SUCCESS("  Agent: sarah.johnson@primefamilyhousing.com / Agent@123!"))
         self.stdout.write(self.style.SUCCESS("  Admin panel: http://localhost:8000/admin/"))
         self.stdout.write(self.style.SUCCESS("  API: http://localhost:8000/api/v1/"))
         self.stdout.write(self.style.SUCCESS("=" * 60))

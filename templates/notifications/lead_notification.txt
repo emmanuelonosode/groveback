@@ -1,4 +1,4 @@
-Hasker & Co. Realty Group — New Lead Alert
+PrimeFamilyHousing — New Lead Alert
 ======================================
 
 A new lead has been submitted. Here are the details:
@@ -22,4 +22,4 @@ Budget: ${{ lead.budget_min|default:"—" }} – ${{ lead.budget_max|default:"op
 Please follow up within 24 hours.
 
 ---
-Hasker & Co. Realty Group | info@haskerrealtygroup.com
+PrimeFamilyHousing | info@primefamilyhousing.com

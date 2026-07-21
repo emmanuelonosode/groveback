@@ -4,7 +4,7 @@ from django.db import models
 class EmailConfiguration(models.Model):
     """
     Singleton model — stores the SMTP credentials used to send all
-    Hasker & Co. Realty Group emails.  Only one active row should exist at a time.
+    PrimeFamilyHousing emails.  Only one active row should exist at a time.
 
     How to use:
       config = EmailConfiguration.get_active()
@@ -15,11 +15,11 @@ class EmailConfiguration(models.Model):
 
     display_name    = models.CharField(
         max_length=100,
-        default="Hasker & Co. Realty Group",
+        default="PrimeFamilyHousing",
         help_text="Sender name shown in the recipient's inbox.",
     )
     from_email      = models.EmailField(
-        help_text="The email address emails are sent from (e.g. info@haskerrealtygroup.com).",
+        help_text="The email address emails are sent from (e.g. info@primefamilyhousing.com).",
     )
     smtp_host       = models.CharField(
         max_length=200,

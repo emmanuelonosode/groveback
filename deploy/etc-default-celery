@@ -1,4 +1,4 @@
-# ── Hasker & Co. — Celery environment file ───────────────────────────────────
+# ── PrimeFamilyHousing — Celery environment file ───────────────────────────────────
 # Copy this to /etc/default/celery on the server, then fill the two <REPLACE> paths.
 #
 #   sudo cp deploy/etc-default-celery /etc/default/celery

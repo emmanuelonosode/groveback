@@ -38,9 +38,9 @@ class PostAdmin(ModelAdmin):
             PostCategory.BUYERS_GUIDE:    "#16a34a",
             PostCategory.SELLERS_GUIDE:   "#7c3aed",
             PostCategory.INVESTMENT:      "#d97706",
-            PostCategory.MARKET_UPDATE:   "#2563eb",
+            PostCategory.MARKET_UPDATE:   "#012d1d",
         }
-        color = colors.get(obj.category, "#6b7280")
+        color = colors.get(obj.category, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;'
             'border-radius:9999px;font-size:11px">{}</span>',
@@ -51,11 +51,11 @@ class PostAdmin(ModelAdmin):
     def published_badge(self, obj):
         if obj.is_published:
             return format_html(
-                '<span style="background:#dcfce7;color:#166534;padding:2px 8px;'
+                '<span style="background:#c1ecd4;color:#166534;padding:2px 8px;'
                 'border-radius:9999px;font-size:11px">Published</span>'
             )
         return format_html(
-            '<span style="background:#f3f4f6;color:#374151;padding:2px 8px;'
+            '<span style="background:#edefe7;color:#414844;padding:2px 8px;'
             'border-radius:9999px;font-size:11px">Draft</span>'
         )
     published_badge.short_description = "Status"

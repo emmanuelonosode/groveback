@@ -1,4 +1,4 @@
-# Celery on a VPS (systemd) — Hasker & Co.
+# Celery on a VPS (systemd) — PrimeFamilyHousing
 
 Runs a **worker** (async tasks) and **beat** (scheduler). Beat enables the
 already-defined jobs: abandoned-application recovery, weekly lead follow-up,

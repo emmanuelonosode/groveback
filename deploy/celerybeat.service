@@ -1,5 +1,5 @@
 [Unit]
-Description=Celery Beat Scheduler (Hasker & Co.)
+Description=Celery Beat Scheduler (PrimeFamilyHousing)
 After=network.target redis-server.service redis.service
 
 [Service]

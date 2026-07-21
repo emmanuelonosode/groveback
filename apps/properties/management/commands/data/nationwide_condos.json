@@ -2,7 +2,7 @@
   "meta": {
     "source": "Nationwide Bulk Condo Extractor",
     "scraped_date": "2026-05-06",
-    "schema_version": "Hasker & Co. Property Data Schema",
+    "schema_version": "PrimeFamilyHousing Property Data Schema",
     "total_listings": 1000,
     "filters": {
       "type": "condo",

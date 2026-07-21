@@ -920,8 +920,8 @@ class Command(BaseCommand):
 
             # ── Clear existing invh properties ─────────────────────────────────
             if options["clear"] and not dry_run:
-                count = Property.objects.filter(agent__email="agent@haskerrealtygroup.com").count()
-                Property.objects.filter(agent__email="agent@haskerrealtygroup.com").delete()
+                count = Property.objects.filter(agent__email="agent@primefamilyhousing.com").count()
+                Property.objects.filter(agent__email="agent@primefamilyhousing.com").delete()
                 self.stdout.write(self.style.WARNING(f"Cleared {count} existing invh properties."))
 
             # ── Ensure amenity categories ──────────────────────────────────────
@@ -937,7 +937,7 @@ class Command(BaseCommand):
             agent = None
             if not dry_run:
                 agent, created = User.objects.get_or_create(
-                    email="agent@haskerrealtygroup.com",
+                    email="agent@primefamilyhousing.com",
                     defaults={
                         "first_name": "Marcus",
                         "last_name":  "Reid",

@@ -4,44 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>{% block subject %}Hasker &amp; Co. Realty Group{% endblock %}</title>
+  <title>{% block subject %}PrimeFamilyHousing{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet" />
   <!--[if mso]><style>* { font-family: Arial, sans-serif !important; }</style><![endif]-->
   <style>
-    body  { margin: 0; padding: 0; background-color: #E8E5DC; }
+    body  { margin: 0; padding: 0; background-color: #f3f4ec; }
     img   { border: 0; display: block; }
     a     { text-decoration: none; }
     table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
-    @media only screen and (max-width: 600px) {
+    @media only screen and (max-width: 620px) {
       .email-outer  { padding: 24px 0 40px !important; }
-      .header-cell  { padding: 18px 22px !important; }
+      .header-cell  { padding: 22px 24px !important; }
       .content-cell { padding: 32px 24px !important; }
-      .footer-cell  { padding: 24px 22px !important; }
+      .footer-cell  { padding: 28px 24px !important; }
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#E8E5DC;-webkit-font-smoothing:antialiased;font-family:'DM Sans',Arial,sans-serif;">
+<body style="margin:0;padding:0;background-color:#f3f4ec;-webkit-font-smoothing:antialiased;font-family:'Source Sans 3',Arial,sans-serif;">
 
 {% load i18n %}
 
-<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#E8E5DC">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f3f4ec">
   <tr>
-    <td align="center" style="padding:48px 16px 64px;" class="email-outer">
+    <td align="center" style="padding:32px 16px 56px;" class="email-outer">
 
       <!-- EMAIL CARD -->
-      <table width="580" cellpadding="0" cellspacing="0" border="0" style="max-width:580px;width:100%;background-color:#ffffff;border:1px solid #F1F5F9;box-shadow:0 8px 32px rgba(11,31,58,0.07),0 2px 6px rgba(11,31,58,0.04);">
+      <table width="672" cellpadding="0" cellspacing="0" border="0" style="max-width:672px;width:100%;background-color:#f9faf2;border:1px solid #e2e3db;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(8,28,21,0.06),0 2px 6px rgba(8,28,21,0.04);">
 
-        <!-- ── HEADER ───────────────────────────────────────── -->
+        <!-- ── HEADER — primary-container green band, centered wordmark ── -->
         <tr>
-          <td bgcolor="#ffffff" style="padding:24px 40px 20px;border-bottom:1px solid #F1F5F9;" class="header-cell">
-            <img
-              src="{{ frontend_url }}/logo/logo.png"
-              alt="Hasker &amp; Co. Realty Group"
-              height="38"
-              style="display:block;height:38px;width:auto;max-width:180px;"
-            />
+          <td bgcolor="#1b4332" align="center" style="padding:24px 40px;" class="header-cell">
+            <a href="{{ frontend_url }}" style="text-decoration:none;">
+              <span style="font-family:'Montserrat',Arial,sans-serif;font-size:32px;line-height:40px;font-weight:700;letter-spacing:-0.5px;color:#ffffff;">PrimeFamilyHousing</span>
+            </a>
           </td>
         </tr>
 
@@ -50,36 +47,52 @@
 
         <!-- ── BODY ─────────────────────────────────────────── -->
         <tr>
-          <td bgcolor="#ffffff" style="padding:40px 40px 36px;" class="content-cell">
+          <td bgcolor="#f9faf2" style="padding:40px 48px;" class="content-cell">
             {% block content %}{% endblock %}
           </td>
         </tr>
 
-        <!-- ── FOOTER ───────────────────────────────────────── -->
+        <!-- ── FOOTER — forest-deep band ──────────────────── -->
         <tr>
-          <td bgcolor="#FBF9F4" align="center" style="padding:28px 40px 28px;border-top:1px solid #F1F5F9;" class="footer-cell">
+          <td bgcolor="#081C15" align="center" style="padding:32px 40px;" class="footer-cell">
 
             <!-- Social row -->
-            <p style="margin:0 0 16px;font-family:'DM Sans',Arial,sans-serif;font-size:12px;color:#94A3B8;">
-              <a href="https://www.instagram.com/haskerrealtygroup/" style="color:#64748B;text-decoration:none;">Instagram</a>
+            <p style="margin:0 0 20px;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:16px;color:#a5d0b9;">
+              <a href="https://www.facebook.com/primefamilyhousing" style="color:#E9EDC6;text-decoration:none;">Facebook</a>
               &nbsp;&middot;&nbsp;
-              <a href="https://www.facebook.com/haskerrealtygroup" style="color:#64748B;text-decoration:none;">Facebook</a>
+              <a href="https://www.instagram.com/primefamilyhousing/" style="color:#E9EDC6;text-decoration:none;">Instagram</a>
               &nbsp;&middot;&nbsp;
-              <a href="https://www.linkedin.com/company/hasker-realty-group" style="color:#64748B;text-decoration:none;">LinkedIn</a>
+              <a href="https://www.linkedin.com/company/primefamilyhousing" style="color:#E9EDC6;text-decoration:none;">LinkedIn</a>
             </p>
 
-            <!-- Divider -->
-            <div style="width:32px;height:1px;background-color:#E2E8F0;margin:0 auto 14px;"></div>
+            <!-- Copyright + address -->
+            <p style="margin:0 0 4px;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:18px;color:rgba(255,255,255,0.8);">
+              &copy; {% now "Y" %} PrimeFamilyHousing. Dedicated to finding your sanctuary.
+            </p>
+            <p style="margin:0 0 16px;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:18px;color:rgba(255,255,255,0.6);">
+              213 Bob Ln, Virginia Beach, VA 23454
+            </p>
 
-            <!-- Legal -->
-            <p style="margin:0 0 4px;font-family:'DM Sans',Arial,sans-serif;font-size:11px;color:#94A3B8;line-height:1.6;">
-              &copy; {% now "Y" %} Hasker &amp; Co. Realty Group &nbsp;&bull;&nbsp; Equal Housing Opportunity
+            <!-- Equal Housing -->
+            <p style="margin:0 0 18px;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:16px;color:rgba(255,255,255,0.6);">
+              &#9878;&nbsp; Equal Housing Opportunity
             </p>
-            <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:11px;color:#94A3B8;line-height:1.6;">
-              Questions? <a href="mailto:info@haskerrealtygroup.com" style="color:#64748B;text-decoration:none;">info@haskerrealtygroup.com</a>
-              &nbsp;&bull;&nbsp;
-              <a href="tel:+17572082767" style="color:#64748B;text-decoration:none;">(757) 208-2767</a>
-            </p>
+
+            <!-- Legal links -->
+            <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-top:1px solid rgba(193,200,194,0.25);">
+              <tr>
+                <td style="padding-top:16px;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:16px;color:rgba(255,255,255,0.8);">
+                  <a href="{{ frontend_url }}/privacy" style="color:rgba(255,255,255,0.8);text-decoration:none;">Privacy Policy</a>
+                  &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+                  <a href="{{ frontend_url }}/terms" style="color:rgba(255,255,255,0.8);text-decoration:none;">Terms of Service</a>
+                  &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+                  <a href="{{ frontend_url }}/accessibility" style="color:rgba(255,255,255,0.8);text-decoration:none;">Fair Housing</a>
+                  &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+                  <a href="{{ frontend_url }}/contact" style="color:rgba(255,255,255,0.8);text-decoration:none;">Contact Support</a>
+                </td>
+              </tr>
+            </table>
+
           </td>
         </tr>
 

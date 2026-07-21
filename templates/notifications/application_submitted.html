@@ -1,101 +1,139 @@
 {% extends "notifications/email_base.html" %}
 
-{% block subject %}Application Received — Hasker &amp; Co. Realty Group{% endblock %}
+{% block subject %}We received your application — PrimeFamilyHousing{% endblock %}
 
 {% block content %}
-
-  <!-- Spot illustration -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 28px 0;text-align:center;">
+  <!-- Success illustration -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f7f9ec;border-radius:12px;margin:0 0 28px 0;">
     <tr>
-      <td>
-        <img src="{{ frontend_url }}/illustrations/spot-phone-apply.png" alt="" width="84" height="84" style="display:inline-block;width:84px;height:84px;" />
+      <td align="center" style="padding:32px 24px;">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="96" height="96" align="center" valign="middle" style="width:96px;height:96px;background-color:#ffffff;border-radius:50%;box-shadow:0 2px 8px rgba(8,28,21,0.08);">
+              <span style="font-size:44px;line-height:96px;color:#2E7D32;">&#10003;</span>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
-
-  <!-- Status label -->
-  <p style="margin:0 0 24px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2563EB;">
-    Application Received
-  </p>
 
   <!-- Heading -->
-  <h1 style="margin:0 0 16px;font-size:26px;font-weight:700;color:#1E3A5F;line-height:1.25;letter-spacing:-0.4px;">
-    Thank you,<br>{{ app.first_name }}.
-  </h1>
-
-  <!-- Lead paragraph -->
-  <p style="margin:0 0 32px;font-size:15px;color:#475569;line-height:1.75;">
-    We have received your rental application. Our team is reviewing your submission and will be in touch within 1–2 business days.
+  <p style="margin:0 0 12px 0;font-family:'Montserrat',Arial,sans-serif;font-size:24px;line-height:32px;font-weight:600;color:#081C15;text-align:center;">
+    We&apos;ve got it!
+  </p>
+  <p style="margin:0 auto 28px;font-size:16px;line-height:24px;color:#414844;text-align:center;max-width:440px;">
+    Thank you for applying to live with PrimeFamilyHousing{% if app.first_name %}, {{ app.first_name }}{% endif %}. We&apos;ve received your application and our team is currently reviewing your details.
   </p>
 
-  <!-- Summary table -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0"
-         style="border:1px solid #e2e8f0;margin-bottom:32px;">
+  <!-- Application summary -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4ec;border:1px solid #c1c8c2;border-radius:12px;margin:0 0 32px 0;">
     <tr>
-      <td colspan="2" style="padding:14px 20px 10px;border-bottom:1px solid #f1f5f9;">
-        <p style="margin:0;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#94a3b8;">
-          Application Summary
-        </p>
+      <td style="padding:22px 24px;">
+        <p style="margin:0 0 16px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#1a1c18;border-bottom:1px solid #c1c8c2;padding-bottom:10px;">Application Summary</p>
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="50%" valign="top" style="padding:0 12px 16px 0;">
+              <p style="margin:0 0 3px 0;font-size:12px;line-height:16px;color:#717973;">Reference Number</p>
+              <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">APP-{{ app.pk|stringformat:"05d" }}</p>
+            </td>
+            <td width="50%" valign="top" style="padding:0 0 16px 0;">
+              <p style="margin:0 0 3px 0;font-size:12px;line-height:16px;color:#717973;">Applicant Name</p>
+              <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{{ app.first_name }} {{ app.last_name }}</p>
+            </td>
+          </tr>
+          <tr>
+            <td width="50%" valign="top" style="padding:0 12px 0 0;">
+              <p style="margin:0 0 3px 0;font-size:12px;line-height:16px;color:#717973;">Property</p>
+              <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{% if app.rental_property %}{{ app.rental_property.title }}{% else %}General application{% endif %}</p>
+            </td>
+            <td width="50%" valign="top" style="padding:0;">
+              <p style="margin:0 0 3px 0;font-size:12px;line-height:16px;color:#717973;">Requested Move-In</p>
+              <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{{ app.move_in_date|date:"M j, Y" }}</p>
+            </td>
+          </tr>
+        </table>
       </td>
-    </tr>
-    <tr>
-      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;width:40%;">Reference</td>
-      <td style="padding:12px 20px;font-size:13px;color:#1E3A5F;font-weight:600;border-bottom:1px solid #f1f5f9;">#{{ app.pk|stringformat:"05d" }}</td>
-    </tr>
-    <tr>
-      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;">Applicant</td>
-      <td style="padding:12px 20px;font-size:13px;color:#1E3A5F;font-weight:600;border-bottom:1px solid #f1f5f9;">{{ app.full_name }}</td>
-    </tr>
-    <tr>
-      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;">Property</td>
-      <td style="padding:12px 20px;font-size:13px;color:#1E3A5F;font-weight:600;border-bottom:1px solid #f1f5f9;">{% if app.rental_property %}{{ app.rental_property.title }}{% else %}To be confirmed{% endif %}</td>
-    </tr>
-    <tr>
-      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;border-bottom:1px solid #f1f5f9;">Move-In Date</td>
-      <td style="padding:12px 20px;font-size:13px;color:#1E3A5F;font-weight:600;border-bottom:1px solid #f1f5f9;">{{ app.move_in_date }}</td>
-    </tr>
-    <tr>
-      <td style="padding:12px 20px;font-size:13px;color:#94a3b8;font-weight:500;">Submitted</td>
-      <td style="padding:12px 20px;font-size:13px;color:#1E3A5F;font-weight:600;">{{ app.submitted_at|date:"F j, Y" }}</td>
     </tr>
   </table>
 
-  <!-- Next steps -->
-  <p style="margin:0 0 10px;font-size:13px;font-weight:700;color:#1E3A5F;letter-spacing:0.2px;">What happens next?</p>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+  <!-- What happens next -->
+  <p style="margin:0 0 18px 0;font-family:'Montserrat',Arial,sans-serif;font-size:24px;line-height:32px;font-weight:600;color:#081C15;">What happens next?</p>
+
+  <!-- Step 1 (active) -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px 0;background-color:#ffffff;border:1px solid #c1c8c2;border-radius:12px;">
     <tr>
-      <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;">
-        <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;"><span style="color:#2563EB;font-weight:700;">1&nbsp;</span>&nbsp;We verify your payment proof <span style="color:#94a3b8;">(1–2 business hours)</span></p>
+      <td style="padding:16px 18px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="32" valign="top" style="padding-right:14px;">
+              <table cellpadding="0" cellspacing="0" border="0"><tr><td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background-color:#BC6C25;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#ffffff;">1</td></tr></table>
+            </td>
+            <td valign="top">
+              <p style="margin:0 0 3px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#1a1c18;">Verification</p>
+              <p style="margin:0;font-size:12px;line-height:16px;color:#414844;">We are verifying your provided documents, employment, and rental history.</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
+  </table>
+  <!-- Step 2 -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px 0;">
     <tr>
-      <td style="padding:8px 0;border-bottom:1px solid #f1f5f9;">
-        <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;"><span style="color:#2563EB;font-weight:700;">2&nbsp;</span>&nbsp;Our team reviews your full application</p>
+      <td style="padding:4px 18px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="32" valign="top" style="padding-right:14px;">
+              <table cellpadding="0" cellspacing="0" border="0"><tr><td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background-color:#e2e3db;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#717973;">2</td></tr></table>
+            </td>
+            <td valign="top">
+              <p style="margin:0 0 3px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#1a1c18;">Review</p>
+              <p style="margin:0;font-size:12px;line-height:16px;color:#414844;">Our team reviews your application for completeness against the property criteria.</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
+  </table>
+  <!-- Step 3 -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px 0;">
     <tr>
-      <td style="padding:8px 0;">
-        <p style="margin:0;font-size:13px;color:#64748b;line-height:1.6;"><span style="color:#2563EB;font-weight:700;">3&nbsp;</span>&nbsp;You receive an email with the decision</p>
+      <td style="padding:4px 18px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td width="32" valign="top" style="padding-right:14px;">
+              <table cellpadding="0" cellspacing="0" border="0"><tr><td width="32" height="32" align="center" valign="middle" style="width:32px;height:32px;background-color:#e2e3db;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#717973;">3</td></tr></table>
+            </td>
+            <td valign="top">
+              <p style="margin:0 0 3px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:700;color:#1a1c18;">Decision</p>
+              <p style="margin:0;font-size:12px;line-height:16px;color:#414844;">You&apos;ll receive an update on your approval status, typically within a few business days.</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
 
   <!-- CTA -->
-  <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px 0;">
     <tr>
-      <td style="background-color:#1E3A5F;">
-        <a href="{{ frontend_url }}/portal/profile"
-           style="display:inline-block;padding:14px 32px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ffffff;text-decoration:none;">
-          Track My Application
-        </a>
+      <td align="center">
+        <table cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="background-color:#012d1d;border-radius:9999px;">
+              <a href="{{ frontend_url }}/portal/dashboard" style="display:inline-block;padding:14px 40px;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">
+                Track My Application
+              </a>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
 
-  <!-- Sign-off -->
-  <p style="margin:0;font-size:13px;color:#94a3b8;line-height:1.6;">
-    Have a question? Reply to this email or reach us at
-    <a href="mailto:info@haskerrealtygroup.com" style="color:#2563EB;font-weight:500;">info@haskerrealtygroup.com</a>.
+  <p style="margin:0;font-size:12px;line-height:18px;color:#414844;text-align:center;">
+    Have questions? Reply to this email or contact us at
+    <a href="mailto:info@primefamilyhousing.com" style="color:#012d1d;text-decoration:none;">info@primefamilyhousing.com</a>.
   </p>
-
 {% endblock %}

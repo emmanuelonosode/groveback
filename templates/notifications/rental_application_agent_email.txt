@@ -23,4 +23,4 @@ The completed application PDF is attached. Please log in to the admin dashboard 
 
 Admin: {{ admin_url }}/admin/crm/rentalapplication/{{ app.pk }}/change/
 
-Hasker & Co. Realty Group — Internal Notification
+PrimeFamilyHousing — Internal Notification

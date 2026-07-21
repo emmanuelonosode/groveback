@@ -1,30 +1,30 @@
 {% extends "notifications/email_base.html" %}
 
-{% block subject %}Re: Your application for {{ app.role_title }} &mdash; Hasker &amp; Co. Realty Group{% endblock %}
+{% block subject %}Re: Your application for {{ app.role_title }} &mdash; PrimeFamilyHousing{% endblock %}
 
 {% block content %}
-  <p style="margin:0 0 20px 0;font-size:22px;font-weight:700;color:#1E3A5F;line-height:1.3;">
+  <p style="margin:0 0 20px 0;font-family:'Montserrat',Arial,sans-serif;font-size:22px;font-weight:700;color:#081C15;line-height:1.3;">
     Hi {{ app.full_name|truncatewords:2 }},
   </p>
 
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
-    Thank you for taking the time to apply for the <strong>{{ app.role_title }}</strong> position at Hasker &amp; Co. Realty Group and for your interest in joining our team.
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
+    Thank you for taking the time to apply for the <strong>{{ app.role_title }}</strong> position at PrimeFamilyHousing and for your interest in joining our team.
   </p>
 
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
     After careful consideration, we have decided to move forward with other candidates whose experience more closely matches our current needs. This was not an easy decision &mdash; we reviewed your application thoroughly and appreciate the time you invested.
   </p>
 
-  <p style="margin:0 0 16px 0;font-size:15px;color:#334155;line-height:1.7;">
-    We encourage you to apply again in the future as new roles open up. You can view open positions at any time at <a href="https://haskerrealtygroup.com/careers" style="color:#2563EB;">haskerrealtygroup.com/careers</a>.
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
+    We encourage you to apply again in the future as new roles open up. You can view open positions at any time at <a href="https://primefamilyhousing.com/careers" style="color:#012d1d;">primefamilyhousing.com/careers</a>.
   </p>
 
-  <p style="margin:0 0 16px 0;font-size:14px;color:#64748b;">
-    Thank you again for your interest in Hasker &amp; Co. Realty Group.
+  <p style="margin:0 0 16px 0;font-size:14px;color:#717973;">
+    Thank you again for your interest in PrimeFamilyHousing.
   </p>
 
-  <p style="margin:32px 0 0 0;font-size:14px;color:#334155;">
+  <p style="margin:32px 0 0 0;font-size:14px;color:#414844;">
     Best regards,<br>
-    <strong style="color:#1E3A5F;">The Hiring Team at Hasker &amp; Co. Realty Group</strong>
+    <strong style="color:#081C15;">The Hiring Team at PrimeFamilyHousing</strong>
   </p>
 {% endblock %}

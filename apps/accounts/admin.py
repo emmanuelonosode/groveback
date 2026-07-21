@@ -98,11 +98,11 @@ class CustomUserAdmin(ModelAdmin, UserAdmin):
         colors = {
             Role.ADMIN: "#dc2626",
             Role.MANAGER: "#7c3aed",
-            Role.AGENT: "#2563eb",
+            Role.AGENT: "#012d1d",
             Role.ACCOUNTANT: "#0891b2",
             Role.CLIENT: "#16a34a",
         }
-        color = colors.get(obj.role, "#6b7280")
+        color = colors.get(obj.role, "#717973")
         return format_html(
             '<span style="background:{};color:#fff;padding:2px 8px;border-radius:9999px;font-size:11px">{}</span>',
             color, obj.get_role_display()

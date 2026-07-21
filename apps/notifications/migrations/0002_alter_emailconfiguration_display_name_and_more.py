@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='emailconfiguration',
             name='display_name',
-            field=models.CharField(default='Hasker & Co. Realty Group', help_text="Sender name shown in the recipient's inbox.", max_length=100),
+            field=models.CharField(default='PrimeFamilyHousing', help_text="Sender name shown in the recipient's inbox.", max_length=100),
         ),
         migrations.AlterField(
             model_name='emailconfiguration',
             name='from_email',
-            field=models.EmailField(help_text='The email address emails are sent from (e.g. info@haskerrealtygroup.com).', max_length=254),
+            field=models.EmailField(help_text='The email address emails are sent from (e.g. info@primefamilyhousing.com).', max_length=254),
         ),
     ]

@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 max_length=200,
-                help_text='e.g. "@HaskerRealty" or "payments@haskerrealtygroup.com"',
+                help_text='e.g. "@PrimeFamilyHousing" or "payments@primefamilyhousing.com"',
             ),
         ),
     ]

@@ -35,7 +35,7 @@ def main():
     target_site = None
     for entry in site_entries:
         url = entry.get("siteUrl", "")
-        if "haskerrealtygroup.com" in url:
+        if "primefamilyhousing.com" in url:
             if url.startswith("sc-domain:"):
                 target_site = url
                 break
@@ -142,7 +142,7 @@ def generate_opportunities(backend_dir, queries, pages):
         impressions = p.get("impressions", 0)
         ctr = p.get("ctr", 0) * 100
         position = p.get("position", 0)
-        slug_display = page_url.replace("https://haskerrealtygroup.com", "") or "/"
+        slug_display = page_url.replace("https://primefamilyhousing.com", "") or "/"
         top_pages_table += f"| [{slug_display}]({page_url}) | {clicks:,} | {impressions:,} | {ctr:.2f}% | {position:.1f} |\n"
 
     # Compile Markdown Opportunities
@@ -166,7 +166,7 @@ These pages have high search visibility (impressions) but users aren't clicking.
     if not low_ctr_pages:
         opportunities_md += "| None found | - | - | - | - | - |\n"
     for item in low_ctr_pages[:10]:
-        slug = item["url"].replace("https://haskerrealtygroup.com", "") or "/"
+        slug = item["url"].replace("https://primefamilyhousing.com", "") or "/"
         opportunities_md += f"| [{slug}]({item['url']}) | {item['clicks']:,} | {item['impressions']:,} | {item['ctr']:.2f}% | {item['position']:.1f} | Revise title tag to include primary keywords; write a benefit-driven meta description. |\n"
 
     opportunities_md += """
@@ -180,7 +180,7 @@ These pages are ranking on page two of Google results. A minor on-page SEO boost
     if not page_one_candidates:
         opportunities_md += "| None found | - | - | - | - | - |\n"
     for item in page_one_candidates[:10]:
-        slug = item["url"].replace("https://haskerrealtygroup.com", "") or "/"
+        slug = item["url"].replace("https://primefamilyhousing.com", "") or "/"
         opportunities_md += f"| [{slug}]({item['url']}) | {item['clicks']:,} | {item['impressions']:,} | {item['ctr']:.2f}% | {item['position']:.1f} | Add targeted headers; increase page content depth; add 2-3 links from high-authority indexed pages. |\n"
 
     with open(report_path, "w", encoding="utf-8") as f:
