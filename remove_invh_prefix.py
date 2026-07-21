@@ -119,9 +119,9 @@ def main():
                     desc_cleaned += 1
                     updated = True
                     
-                # D. Map agent to 43
-                if fields.get("agent") != 43:
-                    fields["agent"] = 43
+                # D. Map agent to 1
+                if fields.get("agent") != 1:
+                    fields["agent"] = 1
                     updated = True
                     
                 if updated:
