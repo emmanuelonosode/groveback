@@ -164,12 +164,12 @@ def _clean_desc(text: str) -> str:
 # ── Price transform ──────────────────────────────────────────────────────────
 
 def _transform_price(raw) -> int:
-    """raw_price × 0.70, rounded to nearest dollar."""
+    """raw_price × 0.85, rounded up to nearest 10s."""
     try:
         p = int(float(str(raw).replace(",", "").replace("$", "").strip()))
     except (ValueError, TypeError):
         return 0
-    return round(p * 0.70)
+    return int(math.ceil(p * 0.85 / 10.0) * 10)
 
 
 # ── Raw SQL image insert ─────────────────────────────────────────────────────

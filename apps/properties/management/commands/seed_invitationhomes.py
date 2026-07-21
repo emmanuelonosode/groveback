@@ -226,10 +226,12 @@ class Command(BaseCommand):
                 baths = _dec(row.get("baths", ""), Decimal("0"))
                 sqft = _int(row.get("square_footage", ""), 0) or 0
                 raw_rent = _dec(row.get("rent", ""), Decimal("0"))
-                # Reduce by 30% and round to the nearest dollar
+                # Reduce by 15% and round up to the nearest 10s
                 if raw_rent and raw_rent > 0:
-                    discounted = raw_rent * Decimal("0.70")
-                    rent = Decimal(round(discounted))
+                    import math
+                    discounted = float(raw_rent) * 0.85
+                    rounded = math.ceil(discounted / 10.0) * 10
+                    rent = Decimal(str(int(rounded)))
                 else:
                     rent = raw_rent
                 year_built = _int(row.get("year_built", ""), None)
