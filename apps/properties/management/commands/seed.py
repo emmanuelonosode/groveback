@@ -3,7 +3,7 @@ seed.py
 ───────
 Master demo seed — creates users, amenity categories, and 10 showcase
 properties, each with a full image gallery (5-8 photos) stored via raw SQL
-to avoid CloudinaryField mangling external image URLs.
+to avoid legacy field coercion mangling external image URLs.
 
 Usage:
     python manage.py seed            # fresh seed (clears everything first)
@@ -27,7 +27,7 @@ User = get_user_model()
 def _insert_images(property_id: int, images: list[dict]) -> int:
     """
     Insert PropertyImage rows via raw SQL.
-    Bypasses CloudinaryField.to_python() which mangles external CDN URLs.
+    bypasses legacy field coercion which mangles external CDN URLs.
     Each dict: {url, caption, is_primary, order}
     """
     clean = [
@@ -775,7 +775,7 @@ class Command(BaseCommand):
                     amenity_count += 1
             total_amenities += amenity_count
 
-            # Images — raw SQL to avoid CloudinaryField URL mangling
+            # Images — raw SQL to avoid legacy URL mangling
             n_imgs = _insert_images(prop.id, item["images"])
             total_images += n_imgs
 

@@ -6,32 +6,25 @@ from apps.accounts.serializers import PublicAgentSerializer
 def _resolve_image_url(image_field):
     """
     Safely extract a full URL from an image field value.
-    If the database stores a plain string URL (e.g. standard URLField), it returns it directly.
-    If it's a Django file field or Cloudinary field, it retrieves the .url attribute.
+
+    `PropertyImage.image` is a plain URLField, so the value is almost always a
+    string that can be returned as-is. Django file fields (`.url`) are still
+    handled for any legacy/uploaded values.
+
+    The `image/upload/` guard covers rows written before migration
+    properties.0009 cleaned them up — cheap insurance if an old backup is
+    restored; it is a no-op for normal data.
     """
     if not image_field:
         return None
+
     if isinstance(image_field, str):
-        # Imported listings store an absolute URL as the Cloudinary public_id;
-        # the raw DB value then carries a bogus "image/upload/" prefix.
         if image_field.startswith("image/upload/http"):
             return image_field[len("image/upload/"):]
         return image_field
-    
-    # Check if the field is a CloudinaryResource or file field with a .url attribute
+
     url = getattr(image_field, "url", None)
-    if url:
-        # If it's a CloudinaryResource, it might have stripped the format from public_id.
-        # We restore the format extension if it's missing from the raw string value.
-        raw = getattr(image_field, "public_id", None)
-        if raw and isinstance(raw, str) and raw.startswith("http"):
-            ext = getattr(image_field, "format", None)
-            if ext and not raw.endswith(f".{ext}"):
-                return f"{raw}.{ext}"
-            return raw
-        return url
-        
-    return str(image_field)
+    return url or str(image_field)
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):

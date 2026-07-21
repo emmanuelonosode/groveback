@@ -25,7 +25,7 @@ class JobApplicationListView(generics.ListAPIView):
     """GET /api/v1/careers/applications/ — staff only (AGENT and above)."""
     queryset = JobApplication.objects.select_related("reviewed_by").all()
     serializer_class = JobApplicationAdminSerializer
-    permission_classes = [IsAgentOrAbove()]
+    permission_classes = [IsAgentOrAbove]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["status", "role_id"]
     search_fields = ["full_name", "email", "role_title", "phone"]
@@ -37,7 +37,7 @@ class JobApplicationDetailView(generics.RetrieveUpdateAPIView):
     """GET/PATCH /api/v1/careers/applications/{id}/ — staff only."""
     queryset = JobApplication.objects.select_related("reviewed_by").all()
     serializer_class = JobApplicationAdminSerializer
-    permission_classes = [IsAgentOrAbove()]
+    permission_classes = [IsAgentOrAbove]
 
     def perform_update(self, serializer):
         serializer.save(reviewed_by=self.request.user)

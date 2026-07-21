@@ -125,7 +125,7 @@ def _photo_url(pic) -> str:
 
     if not url:
         return ""
-    # Normalise scheme — CloudinaryField must never receive protocol-relative URLs
+    # Normalise scheme — the stored value must never be a protocol-relative URL
     if url.startswith("//"):
         url = "https:" + url
     elif url.startswith("http://"):
@@ -283,8 +283,8 @@ CATEGORIES = [
 ]
 
 def _insert_images_raw(property_id: int, urls: list) -> int:
-    """Insert images via raw SQL — bypasses CloudinaryField.to_python() which
-    mangles cloudfront.net URLs by treating them as Cloudinary CDN addresses."""
+    """Insert images via raw SQL — bypasses legacy field coercion which
+    mangled cloudfront.net URLs by treating them as CDN addresses."""
     clean = [u for u in urls if u and u.startswith("https://")]
     if not clean:
         return 0
@@ -577,7 +577,7 @@ class Command(BaseCommand):
                                 amen_objs, batch_size=200, ignore_conflicts=True
                             )
 
-                        # Images — raw SQL bypasses CloudinaryField URL mangling
+                        # Images — raw SQL bypasses legacy URL mangling
                         n_images = _insert_images_raw(prop.id, photo_urls)
 
                         self.stdout.write(self.style.SUCCESS(

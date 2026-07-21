@@ -24,7 +24,7 @@ AMENITY_CATEGORIES = [
 # Source: StreetEasy / Apartments.com  |  Scraped: 2026-05-05
 # All set to is_published=False. Review in admin before going live.
 # Note: image URLs are from apartments.com / zillowstatic CDNs.
-#       Replace with Cloudinary-hosted copies for permanent storage.
+#       Replace with self-hosted copies for permanent storage.
 LISTINGS = [
     # ── 1 ─────────────────────────────────────────────────────────────────────
     {

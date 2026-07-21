@@ -593,7 +593,7 @@ class Command(BaseCommand):
             "--skip-images",
             action="store_true",
             default=False,
-            help="Skip Cloudinary image upload (useful for quick test runs).",
+            help="Skip image processing (useful for quick test runs).",
         )
         parser.add_argument(
             "--reset-images",

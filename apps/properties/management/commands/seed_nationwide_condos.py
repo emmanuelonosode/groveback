@@ -42,7 +42,7 @@ AMENITY_CATEGORIES = [
 class Command(BaseCommand):
     help = (
         "Import 1,000 nationwide condo listings with images and amenities. "
-        "Images are uploaded to Cloudinary in parallel. "
+        ""
         "Fixes scraper state code errors."
     )
 
@@ -68,7 +68,7 @@ class Command(BaseCommand):
             "--skip-images",
             action="store_true",
             default=False,
-            help="Skip Cloudinary image upload.",
+            help="Skip image processing.",
         )
         parser.add_argument(
             "--reset-images",
@@ -80,7 +80,7 @@ class Command(BaseCommand):
             "--workers",
             type=int,
             default=20,
-            help="Number of parallel Cloudinary upload workers (default: 20).",
+            help="Number of parallel image workers (default: 20).",
         )
 
     def handle(self, *args, **options):
@@ -164,14 +164,14 @@ class Command(BaseCommand):
             )
             cat_map[cat_def["name"]] = obj
 
-        # ── 5. Upload images to Cloudinary in parallel ────────────────────────
+        # ── 5. Collect image URLs ────────────────────────
         # public_id = properties/nationwide/{prop_id}/{order}
-        # overwrite=False means re-runs reuse existing Cloudinary assets.
-        cloudinary_map: dict[tuple, str] = {}  # (prop_id, order) -> image_url
+        # Re-runs reuse the existing image URLs.
+        image_url_map: dict[tuple, str] = {}  # (prop_id, order) -> image_url
 
         if not skip_images:
             for img in raw_imgs:
-                cloudinary_map[(img["property_id"], img["order"])] = img["image"]
+                image_url_map[(img["property_id"], img["order"])] = img["image"]
 
         # ── 6. Import properties ──────────────────────────────────────────────
         created_count = skipped_count = fixed_states = 0
@@ -244,7 +244,7 @@ class Command(BaseCommand):
             if not skip_images:
                 img_objs = []
                 for img in images_by_prop.get(prop_id, []):
-                    public_id = cloudinary_map.get((prop_id, img["order"]))
+                    public_id = image_url_map.get((prop_id, img["order"]))
                     if public_id:
                         img_objs.append(PropertyImage(
                             property=prop,

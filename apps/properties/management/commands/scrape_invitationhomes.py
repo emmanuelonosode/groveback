@@ -176,7 +176,7 @@ def _transform_price(raw) -> int:
 
 def _insert_images_raw(property_id: int, urls: list) -> int:
     """
-    Insert images via raw SQL to bypass CloudinaryField.to_python() which
+    Insert images via raw SQL to bypass legacy field coercion which
     mangles external CDN URLs (cloudfront.net, etc.) on write.
     """
     clean = [u for u in urls if u and isinstance(u, str) and u.startswith("https://")]

@@ -89,7 +89,7 @@ class TourRequest(models.Model):
     tour_type = models.CharField(max_length=30, blank=True, default="self-tour")
     notes = models.TextField(blank=True)
 
-    # Identity verification (sensitive — government ID images, stored on Cloudinary)
+    # Identity verification (sensitive — government ID images, stored via the configured media storage)
     id_front = models.URLField(max_length=600, blank=True)
     id_back = models.URLField(max_length=600, blank=True)
 

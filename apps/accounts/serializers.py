@@ -56,7 +56,7 @@ class PublicAgentSerializer(serializers.ModelSerializer):
         if not url:
             url = obj.avatar_url
         # Locally-stored media returns a relative "/media/..." path; make it absolute
-        # so the separate frontend domain can load it (Cloudinary URLs pass through).
+        # so the separate frontend domain can load it (absolute URLs pass through).
         request = self.context.get("request")
         if url and url.startswith("/") and request is not None:
             return request.build_absolute_uri(url)

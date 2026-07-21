@@ -102,7 +102,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def avatar_url(self):
-        """Return the Cloudinary HTTPS URL for the avatar, or None if not set."""
+        """Return the HTTPS URL for the avatar, or None if not set."""
         try:
             return self.avatar.url if self.avatar else None
         except Exception:

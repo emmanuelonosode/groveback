@@ -60,9 +60,9 @@ def _clean_desc(text: str) -> str:
 
 
 def _insert_images_raw(property_id: int, urls: list) -> int:
-    """Insert property images via raw SQL, bypassing CloudinaryField entirely.
+    """Insert property images via raw SQL, bypassing Django field coercion entirely.
 
-    CloudinaryField.to_python() recognises cloudfront.net as a Cloudinary CDN
+    The legacy image field coerced cloudfront.net as a CDN
     domain and mangles the URL at assignment time — before it even reaches the
     database. Writing directly through the DB cursor stores the string as-is.
     """
@@ -347,10 +347,10 @@ _S3_RE   = re.compile(r"https?://s3\.amazonaws\.com/[^/]+/images/(\d+)/")
 
 
 def _normalize_url(url: str) -> str:
-    """Convert Rently S3 URLs → CloudFront equivalents (CloudinaryField-safe).
+    """Convert Rently S3 URLs → CloudFront equivalents (safe for storage as-is).
     S3 URLs (https://s3.amazonaws.com/Rently_dev/images/{id}/large_watermarked)
-    get mangled by Django's CloudinaryField because it treats s3.amazonaws.com
-    as a Cloudinary S3-backend host and strips the path. CloudFront URLs are
+    get mangled by the legacy image field because it treated s3.amazonaws.com
+    as an S3-backend host and stripped the path. CloudFront URLs are
     plain CDN links and store/retrieve without issue.
     """
     if not url:
@@ -368,7 +368,7 @@ def _photo_url(pic) -> str:
     Rently API picture objects may be strings or dicts.
     We always prefer large_url > url > medium_url > src.
     We reject anything that doesn't resolve to a full https:// URL so that
-    CloudinaryField never receives a protocol-relative or partial URL
+    the stored value is never protocol-relative or partial
     (which would cause build_url() to produce a garbled CDN address).
     """
     if isinstance(pic, str):
@@ -564,7 +564,7 @@ class Command(BaseCommand):
                     existing_slugs.add(slug)
                     total_props += 1
 
-                    # All gallery photos — use raw SQL to bypass CloudinaryField mangling
+                    # All gallery photos — use raw SQL to bypass legacy URL mangling
                     gallery = comm.get("gallery_photos", [])
                     gallery_urls = [
                         _photo_url(ph)
@@ -702,7 +702,7 @@ class Command(BaseCommand):
                 if amen_objs:
                     PropertyAmenity.objects.bulk_create(amen_objs, batch_size=500, ignore_conflicts=True)
 
-                # Images — raw SQL to bypass CloudinaryField URL mangling
+                # Images — raw SQL to bypass legacy URL mangling
                 photo_urls = [_photo_url(pic) for pic in pictures]
                 n_images = _insert_images_raw(prop.id, photo_urls)
 
