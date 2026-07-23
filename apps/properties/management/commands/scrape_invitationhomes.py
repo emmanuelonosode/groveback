@@ -441,7 +441,7 @@ def _listing_from_json(obj: dict, market_slug: str, default_state: str) -> dict 
     if detail_url and detail_url.startswith("/"):
         detail_url = f"{BASE}{detail_url}"
     if not detail_url and slug:
-        detail_url = f"{BASE}/houses-for-rent/{slug}"
+        detail_url = f"{BASE}/homes-for-rent/{slug}"
     if not slug and detail_url:
         slug = detail_url.rstrip("/").split("/")[-1]
     if not slug and not detail_url:
@@ -546,7 +546,7 @@ def _parse_html_cards(html: str, market_slug: str, default_state: str) -> list[d
 
     # Strategy 1: find links that look like property detail pages, excluding market listing links
     links = [
-        a for a in soup.find_all("a", href=re.compile(r"/houses-for-rent/[^/?#]+$"))
+        a for a in soup.find_all("a", href=re.compile(r"/homes-for-rent/[^/?#]+$"))
         if "/markets/" not in (a.get("href") or "")
     ]
     seen: set[str] = set()
@@ -733,7 +733,7 @@ def _scrape_detail(session: requests.Session, prop: dict,
 def _scrape_market(session: requests.Session, market_slug: str, default_state: str,
                 limit: int | None, base_delay: float, stdout) -> list[dict]:
     """Return all listing stubs (with pagination) for one market."""
-    url = f"{BASE}/markets/houses-for-rent/{market_slug}"
+    url = f"{BASE}/markets/homes-for-rent/{market_slug}"
     stdout.write(f"    Fetching {url} …")
 
     resp     = _get(session, url, headers=HEADERS, base_delay=base_delay)
@@ -776,7 +776,7 @@ def _scrape_market(session: requests.Session, market_slug: str, default_state: s
                     break
                 json_url = (
                     f"{BASE}/_next/data/{build_id}"
-                    f"/markets/houses-for-rent/{market_slug}.json"
+                    f"/markets/homes-for-rent/{market_slug}.json"
                 )
                 try:
                     pr    = _get(session, json_url, headers=JSON_HEADERS,
@@ -818,7 +818,7 @@ def _scrape_market(session: requests.Session, market_slug: str, default_state: s
         # (IH doesn't support ?page=N so duplicates signal end-of-data)
         page_num = 2
         while not limit or len(results) < limit:
-            pg_url = f"{BASE}/markets/houses-for-rent/{market_slug}?page={page_num}"
+            pg_url = f"{BASE}/markets/homes-for-rent/{market_slug}?page={page_num}"
             try:
                 pr       = _get(session, pg_url, headers=HEADERS, base_delay=base_delay)
                 page_nd  = _next_data(pr.text)

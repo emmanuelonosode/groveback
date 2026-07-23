@@ -8,9 +8,8 @@
     body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1a1c18; padding: 0; font-size: 14px; }
     /* Top header band */
     .header-band { background: #081C15; padding: 24px 48px; display: flex; justify-content: space-between; align-items: center; }
-    .wordmark { display: flex; align-items: center; gap: 14px; }
-    .wordmark-text .name { font-size: 19px; font-weight: 800; color: #ffffff; letter-spacing: -0.3px; line-height: 1.2; }
-    .wordmark-text .sub { font-size: 9px; font-weight: 400; color: #012d1d; letter-spacing: 2.8px; text-transform: uppercase; margin-top: 3px; }
+    .brand-logo { width: 112px; }
+    .brand-logo svg { width: 112px; height: auto; display: block; }
     .accent-bar { height: 4px; background: #012d1d; }
     /* Content area */
     .content { padding: 40px 48px; }
@@ -39,20 +38,8 @@
 <body>
   <!-- Header band -->
   <div class="header-band">
-    <div class="wordmark">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 44" width="44" height="44">
-        <circle cx="22" cy="22" r="22" fill="#081C15" stroke="#012d1d" stroke-width="1.5"/>
-        <g transform="translate(22,22) scale(0.173) translate(-160,-160)">
-          <polygon points="76,160 160,56 244,160 160,264" fill="#012d1d"/>
-          <polygon points="120,160 160,104 200,160" fill="#FFFFFF"/>
-          <rect x="124" y="160" width="72" height="50" rx="4" fill="#FFFFFF"/>
-          <rect x="146" y="170" width="28" height="40" rx="4" fill="#012d1d"/>
-        </g>
-      </svg>
-      <div class="wordmark-text">
-        <div class="name">PrimeFamilyHousing</div>
-        <div class="sub">Homes for Families</div>
-      </div>
+    <div class="brand-logo">
+      {% include "notifications/_logo_lockup_beige.svg" %}
     </div>
     <div style="text-align:right;">
       <span class="status-badge">{{ invoice.get_status_display }}</span>

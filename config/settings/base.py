@@ -262,6 +262,14 @@ UNFOLD = {
         "show_all_applications": False,
         "navigation": [
             {
+                "title": "Intelligence & Telemetry",
+                "items": [
+                    {"title": "User Intelligence & Profiles", "icon": "fingerprint", "link": "/admin/analytics/visitor/"},
+                    {"title": "Session Journeys",             "icon": "timeline",    "link": "/admin/analytics/visitorsession/"},
+                    {"title": "Telemetry Intake Spool",       "icon": "dns",         "link": "/admin/analytics/rawtelemetryevent/"},
+                ],
+            },
+            {
                 "title": "Operations",
                 "items": [
                     {"title": "Dashboard",           "icon": "home",           "link": "/admin/"},

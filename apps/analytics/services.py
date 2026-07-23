@@ -64,22 +64,29 @@ def process_single_payload(data: dict):
         return
         
     user_id = data.get("user_id")
+    ip_addr = data.get("ip_address")
     
-    visitor, _ = Visitor.objects.get_or_create(fingerprint_id=fingerprint)
+    visitor, created_visitor = Visitor.objects.get_or_create(fingerprint_id=fingerprint)
+    
+    # Update IP history
+    if ip_addr:
+        if not visitor.first_ip:
+            visitor.first_ip = ip_addr
+        visitor.last_ip = ip_addr
+
     if user_id and not visitor.user_id:
         visitor.user_id = user_id
-        visitor.save(update_fields=["user_id"])
         
     session_id = data.get("session_id")
     if not session_id:
+        visitor.save()
         return
         
-    # We update the visitor if a new session is started by the same visitor
-    session, created = VisitorSession.objects.get_or_create(
+    session, created_session = VisitorSession.objects.get_or_create(
         session_id=session_id,
         defaults={
             "visitor": visitor,
-            "ip_address": data.get("ip_address"),
+            "ip_address": ip_addr,
             "city": data.get("city", ""),
             "region": data.get("region", ""),
             "country_code": data.get("country_code", ""),
@@ -87,6 +94,13 @@ def process_single_payload(data: dict):
             "os": data.get("os", ""),
             "device_type": data.get("device_type", ""),
             "screen": data.get("screen", ""),
+            "viewport": data.get("viewport", ""),
+            "pixel_ratio": float(data.get("pixel_ratio") or 1.0),
+            "connection_type": data.get("connection_type", ""),
+            "hardware_concurrency": int(data.get("hardware_concurrency") or 0),
+            "device_memory": float(data.get("device_memory") or 0.0),
+            "max_touch_points": int(data.get("max_touch_points") or 0),
+            "orientation": data.get("orientation", ""),
             "language": data.get("language", ""),
             "timezone": data.get("timezone", ""),
             "landing_page": data.get("landing_page", ""),
@@ -98,17 +112,24 @@ def process_single_payload(data: dict):
         }
     )
     
-    if not created and visitor != session.visitor:
+    if not created_session and visitor != session.visitor:
         session.visitor = visitor
         session.save(update_fields=["visitor"])
 
     event_type = data.get("event_type")
     ts = parse_datetime(data.get("timestamp") or "") or timezone.now()
 
+    # Track city/location intent
+    city = data.get("city") or session.city
+    if city and city not in (visitor.searched_locations or []):
+        locations = list(visitor.searched_locations or [])
+        locations.append(city)
+        visitor.searched_locations = locations[:20]
+
     # Handle end session
     if event_type == "session_end":
         session.end_time = ts
-        session.total_dwell_time = data.get("dwell_time", 0.0)
+        session.total_dwell_time = float(data.get("dwell_time", 0.0))
         session.save(update_fields=["end_time", "total_dwell_time"])
 
     # Handle page visits
@@ -125,24 +146,62 @@ def process_single_payload(data: dict):
         visit = PageVisit.objects.filter(session=session, path=path).order_by("-entry_time").first()
         if visit:
             if "max_scroll_depth" in data:
-                visit.max_scroll_depth = max(visit.max_scroll_depth, data["max_scroll_depth"])
+                visit.max_scroll_depth = max(visit.max_scroll_depth, float(data["max_scroll_depth"]))
             if "idle_time" in data:
-                visit.idle_time = data["idle_time"]
+                visit.idle_time = float(data["idle_time"])
             visit.save(update_fields=["max_scroll_depth", "idle_time"])
             
-    # Handle arbitrary events (clicks, etc.)
+    # Handle arbitrary events (clicks, conversions, property views, identify)
     if event_type not in ["session_end", "page_view", "engagement", "init", None]:
         visit = None
         if path:
             visit = PageVisit.objects.filter(session=session, path=path).order_by("-entry_time").first()
             
+        event_data = data.get("event_data", {})
+        if not isinstance(event_data, dict):
+            event_data = {}
+
+        # Handle identify / lead submission
+        email = event_data.get("email")
+        if email and isinstance(email, str) and "@" in email:
+            visitor.associated_email = email.strip().lower()
+            visitor.is_lead = True
+            if not visitor.user_id:
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                matched_user = User.objects.filter(email__iexact=email.strip()).first()
+                if matched_user:
+                    visitor.user = matched_user
+
+        # Track property views
+        prop_id = event_data.get("property_id")
+        if prop_id:
+            pid_str = str(prop_id)
+            viewed = list(visitor.viewed_property_ids or [])
+            if pid_str not in viewed:
+                viewed.append(pid_str)
+                visitor.viewed_property_ids = viewed[:50]
+            session.properties_viewed_count = (session.properties_viewed_count or 0) + 1
+            session.save(update_fields=["properties_viewed_count"])
+
         TelemetryEvent.objects.create(
             session=session,
             page_visit=visit,
             event_type=event_type,
-            event_data=data.get("event_data", {}),
+            event_data=event_data,
             created_at=ts,
         )
+
+    # Recalculate visitor summary stats
+    sessions_qs = visitor.sessions.all()
+    visitor.total_sessions_count = sessions_qs.count()
+    visitor.total_dwell_time = sum(s.total_dwell_time or 0.0 for s in sessions_qs)
+    if session.device_type:
+        visitor.primary_device = session.device_type
+    if session.city:
+        visitor.primary_city = session.city
+
+    visitor.save()
 
 
 # ── Durable spool processing (DB-backed, no Redis/Celery) ─────────────────────

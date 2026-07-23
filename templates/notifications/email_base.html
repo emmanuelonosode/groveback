@@ -33,11 +33,18 @@
       <!-- EMAIL CARD -->
       <table width="672" cellpadding="0" cellspacing="0" border="0" style="max-width:672px;width:100%;background-color:#f9faf2;border:1px solid #e2e3db;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(8,28,21,0.06),0 2px 6px rgba(8,28,21,0.04);">
 
-        <!-- ── HEADER — primary-container green band, centered wordmark ── -->
+        <!-- ── HEADER — primary-container green band, centered brand logo ──
+             Hosted PNG (email clients don't render SVG). Absolute URL + solid
+             alt text so it degrades gracefully when a client blocks images.
+             URL is hardcoded (not {{ frontend_url }}) because not every sender
+             passes that into context, and the brand domain is stable. -->
         <tr>
-          <td bgcolor="#1b4332" align="center" style="padding:24px 40px;" class="header-cell">
-            <a href="{{ frontend_url }}" style="text-decoration:none;">
-              <span style="font-family:'Montserrat',Arial,sans-serif;font-size:32px;line-height:40px;font-weight:700;letter-spacing:-0.5px;color:#ffffff;">PrimeFamilyHousing</span>
+          <td bgcolor="#1b4332" align="center" style="padding:26px 40px;" class="header-cell">
+            <a href="https://primefamilyhousing.com" style="text-decoration:none;display:inline-block;">
+              <img src="https://primefamilyhousing.com/brand/logo-lockup-beige-2x.png"
+                   width="200" height="110"
+                   alt="PrimeFamilyHousing — Great Places to Call Home"
+                   style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic;width:200px;max-width:200px;height:auto;" />
             </a>
           </td>
         </tr>
@@ -55,6 +62,12 @@
         <!-- ── FOOTER — forest-deep band ──────────────────── -->
         <tr>
           <td bgcolor="#081C15" align="center" style="padding:32px 40px;" class="footer-cell">
+
+            <!-- Brand emblem accent -->
+            <img src="https://primefamilyhousing.com/brand/emblem-beige-2x.png"
+                 width="118" height="43"
+                 alt="PrimeFamilyHousing"
+                 style="display:block;margin:0 auto 18px;border:0;outline:none;-ms-interpolation-mode:bicubic;width:118px;max-width:118px;height:auto;opacity:0.9;" />
 
             <!-- Social row -->
             <p style="margin:0 0 20px;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;line-height:16px;color:#a5d0b9;">

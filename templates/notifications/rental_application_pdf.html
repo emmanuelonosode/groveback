@@ -34,6 +34,8 @@
   }
   .header-logo  { display: table-cell; vertical-align: middle; width: 55%; }
   .header-meta  { display: table-cell; vertical-align: middle; width: 45%; text-align: right; }
+  .brand-logo   { width: 120px; }
+  .brand-logo svg { width: 120px; height: auto; display: block; }
 
   .doc-title {
     font-family: Helvetica, Arial, sans-serif;
@@ -188,17 +190,9 @@
 <!-- ── Header ─────────────────────────────────────────────────────── -->
 <div class="header">
   <div class="header-logo">
-    <!-- Inline SVG Logo -->
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 48" height="44" width="210">
-      <polygon points="20,24 36,4 52,24 36,44" fill="#012d1d"/>
-      <polygon points="28,24 36,13 44,24" fill="white"/>
-      <rect x="29" y="24" width="14" height="10" rx="1" fill="white"/>
-      <rect x="33" y="26" width="6" height="8" rx="1" fill="#012d1d"/>
-      <text x="62" y="23" font-family="'Montserrat','Helvetica Neue',Helvetica,Arial,sans-serif"
-            font-weight="700" font-size="16" fill="#081C15" letter-spacing="-0.2">PrimeFamilyHousing</text>
-      <text x="63" y="37" font-family="'Source Sans 3','Helvetica Neue',Helvetica,Arial,sans-serif"
-            font-weight="400" font-size="8" fill="#7d562d" letter-spacing="3">HOMES FOR FAMILIES</text>
-    </svg>
+    <div class="brand-logo">
+      {% include "notifications/_logo_lockup_green.svg" %}
+    </div>
   </div>
   <div class="header-meta">
     <div class="doc-title">Rental Application</div>
