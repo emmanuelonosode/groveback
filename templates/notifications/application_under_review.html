@@ -1,134 +1,515 @@
-{% extends "notifications/email_base.html" %}
+<!doctype html>
+<html lang="und" dir="auto" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
-{% block subject %}Your Application Is Under Review — PrimeFamilyHousing{% endblock %}
+<head>
+  <title>Your application is under review — PrimeFamilyHousing</title>
+  <!--[if !mso]><!-->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--<![endif]-->
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style type="text/css">
+    #outlook a {
+      padding: 0;
+    }
 
-{% block hero_image %}
-{% if app.rental_property.primary_image.image %}
-<tr>
-  <td style="padding:0;font-size:0;line-height:0;">
-    <img src="{{ app.rental_property.primary_image.image }}" alt=""
-         width="672" style="display:block;width:100%;max-width:672px;height:240px;object-fit:cover;" />
-  </td>
-</tr>
-{% endif %}
-{% endblock %}
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+    }
 
-{% block content %}
-  <!-- Pill + title -->
-  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px 0;">
-    <tr>
-      <td style="background-color:#f4e7d9;border-radius:9999px;padding:5px 14px;">
-        <span style="font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#BC6C25;">Application Update</span>
-      </td>
-    </tr>
-  </table>
-  <p style="margin:0 0 20px 0;font-family:'Montserrat',Arial,sans-serif;font-size:28px;line-height:36px;font-weight:600;color:#081C15;">
-    Application Under Review
-  </p>
+    table,
+    td {
+      border-collapse: collapse;
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
 
-  <!-- Greeting -->
-  <p style="margin:0 0 10px 0;font-size:18px;line-height:28px;color:#1a1c18;">Dear {{ app.first_name|default:"Future Resident" }},</p>
-  <p style="margin:0 0 28px 0;font-size:16px;line-height:24px;color:#414844;">
-    Thank you for applying to join one of our communities. We&apos;ve successfully received your application{% if app.rental_property %} for <strong style="color:#081C15;">{{ app.rental_property.title }}</strong>{% endif %}. Our dedicated leasing team is currently reviewing your details. We appreciate your patience during this process.
-  </p>
+    img {
+      border: 0;
+      height: auto;
+      line-height: 100%;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+    }
 
-  <!-- Application Summary -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #c1c8c2;border-radius:12px;overflow:hidden;margin:0 0 28px 0;">
-    <tr>
-      <td style="background-color:#f3f4ec;padding:12px 18px;border-bottom:1px solid #c1c8c2;">
-        <span style="font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#1a1c18;">Application Summary</span>
-      </td>
-    </tr>
-    <tr>
-      <td style="background-color:#ffffff;padding:18px;">
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+    p {
+      display: block;
+      margin: 13px 0;
+    }
+  </style>
+  <!--[if mso]>
+    <noscript>
+    <xml>
+    <o:OfficeDocumentSettings>
+      <o:AllowPNG/>
+      <o:PixelsPerInch>96</o:PixelsPerInch>
+    </o:OfficeDocumentSettings>
+    </xml>
+    </noscript>
+    <![endif]-->
+  <!--[if lte mso 11]>
+    <style type="text/css">
+      .mj-outlook-group-fix { width:100% !important; }
+    </style>
+    <![endif]-->
+  <!--[if !mso]><!-->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" type="text/css">
+  <style type="text/css">
+    @import url(https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap);
+    @import url(https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap);
+  </style>
+  <!--<![endif]-->
+  <style type="text/css">
+    @media only screen and (min-width:600px) {
+      .mj-column-per-100 {
+        width: 100% !important;
+        max-width: 100%;
+      }
+    }
+  </style>
+  <style media="screen and (min-width:600px)">
+    .moz-text-html .mj-column-per-100 {
+      width: 100% !important;
+      max-width: 100%;
+    }
+  </style>
+  <style type="text/css">
+    @media only screen and (max-width:599px) {
+      table.mj-full-width-mobile {
+        width: 100% !important;
+      }
+
+      td.mj-full-width-mobile {
+        width: auto !important;
+      }
+    }
+  </style>
+  <style type="text/css">
+    a {
+      text-decoration: none;
+    }
+  </style>
+  <!-- Shared <mj-head> children: fonts, global type defaults, brand classes, dark-mode lock -->
+  <!-- Lock to light so Apple/Gmail dark mode can't invert the forest-green palette -->
+  <meta name="color-scheme" content="light only">
+  <meta name="supported-color-schemes" content="light">
+</head>
+
+<body style="word-spacing:normal;background-color:#f3f4ec;">
+  <div style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">Your application is in and our leasing team is reviewing it now.</div>
+  <div aria-label="Your application is under review — PrimeFamilyHousing" aria-roledescription="email" role="article" lang="und" dir="auto" style="word-spacing:normal;background-color:#f3f4ec;">
+    <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:672px;" width="672" bgcolor="#f9faf2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+    <div style="background:#f9faf2;background-color:#f9faf2;margin:0px auto;max-width:672px;border-radius:12px;overflow:hidden;">
+      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9faf2;background-color:#f9faf2;width:100%;border-collapse:separate;">
+        <tbody>
           <tr>
-            <td width="50%" valign="top" style="padding:0 16px 16px 0;">
-              <p style="margin:0 0 3px 0;font-size:11px;line-height:16px;letter-spacing:0.06em;text-transform:uppercase;color:#414844;">Property</p>
-              <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{% if app.rental_property %}{{ app.rental_property.title }}{% else %}General application{% endif %}</p>
-            </td>
-            <td width="50%" valign="top" style="padding:0 0 16px 0;">
-              <p style="margin:0 0 3px 0;font-size:11px;line-height:16px;letter-spacing:0.06em;text-transform:uppercase;color:#414844;">Applicant Name</p>
-              <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{{ app.first_name }} {{ app.last_name }}</p>
+            <td style="border:1px solid #e2e3db;border-radius:12px;direction:ltr;font-size:0px;padding:0;text-align:center;">
+              <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><![endif]-->
+              <!-- Brand header: forest-green band + beige logo lockup (hosted PNG, alt fallback) -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#1b4332" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#1b4332;background-color:#1b4332;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#1b4332;background-color:#1b4332;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:26px 40px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:590px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0;word-break:break-word;">
+                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                    <tbody>
+                                      <tr>
+                                        <td style="width:200px;">
+                                          <a href="https://primefamilyhousing.com" target="_blank">
+                                            <img alt="PrimeFamilyHousing — Great Places to Call Home" src="https://primefamilyhousing.com/brand/logo-lockup-beige-2x.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="200" height="auto" />
+                                          </a>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- Hero band (forest-deep, distinct from the logo band above) -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#081C15" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#081C15;background-color:#081C15;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#081C15;background-color:#081C15;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:34px 48px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:574px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0 0 8px;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;line-height:24px;text-align:center;text-transform:uppercase;color:#A3B18A;">Status Update</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0;word-break:break-word;">
+                                  <div style="font-family:Montserrat, 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:28px;font-weight:700;line-height:34px;text-align:center;color:#ffffff;">Application Under Review</div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- Intro -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#f9faf2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#f9faf2;background-color:#f9faf2;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9faf2;background-color:#f9faf2;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:36px 48px 24px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:574px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="left" style="font-size:0px;padding:0;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:16px;line-height:24px;text-align:left;color:#414844;">Dear {% if app.first_name %}{{ app.first_name }}{% else %}Future Resident{% endif %},<br /><br /> Thank you for applying to join one of our communities. We have successfully received your application{% if app.rental_property %} for <strong style="color:#081C15;">{{ app.rental_property.title }}</strong>{% endif %}. Our dedicated leasing team is currently reviewing your details. We appreciate your patience during this process.</div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- Application summary card -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#f9faf2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#f9faf2;background-color:#f9faf2;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9faf2;background-color:#f9faf2;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:0 48px 28px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:574px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:separate;">
+                            <tbody>
+                              <tr>
+                                <td style="background-color:#f3f4ec;border:1px solid #c1c8c2;border-radius:12px;vertical-align:top;border-collapse:separate;padding:22px 24px;">
+                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
+                                    <tbody>
+                                      <tr>
+                                        <td align="left" style="font-size:0px;padding:0 0 10px;word-break:break-word;">
+                                          <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;line-height:24px;text-align:left;text-transform:uppercase;color:#1a1c18;">Application Summary</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td align="center" style="font-size:0px;padding:0 0 16px;word-break:break-word;">
+                                          <p style="border-top:solid 1px #c1c8c2;font-size:1px;margin:0px auto;width:100%;">
+                                          </p>
+                                          <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 1px #c1c8c2;font-size:1px;margin:0px auto;width:524px;" role="presentation" width="524px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+</td></tr></table><![endif]-->
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td align="left" style="font-size:0px;padding:0;word-break:break-word;">
+                                          <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                                            <tr>
+                                              <td style="width:50%;padding:0 12px 16px 0;vertical-align:top;">
+                                                <p style="margin:0 0 3px;font-size:12px;line-height:16px;color:#717973;">Property</p>
+                                                <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{% if app.rental_property %}{{ app.rental_property.title }}{% else %}General application{% endif %}</p>
+                                              </td>
+                                              <td style="width:50%;padding:0 0 16px;vertical-align:top;">
+                                                <p style="margin:0 0 3px;font-size:12px;line-height:16px;color:#717973;">Applicant Name</p>
+                                                <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{{ app.first_name }} {{ app.last_name }}</p>
+                                              </td>
+                                            </tr>
+                                            <tr>
+                                              <td style="width:50%;padding:0 12px 0 0;vertical-align:top;">
+                                                <p style="margin:0 0 3px;font-size:12px;line-height:16px;color:#717973;">Application ID</p>
+                                                <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">APP-{{ app.pk|stringformat:"05d" }}</p>
+                                              </td>
+                                              <td style="width:50%;padding:0;vertical-align:top;">
+                                                <p style="margin:0 0 3px;font-size:12px;line-height:16px;color:#717973;">Submitted On</p>
+                                                <p style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:#1a1c18;">{{ app.submitted_at|date:"F j, Y" }}</p>
+                                              </td>
+                                            </tr>
+                                          </table>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- What to expect next (beige card) -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#f9faf2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#f9faf2;background-color:#f9faf2;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9faf2;background-color:#f9faf2;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:0 48px 8px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:574px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:separate;">
+                            <tbody>
+                              <tr>
+                                <td style="background-color:#f7f9ec;border-radius:12px;vertical-align:top;border-collapse:separate;padding:24px 24px 8px;">
+                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="" width="100%">
+                                    <tbody>
+                                      <tr>
+                                        <td align="left" style="font-size:0px;padding:0 0 16px;word-break:break-word;">
+                                          <div style="font-family:Montserrat, 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:18px;font-weight:700;line-height:24px;text-align:left;color:#081C15;">What to expect next</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td align="left" style="font-size:0px;padding:0;word-break:break-word;">
+                                          <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                                            <tr>
+                                              <td style="width:32px;vertical-align:top;padding:0 14px 18px 0;">
+                                                <table cellpadding="0" cellspacing="0" role="presentation">
+                                                  <tr>
+                                                    <td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#A3B18A;border-radius:50%;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#ffffff;">1</td>
+                                                  </tr>
+                                                </table>
+                                              </td>
+                                              <td style="vertical-align:top;padding:0 0 18px;">
+                                                <p style="margin:0 0 2px;font-size:14px;font-weight:700;color:#1a1c18;">Verification Process</p>
+                                                <p style="margin:0;font-size:12px;line-height:17px;color:#414844;">Our team is reviewing your employment, rental history, and background check. This typically takes 24–48 business hours.</p>
+                                              </td>
+                                            </tr>
+                                            <tr>
+                                              <td style="width:32px;vertical-align:top;padding:0 14px 18px 0;">
+                                                <table cellpadding="0" cellspacing="0" role="presentation">
+                                                  <tr>
+                                                    <td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#A3B18A;border-radius:50%;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#ffffff;">2</td>
+                                                  </tr>
+                                                </table>
+                                              </td>
+                                              <td style="vertical-align:top;padding:0 0 18px;">
+                                                <p style="margin:0 0 2px;font-size:14px;font-weight:700;color:#1a1c18;">Additional Information</p>
+                                                <p style="margin:0;font-size:12px;line-height:17px;color:#414844;">If we need any further documentation, a leasing agent will contact you directly via email or phone.</p>
+                                              </td>
+                                            </tr>
+                                            <tr>
+                                              <td style="width:32px;vertical-align:top;padding:0 14px 0 0;">
+                                                <table cellpadding="0" cellspacing="0" role="presentation">
+                                                  <tr>
+                                                    <td width="26" height="26" align="center" valign="middle" style="width:26px;height:26px;background:#A3B18A;border-radius:50%;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#ffffff;">3</td>
+                                                  </tr>
+                                                </table>
+                                              </td>
+                                              <td style="vertical-align:top;padding:0;">
+                                                <p style="margin:0 0 2px;font-size:14px;font-weight:700;color:#1a1c18;">Final Decision</p>
+                                                <p style="margin:0;font-size:12px;line-height:17px;color:#414844;">You will receive an email notification as soon as a final decision is made regarding your application.</p>
+                                              </td>
+                                            </tr>
+                                          </table>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- CTA -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#f9faf2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#f9faf2;background-color:#f9faf2;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9faf2;background-color:#f9faf2;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:24px 48px 8px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:574px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0;word-break:break-word;">
+                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;">
+                                    <tbody>
+                                      <tr>
+                                        <td align="center" bgcolor="#012d1d" role="presentation" style="border:none;border-radius:9999px;cursor:auto;mso-padding-alt:14px 40px;background:#012d1d;" valign="middle">
+                                          <a href="{{ frontend_url }}/portal/dashboard" style="display:inline-block;background:#012d1d;color:#ffffff;font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:14px;font-weight:600;line-height:120%;letter-spacing:0.05em;margin:0;text-decoration:none;text-transform:none;padding:14px 40px;mso-padding-alt:0px;border-radius:9999px;" target="_blank"> View Application Status </a>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- Sign-off -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#f9faf2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#f9faf2;background-color:#f9faf2;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9faf2;background-color:#f9faf2;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:16px 48px 4px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:574px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:15px;line-height:22px;text-align:center;color:#414844;">Warmly,<br /><strong style="color:#081C15;">The PrimeFamilyHousing Leasing Team</strong></div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- Support -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#f9faf2" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#f9faf2;background-color:#f9faf2;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#f9faf2;background-color:#f9faf2;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:12px 48px 40px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:574px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;line-height:18px;text-align:center;color:#717973;">Need help? Contact our support team at <a href="mailto:info@primefamilyhousing.com" style="color:#012d1d;">info@primefamilyhousing.com</a>.<br /> Please do not reply directly to this automated email.</div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr><![endif]-->
+              <!-- Brand footer: forest-deep band, emblem, social, NAP (Clearfield UT), legal -->
+              <!--[if mso | IE]><tr><td class="" width="672px" ><table align="center" border="0" cellpadding="0" cellspacing="0" class="" role="presentation" style="width:670px;" width="670" bgcolor="#081C15" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+              <div style="background:#081C15;background-color:#081C15;margin:0px auto;max-width:670px;">
+                <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#081C15;background-color:#081C15;width:100%;">
+                  <tbody>
+                    <tr>
+                      <td style="direction:ltr;font-size:0px;padding:32px 40px;text-align:center;">
+                        <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:590px;" ><![endif]-->
+                        <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+                          <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
+                            <tbody>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0 0 18px;word-break:break-word;">
+                                  <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                    <tbody>
+                                      <tr>
+                                        <td style="width:118px;">
+                                          <img alt="PrimeFamilyHousing" src="https://primefamilyhousing.com/brand/emblem-beige-2x.png" style="border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:13px;" width="118" height="auto" />
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0 0 18px;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;line-height:16px;text-align:center;color:#a5d0b9;"><a href="https://www.facebook.com/primefamilyhousing" style="color:#E9EDC6;">Facebook</a> &nbsp;&middot;&nbsp; <a href="https://www.instagram.com/primefamilyhousing/" style="color:#E9EDC6;">Instagram</a> &nbsp;&middot;&nbsp; <a href="https://www.linkedin.com/company/primefamilyhousing" style="color:#E9EDC6;">LinkedIn</a></div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0 0 4px;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;line-height:18px;text-align:center;color:rgba(255,255,255,0.8);">&copy; {% now "Y" %} PrimeFamilyHousing. Dedicated to finding your sanctuary.</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0 0 16px;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;line-height:18px;text-align:center;color:rgba(255,255,255,0.6);">1425 S 1500 E Unit 222, Clearfield, UT 84015</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0 0 16px;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;line-height:16px;text-align:center;color:rgba(255,255,255,0.6);">&#9878;&nbsp; Equal Housing Opportunity</div>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:0 0 14px;word-break:break-word;">
+                                  <p style="border-top:solid 1px rgba(193,200,194,0.25);font-size:1px;margin:0px auto;width:100%;">
+                                  </p>
+                                  <!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" style="border-top:solid 1px rgba(193,200,194,0.25);font-size:1px;margin:0px auto;width:590px;" role="presentation" width="590px" ><tr><td style="height:0;line-height:0;"> &nbsp;
+</td></tr></table><![endif]-->
+                                </td>
+                              </tr>
+                              <tr>
+                                <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                                  <div style="font-family:'Source Sans 3', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size:12px;line-height:16px;text-align:center;color:rgba(255,255,255,0.8);"><a href="{{ frontend_url }}/privacy" style="color:rgba(255,255,255,0.8);">Privacy Policy</a> &nbsp;&middot;&nbsp; <a href="{{ frontend_url }}/terms" style="color:rgba(255,255,255,0.8);">Terms of Service</a> &nbsp;&middot;&nbsp; <a href="{{ frontend_url }}/accessibility" style="color:rgba(255,255,255,0.8);">Fair Housing</a> &nbsp;&middot;&nbsp; <a href="{{ frontend_url }}/contact" style="color:rgba(255,255,255,0.8);">Contact</a></div>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--[if mso | IE]></td></tr></table><![endif]-->
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <!--[if mso | IE]></td></tr></table></td></tr></table><![endif]-->
             </td>
           </tr>
-          <tr>
-            <td width="50%" valign="top" style="padding:0 16px 0 0;">
-              <p style="margin:0 0 4px 0;font-size:11px;line-height:16px;letter-spacing:0.06em;text-transform:uppercase;color:#414844;">Application ID</p>
-              <span style="display:inline-block;font-family:'Source Sans 3',Arial,sans-serif;font-size:13px;font-weight:600;color:#1a1c18;background-color:#edefe7;padding:2px 8px;border-radius:4px;">APP-{{ app.pk|stringformat:"05d" }}</span>
-            </td>
-            <td width="50%" valign="top" style="padding:0;">
-              <p style="margin:0 0 3px 0;font-size:11px;line-height:16px;letter-spacing:0.06em;text-transform:uppercase;color:#414844;">Submitted On</p>
-              <p style="margin:0;font-size:15px;line-height:20px;color:#1a1c18;">{{ app.submitted_at|date:"F j, Y"|default:"Recently" }}</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+        </tbody>
+      </table>
+    </div>
+    <!--[if mso | IE]></td></tr></table><![endif]-->
+  </div>
+</body>
 
-  <!-- What to expect next -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f2f5df;border:1px solid #A3B18A;border-radius:12px;margin:0 0 28px 0;">
-    <tr>
-      <td style="padding:24px;">
-        <p style="margin:0 0 18px 0;font-family:'Montserrat',Arial,sans-serif;font-size:18px;line-height:24px;font-weight:600;color:#081C15;">
-          &#8987;&nbsp; What to expect next
-        </p>
-
-        <!-- Item 1 -->
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px 0;">
-          <tr>
-            <td width="26" valign="top" style="padding-right:12px;">
-              <table cellpadding="0" cellspacing="0" border="0"><tr><td width="24" height="24" align="center" valign="middle" style="width:24px;height:24px;background-color:#c1ecd4;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:700;color:#002114;">1</td></tr></table>
-            </td>
-            <td valign="top">
-              <p style="margin:0 0 2px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;color:#1a1c18;">Verification Process</p>
-              <p style="margin:0;font-size:13px;line-height:18px;color:#414844;">Our team is reviewing your employment, rental history, and background check. This typically takes 24&ndash;48 business hours.</p>
-            </td>
-          </tr>
-        </table>
-        <!-- Item 2 -->
-        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 16px 0;">
-          <tr>
-            <td width="26" valign="top" style="padding-right:12px;">
-              <table cellpadding="0" cellspacing="0" border="0"><tr><td width="24" height="24" align="center" valign="middle" style="width:24px;height:24px;background-color:#c1ecd4;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:700;color:#002114;">2</td></tr></table>
-            </td>
-            <td valign="top">
-              <p style="margin:0 0 2px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;color:#1a1c18;">Additional Information</p>
-              <p style="margin:0;font-size:13px;line-height:18px;color:#414844;">If we need any further documentation, a leasing agent will contact you directly via email or phone.</p>
-            </td>
-          </tr>
-        </table>
-        <!-- Item 3 -->
-        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td width="26" valign="top" style="padding-right:12px;">
-              <table cellpadding="0" cellspacing="0" border="0"><tr><td width="24" height="24" align="center" valign="middle" style="width:24px;height:24px;background-color:#e2e3db;border:1px solid #c1c8c2;border-radius:50%;font-family:'Source Sans 3',Arial,sans-serif;font-size:12px;font-weight:700;color:#414844;">3</td></tr></table>
-            </td>
-            <td valign="top">
-              <p style="margin:0 0 2px 0;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;color:#1a1c18;">Final Decision</p>
-              <p style="margin:0;font-size:13px;line-height:18px;color:#414844;">You will receive an email notification as soon as a final decision is made regarding your application.</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-
-  <!-- CTA -->
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-    <tr>
-      <td align="center">
-        <table cellpadding="0" cellspacing="0" border="0">
-          <tr>
-            <td style="background-color:#012d1d;border-radius:8px;">
-              <a href="{{ frontend_url }}/portal/dashboard" style="display:inline-block;padding:13px 32px;font-family:'Source Sans 3',Arial,sans-serif;font-size:14px;font-weight:600;letter-spacing:0.05em;color:#ffffff;text-decoration:none;">
-                View Application Status
-              </a>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-{% endblock %}
+</html>
