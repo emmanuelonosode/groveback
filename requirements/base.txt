@@ -3,7 +3,10 @@ djangorestframework>=3.14
 djangorestframework-simplejwt>=5.0
 django-cors-headers>=4.0
 django-filter>=23.0
-# mysqlclient>=2.2
+# Required whenever DATABASE_URL is a mysql:// URL (see config/settings/base.py) —
+# without it Django silently has no MySQL driver. Building the wheel needs system
+# headers: `apt install pkg-config default-libmysqlclient-dev build-essential`.
+mysqlclient>=2.2
 redis>=4.0
 celery>=5.0
 django-celery-beat>=2.0

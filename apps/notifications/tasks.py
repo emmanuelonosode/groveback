@@ -233,7 +233,7 @@ def send_invoice_email(invoice_id: int):
 def send_job_application_notification(application_id: int):
     """
     1. Send confirmation email to the applicant.
-    2. Send an alert with full details to careers@ and all active managers.
+    2. Send an alert with full details to career@ and all active managers.
     """
     try:
         from apps.careers.models import JobApplication
@@ -259,7 +259,7 @@ def send_job_application_notification(application_id: int):
             CustomUser.objects.filter(role=Role.MANAGER, is_active=True)
             .values_list("email", flat=True)
         )
-        staff_recipients = list(set(manager_emails + ["careers@primefamilyhousing.com"]))
+        staff_recipients = list(set(manager_emails + ["career@primefamilyhousing.com"]))
 
         alert_body = render_to_string(
             "notifications/job_application_staff_alert.html", {"app": app}

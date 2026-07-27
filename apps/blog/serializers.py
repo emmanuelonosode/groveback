@@ -20,15 +20,28 @@ class PostListSerializer(serializers.ModelSerializer):
             "tags", "read_time_minutes",
         ]
 
+    def _absolute(self, url):
+        """
+        Locally-stored media returns a relative "/media/..." path. The frontend runs on a
+        different domain (primefamilyhousing.com) than this API (admin.primefamilyhousing.com),
+        so a relative path resolves against the frontend host, where /media/ does not exist —
+        every blog image would 404. Mirrors PublicAgentSerializer.get_avatar_url in
+        apps/accounts/serializers.py. Absolute URLs (e.g. cloud storage) pass through.
+        """
+        request = self.context.get("request")
+        if url and url.startswith("/") and request is not None:
+            return request.build_absolute_uri(url)
+        return url
+
     def get_featured_image_url(self, obj):
         if obj.featured_image:
-            return obj.featured_image.url
+            return self._absolute(obj.featured_image.url)
         return None
 
     def get_author_avatar_url(self, obj):
         try:
             if obj.author.avatar:
-                return obj.author.avatar.url
+                return self._absolute(obj.author.avatar.url)
         except Exception:
             pass
         return None

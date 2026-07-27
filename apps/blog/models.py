@@ -8,6 +8,10 @@ class PostCategory(models.TextChoices):
     SELLERS_GUIDE   = "SELLERS_GUIDE",   "Seller's Guide"
     INVESTMENT      = "INVESTMENT",      "Investment"
     MARKET_UPDATE   = "MARKET_UPDATE",   "Market Update"
+    # Every other category is sales-side. PrimeFamilyHousing's audience is renters, so
+    # tenant-facing guides had nowhere to live and would have displayed as "Buyer's
+    # Guide" on the card, the article page and in Article JSON-LD.
+    RENTER_GUIDE    = "RENTER_GUIDE",    "Renter's Guide"
 
 
 class Post(models.Model):
