@@ -110,6 +110,81 @@ def _coord(value):
     return None if d is None else d.quantize(Decimal("0.000001"))
 
 
+def _js_literal(text: str, key: str):
+    """
+    Return the balanced {...} / [...] literal that follows `key:` in the page's embedded
+    app state, or None.
+
+    Their detail pages ship the full internal listing record as a JavaScript object
+    literal (unquoted keys, so not valid JSON). The schema.org block alongside it is
+    clean but deliberately minimal — one hero image and no amenity categories, year
+    built, tours or availability date. Everything else lives here.
+
+    Brace-counting rather than regex because the record nests several levels deep and
+    contains braces inside description strings.
+    """
+    i = text.find(key + ":")
+    if i < 0:
+        return None
+    j = i + len(key) + 1
+    while j < len(text) and text[j] not in "[{":
+        j += 1
+    if j >= len(text):
+        return None
+    open_c = text[j]
+    close_c = "]" if open_c == "[" else "}"
+    depth, k, instr, esc = 0, j, None, False
+    while k < len(text):
+        c = text[k]
+        if instr:
+            if esc:
+                esc = False
+            elif c == "\\":
+                esc = True
+            elif c == instr:
+                instr = None
+        else:
+            if c in "\"'":
+                instr = c
+            elif c == open_c:
+                depth += 1
+            elif c == close_c:
+                depth -= 1
+                if depth == 0:
+                    return text[j:k + 1]
+        k += 1
+    return None
+
+
+def _js_to_json(js: str) -> str:
+    """Quote bare identifier keys and normalise single-quoted strings so json can read it."""
+    js = re.sub(r'([{,])\s*([A-Za-z_$][\w$]*)\s*:', r'\1"\2":', js)
+    js = re.sub(r"'((?:[^'\\]|\\.)*)'", lambda m: json.dumps(m.group(1)), js)
+    return js
+
+
+def _embedded(html: str, key: str, default):
+    lit = _js_literal(html, key)
+    if not lit:
+        return default
+    try:
+        return json.loads(_js_to_json(lit))
+    except Exception:
+        return default
+
+
+def _scalar(html: str, key: str):
+    """Pull a simple `key:value` scalar out of the embedded record."""
+    m = re.search(rf'\b{key}:\s*("(?:[^"\\]|\\.)*"|true|false|null|-?\d+(?:\.\d+)?)', html)
+    if not m:
+        return None
+    raw = m.group(1)
+    try:
+        return json.loads(raw)
+    except Exception:
+        return None
+
+
 def parse_listing(html: str, url: str) -> dict | None:
     """Pull a normalised listing dict out of a detail page's JSON-LD."""
     residence = offer = product = None
@@ -135,20 +210,52 @@ def parse_listing(html: str, url: str) -> dict | None:
     floor = residence.get("floorSize") or {}
     slug = url.rstrip("/").rsplit("/", 1)[-1]
 
-    images = []
-    for key in ("image", "photo"):
-        val = residence.get(key) or (product or {}).get(key)
-        if isinstance(val, str):
-            images.append(val)
-        elif isinstance(val, list):
-            images.extend(v if isinstance(v, str) else v.get("url", "") for v in val)
-    images = [i for i in dict.fromkeys(images) if i.startswith("http")]
+    # ── Photos ───────────────────────────────────────────────────────────────
+    # The embedded record carries the full gallery (typically 15–20 shots: every
+    # bedroom, kitchen, both elevations, floor plans). schema.org only exposes the
+    # single hero image, so relying on it alone gave each listing ONE photo.
+    photos = _embedded(html, "photos", []) or []
+    gallery = []
+    for p in sorted(
+        [p for p in photos if isinstance(p, dict) and p.get("image_url")],
+        key=lambda p: (not p.get("is_primary"), p.get("sequence") or 0),
+    ):
+        gallery.append({"url": p["image_url"], "primary": bool(p.get("is_primary"))})
 
-    amenities = [
-        a.get("name", "").strip()
-        for a in (residence.get("amenityFeature") or [])
-        if isinstance(a, dict) and a.get("name")
+    if not gallery:  # fall back to the schema.org hero
+        for key in ("image", "photo"):
+            val = residence.get(key) or (product or {}).get(key)
+            if isinstance(val, str):
+                gallery.append({"url": val, "primary": True})
+            elif isinstance(val, list):
+                gallery.extend(
+                    {"url": v if isinstance(v, str) else v.get("url", ""), "primary": False}
+                    for v in val
+                )
+    seen_img = set()
+    gallery = [
+        g for g in gallery
+        if g["url"].startswith("http") and not (g["url"] in seen_img or seen_img.add(g["url"]))
     ]
+
+    # ── Amenities ────────────────────────────────────────────────────────────
+    # Embedded list carries a `category` per amenity; schema.org's amenityFeature is
+    # names only. Prefer the richer one so they group correctly in the UI.
+    amenities = []
+    for a in _embedded(html, "amenities", []) or []:
+        if isinstance(a, dict) and a.get("name"):
+            amenities.append({"name": a["name"].strip(), "category": (a.get("category") or "").strip()})
+    if not amenities:
+        amenities = [
+            {"name": a.get("name", "").strip(), "category": ""}
+            for a in (residence.get("amenityFeature") or [])
+            if isinstance(a, dict) and a.get("name")
+        ]
+
+    year_built = _scalar(html, "year_built")
+    tour = _scalar(html, "virtual_tour_url") or ""
+    tour_mobile = _scalar(html, "virtual_tour_url_mobile") or ""
+    market = _scalar(html, "market_name") or ""
 
     availability = str((offer or {}).get("availability", "")).lower()
 
@@ -167,7 +274,12 @@ def parse_listing(html: str, url: str) -> dict | None:
         "bedrooms": int(_dec(residence.get("numberOfBedrooms"), 0) or 0),
         "bathrooms": _dec(residence.get("numberOfBathroomsTotal"), Decimal(0)),
         "sqft": int(_dec(floor.get("value"), 0) or 0),
-        "images": images,
+        "year_built": int(year_built) if isinstance(year_built, (int, float)) else None,
+        "virtual_tour_url": tour if isinstance(tour, str) else "",
+        "tour_360_url": tour_mobile if isinstance(tour_mobile, str) else "",
+        "neighborhood": market if isinstance(market, str) else "",
+        "garage": 1 if any("garage" in a["name"].lower() for a in amenities) else 0,
+        "images": gallery,
         "amenities": amenities,
         "url": url,
     }
@@ -255,6 +367,11 @@ class Command(BaseCommand):
             "type": "residential",
             "listing_type": "for-rent",
             "is_published": data["available"],
+            "year_built": data["year_built"],
+            "garage": data["garage"],
+            "virtual_tour_url": data["virtual_tour_url"][:200],
+            "tour_360_url": data["tour_360_url"][:200],
+            "neighborhood": data["neighborhood"][:100],
         }
 
         prop = Property.objects.filter(slug=data["slug"]).first()
@@ -269,34 +386,60 @@ class Command(BaseCommand):
             for f in changed:
                 setattr(prop, f, fields[f])
             prop.save(update_fields=changed)
-        # Images/amenities are only touched when absent, so a re-run doesn't churn them.
-        if not prop.images.exists():
-            self.sync_images(prop, data["images"])
-        if not prop.amenities.exists():
-            self.sync_amenities(prop, data["amenities"])
+        # Always offered — both helpers compare against what's stored and return early
+        # when identical, so galleries and amenities stay in step with their feed
+        # (new photos, removed features) without churning rows on a no-op run.
+        self.sync_images(prop, data["images"])
+        self.sync_amenities(prop, data["amenities"])
         return "updated" if changed else "unchanged"
 
-    def sync_images(self, prop, urls):
-        PropertyImage.objects.bulk_create(
-            [PropertyImage(property=prop, image=u[:500], is_primary=(i == 0), order=i)
-             for i, u in enumerate(urls[:25])],
-            ignore_conflicts=True,
-        )
-
-    def sync_amenities(self, prop, names):
-        if not names:
+    def sync_images(self, prop, gallery):
+        """Replace the gallery when it differs. Order and primary flag come from their feed."""
+        incoming = [g["url"][:500] for g in gallery][:40]
+        if not incoming:
             return
-        cat, _ = AmenityCategory.objects.get_or_create(
-            name__iexact="features", defaults={"name": "Features", "icon": "sparkles"},
-        )
+        existing = list(prop.images.order_by("order", "id").values_list("image", flat=True))
+        if existing == incoming:
+            return
+        prop.images.all().delete()
+        PropertyImage.objects.bulk_create([
+            PropertyImage(
+                property=prop, image=url,
+                is_primary=(gallery[i].get("primary") or i == 0),
+                order=i,
+            )
+            for i, url in enumerate(incoming)
+        ])
+
+    def sync_amenities(self, prop, amenities):
+        """Mirror their amenity list, preserving their category grouping."""
+        incoming = {a["name"][:100] for a in amenities if a.get("name")}
+        if not incoming:
+            return
+        if {a.name for a in prop.amenities.all()} == incoming:
+            return
+
+        cats = {}
+        for a in amenities:
+            label = (a.get("category") or "Features").strip() or "Features"
+            if label not in cats:
+                cats[label], _ = AmenityCategory.objects.get_or_create(
+                    name__iexact=label, defaults={"name": label[:50], "icon": "sparkles"},
+                )
+
+        prop.amenities.all().delete()
         seen, rows = set(), []
-        for n in names:
-            key = n.lower()
-            if key in seen:
+        for a in amenities:
+            name = (a.get("name") or "")[:100]
+            if not name or name.lower() in seen:
                 continue
-            seen.add(key)
-            rows.append(PropertyAmenity(property=prop, category=cat, name=n[:100]))
-        PropertyAmenity.objects.bulk_create(rows, batch_size=500, ignore_conflicts=True)
+            seen.add(name.lower())
+            rows.append(PropertyAmenity(
+                property=prop,
+                category=cats.get((a.get("category") or "Features").strip() or "Features"),
+                name=name,
+            ))
+        PropertyAmenity.objects.bulk_create(rows, batch_size=500)
 
     # ── Entry point ──────────────────────────────────────────────────────────
     def handle(self, *args, **opts):

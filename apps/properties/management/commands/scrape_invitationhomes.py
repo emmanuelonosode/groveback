@@ -27,7 +27,7 @@ from decimal import Decimal, InvalidOperation
 import requests
 from bs4 import BeautifulSoup
 from django.contrib.auth import get_user_model
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 from django.utils.text import slugify
 
@@ -878,7 +878,20 @@ def _scrape_market(session: requests.Session, market_slug: str, default_state: s
 # ── Command ──────────────────────────────────────────────────────────────────
 
 class Command(BaseCommand):
-        help = "Scrape invitationhomes.com and seed listings into the Property model."
+        help = "DEPRECATED — superseded by sync_invitationhomes."
+
+        def handle(self, *args, **options):
+            # Every request this makes 404s. Invitation Homes moved off Next.js and
+            # renamed the market path to /markets/houses-for-rent/{city}-{state}, so both
+            # the URL and the __NEXT_DATA__ parsing below are dead. It failed silently —
+            # importing nothing while reporting success — which is why inventory sat
+            # frozen from May. It also only ever created new rows, so it could never
+            # reprice or retire a listing.
+            raise CommandError(
+                "scrape_invitationhomes is dead: their /markets/homes-for-rent/* paths now "
+                "404 and the __NEXT_DATA__ payload it parses no longer exists.\n"
+                "Use: python manage.py sync_invitationhomes --dry-run --limit 20"
+            )
 
         def add_arguments(self, parser):
             parser.add_argument(
@@ -906,7 +919,10 @@ class Command(BaseCommand):
                 help="Delete all properties tagged cross_street='invh' before seeding.",
             )
 
-        def handle(self, *args, **options):
+        # Renamed from `handle` so the deprecation guard above actually runs — Python
+        # keeps the LAST definition in a class body, so this one was silently winning.
+        # Kept intact for reference only; it cannot import anything any more.
+        def _dead_handle(self, *args, **options):
             market_filter = (
                 set(options["markets"].split(",")) if options["markets"] else None
             )
