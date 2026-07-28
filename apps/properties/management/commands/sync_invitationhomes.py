@@ -302,6 +302,14 @@ class Command(BaseCommand):
             "--no-retire", action="store_true",
             help="Do not mark listings that disappeared from their sitemap as unavailable.",
         )
+        parser.add_argument(
+            "--publish-all", action="store_true",
+            help="Publish every synced listing regardless of their availability flag.",
+        )
+        parser.add_argument(
+            "--all-available", action="store_true",
+            help="Force status='available' on every synced listing, ignoring their availability flag.",
+        )
 
     # ── Fetch ────────────────────────────────────────────────────────────────
     def listing_urls(self, session, timeout):
@@ -323,6 +331,11 @@ class Command(BaseCommand):
                 if r.status_code == 404:
                     return None
                 r.raise_for_status()
+                # Force UTF-8. Per RFC 2616 requests falls back to ISO-8859-1 for text/*
+                # when the response declares no charset, which silently turns their UTF-8
+                # copy into mojibake — "décor" arriving as "dÃ©cor" and landing in the
+                # description verbatim. Their pages are UTF-8; say so explicitly.
+                r.encoding = "utf-8"
                 return parse_listing(r.text, url)
             except Exception:
                 if attempt == 2:
@@ -331,7 +344,7 @@ class Command(BaseCommand):
         return None
 
     # ── Write ────────────────────────────────────────────────────────────────
-    def upsert(self, data, agent, discount):
+    def upsert(self, data, agent, discount, publish_all=False, all_available=False):
         """
         Returns "created" | "updated" | "unchanged".
 
@@ -363,10 +376,14 @@ class Command(BaseCommand):
             "zip_code": data["zip_code"][:10],
             "latitude": data["latitude"],
             "longitude": data["longitude"],
-            "status": "available" if data["available"] else "rented",
+            # Availability normally mirrors their feed. The overrides exist because the
+            # sync is the authority on these two fields — without them, any manual
+            # publish/status change made in the admin or via SQL is silently reverted on
+            # the very next run.
+            "status": "available" if (all_available or data["available"]) else "rented",
             "type": "residential",
             "listing_type": "for-rent",
-            "is_published": data["available"],
+            "is_published": bool(publish_all or data["available"]),
             "year_built": data["year_built"],
             "garage": data["garage"],
             "virtual_tour_url": data["virtual_tour_url"][:200],
@@ -494,7 +511,11 @@ class Command(BaseCommand):
         created = updated = unchanged = 0
         with transaction.atomic():
             for d in parsed:
-                outcome = self.upsert(d, agent, discount)
+                outcome = self.upsert(
+                    d, agent, discount,
+                    publish_all=opts["publish_all"],
+                    all_available=opts["all_available"],
+                )
                 created += outcome == "created"
                 updated += outcome == "updated"
                 unchanged += outcome == "unchanged"

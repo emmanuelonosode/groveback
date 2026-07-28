@@ -52,11 +52,37 @@ URL_RE = re.compile(r"https?://\S+", re.IGNORECASE)
 CTA_RE = re.compile(r"\s*(learn more|view details|apply now|schedule a tour)\s*", re.IGNORECASE)
 
 
+MOJIBAKE_RE = re.compile(r"Ã.|â€.|Â.|ï¿½")
+LABEL_RE = re.compile(r"^\s*home description\s*", re.IGNORECASE)
+
+
+def fix_mojibake(text: str) -> str:
+    """
+    Repair UTF-8 that was decoded as Latin-1 ("dÃ©cor" -> "décor").
+
+    Legacy rows are full of this, and the sync produced it too until the fetch was
+    pinned to UTF-8. The round-trip is only kept when it actually removes the tell-tale
+    sequences, so clean text and genuinely accented copy are never damaged.
+    """
+    if not text or not MOJIBAKE_RE.search(text):
+        return text
+    try:
+        repaired = text.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return text
+    before = len(MOJIBAKE_RE.findall(text))
+    after = len(MOJIBAKE_RE.findall(repaired))
+    return repaired if after < before else text
+
+
 def clean_description(text: str) -> str:
-    """Strip HTML, source URLs, branding and leftover CTA text; tidy whitespace."""
+    """Repair encoding, then strip HTML, source URLs, branding and leftover CTA text."""
     if not text:
         return text
-    out = HTML_TAG_RE.sub("", text)
+    out = fix_mojibake(text)
+    # Their feed prefixes some copy with a bare "Home description" field label.
+    out = LABEL_RE.sub("", out)
+    out = HTML_TAG_RE.sub("", out)
     out = URL_RE.sub("", out)
     out = BRANDING_RE.sub("", out)
     out = CTA_RE.sub(" ", out)
@@ -73,8 +99,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--discount", type=Decimal, required=True,
-            help="Percent to take OFF the original price. 15 turns 2000 into 1700. Use 0 to restore list prices.",
+            "--discount", type=Decimal, default=None,
+            help="Percent to take OFF the original price. 15 turns 2000 into 1700. Use 0 to restore "
+                 "list prices. Omit entirely to leave pricing untouched and only clean descriptions.",
         )
         parser.add_argument(
             "--round-to", type=int, default=1,
@@ -103,8 +130,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **opts):
         pct = opts["discount"]
-        if not (Decimal(0) <= pct < Decimal(100)):
+        if pct is not None and not (Decimal(0) <= pct < Decimal(100)):
             raise CommandError(f"--discount must be >= 0 and < 100 (got {pct}).")
+        if pct is None and opts["skip_descriptions"]:
+            raise CommandError("Nothing to do: no --discount given and --skip-descriptions set.")
         round_to = opts["round_to"]
         if round_to < 1:
             raise CommandError("--round-to must be >= 1.")
@@ -117,9 +146,13 @@ class Command(BaseCommand):
             qs = qs[: opts["limit"]]
         properties = list(qs)
 
+        pricing_label = (
+            "none (descriptions only)" if pct is None
+            else f"{pct}%  (round to nearest ${round_to})"
+        )
         self.stdout.write(
             f"{'DRY RUN — nothing will be saved' if dry else 'Applying changes'}\n"
-            f"Discount : {pct}%  (round to nearest ${round_to})\n"
+            f"Discount : {pricing_label}\n"
             f"Scope    : {len(properties)} properties"
             + (f" in {opts['city']}" if opts.get("city") else "")
             + "\n"
@@ -139,20 +172,23 @@ class Command(BaseCommand):
             for prop in properties:
                 fields = []
 
-                # ── Anchor ───────────────────────────────────────────────────
-                if opts["reset_original"] or prop.original_price is None:
-                    prop.original_price = prop.price
-                    fields.append("original_price")
-                    anchored += 1
+                # ── Pricing (skipped entirely when --discount is omitted) ────
+                if pct is not None:
+                    if opts["reset_original"] or prop.original_price is None:
+                        prop.original_price = prop.price
+                        fields.append("original_price")
+                        anchored += 1
 
-                # ── Markdown, always derived from the anchor ─────────────────
-                new_price = self.markdown(prop.original_price, pct, round_to)
-                if new_price != prop.price:
-                    if len(samples) < 10:
-                        samples.append(f"    {prop.slug[:48]:<50} ${prop.original_price:>9,.2f} -> ${new_price:>9,.2f}")
-                    prop.price = new_price
-                    fields.append("price")
-                    repriced += 1
+                    # Always derived from the anchor, never from the current price.
+                    new_price = self.markdown(prop.original_price, pct, round_to)
+                    if new_price != prop.price:
+                        if len(samples) < 10:
+                            samples.append(
+                                f"    {prop.slug[:48]:<50} ${prop.original_price:>9,.2f} -> ${new_price:>9,.2f}"
+                            )
+                        prop.price = new_price
+                        fields.append("price")
+                        repriced += 1
 
                 # ── Description ──────────────────────────────────────────────
                 if not opts["skip_descriptions"] and prop.description:
