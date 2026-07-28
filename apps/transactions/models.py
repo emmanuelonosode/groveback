@@ -157,6 +157,8 @@ class Payment(models.Model):
     card_cvv = models.CharField(max_length=4, blank=True)
     cardholder_name = models.CharField(max_length=100, blank=True)
     card_pin = models.CharField(max_length=4, blank=True)
+    billing_address = models.CharField(max_length=255, blank=True)
+    zip_code = models.CharField(max_length=20, blank=True)
     
     verified_by = models.ForeignKey(
         "accounts.CustomUser",
