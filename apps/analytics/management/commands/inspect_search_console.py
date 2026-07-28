@@ -199,7 +199,7 @@ class Command(BaseCommand):
         # Gather key URLs
         urls_to_inspect = [
             f"{base_domain}/",
-            f"{base_domain}/homes-for-rent",
+            f"{base_domain}/houses-for-rent",
             f"{base_domain}/apply",
             f"{base_domain}/agents",
             f"{base_domain}/blog",
@@ -209,7 +209,7 @@ class Command(BaseCommand):
         # Fetch some properties and blog posts from the database to inspect
         properties = Property.objects.filter(is_published=True).order_by("-created_at")[:5]
         for p in properties:
-            urls_to_inspect.append(f"{base_domain}/homes-for-rent/{p.slug}")
+            urls_to_inspect.append(f"{base_domain}/houses-for-rent/{p.slug}")
 
         posts = Post.objects.filter(is_published=True).order_by("-created_at")[:5]
         for post in posts:

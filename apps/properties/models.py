@@ -41,7 +41,19 @@ class Property(models.Model):
     status = models.CharField(max_length=20, choices=PropertyStatus.choices, default=PropertyStatus.AVAILABLE)
 
     # Pricing
+    # `price` is what the site displays. `original_price` is the untouched source/list
+    # price captured at import — the anchor every markdown is computed FROM.
+    #
+    # Without it a percentage discount is unrepeatable: applying 15% to an already
+    # discounted `price` compounds (2000 → 1700 → 1445 → 1228) and the source figure is
+    # gone for good after the first run. Deriving from `original_price` instead means
+    # sanitize_listings can be re-run any number of times, and the percentage can be
+    # changed freely, always landing on the same answer.
     price = models.DecimalField(max_digits=12, decimal_places=2)
+    original_price = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        help_text="Source list price before any markdown. Set once at import; never overwritten by sanitize_listings.",
+    )
     price_label = models.CharField(max_length=20, blank=True, help_text='e.g. "/mo" for rentals')
 
     # Physical

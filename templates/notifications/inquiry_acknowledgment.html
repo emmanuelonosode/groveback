@@ -99,7 +99,7 @@
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:2px 0 32px 0;">
   <tr>
     <td align="center" style="background-color:#f9faf2;border:1px solid #e2e3db;border-top:none;border-radius:0 0 12px 12px;padding:12px 20px;">
-      <a href="{{ frontend_url }}/homes-for-rent/{{ prop.slug }}"
+      <a href="{{ frontend_url }}/houses-for-rent/{{ prop.slug }}"
          style="font-size:13px;font-weight:600;color:#012d1d;text-decoration:none;">
         View all photos &amp; virtual tour &rarr;
       </a>
@@ -291,13 +291,13 @@
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 32px 0;">
   <tr>
     <td style="padding-right:6px;" width="33%">
-      <a href="{{ frontend_url }}/homes-for-rent/{{ prop.slug }}"
+      <a href="{{ frontend_url }}/houses-for-rent/{{ prop.slug }}"
          style="display:block;text-align:center;background-color:#081C15;color:#ffffff;font-size:13px;font-weight:700;padding:14px 10px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;">
         View Listing
       </a>
     </td>
     <td style="padding:0 3px;" width="33%">
-      <a href="{{ frontend_url }}/homes-for-rent/{{ prop.slug }}#schedule-form"
+      <a href="{{ frontend_url }}/houses-for-rent/{{ prop.slug }}#schedule-form"
          style="display:block;text-align:center;background-color:#012d1d;color:#ffffff;font-size:13px;font-weight:700;padding:14px 10px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;">
         Book Viewing
       </a>
@@ -405,7 +405,7 @@
 <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 36px 0;">
   <tr>
     <td style="background-color:#012d1d;border-radius:8px;">
-      <a href="{{ frontend_url }}/homes-for-rent"
+      <a href="{{ frontend_url }}/houses-for-rent"
          style="display:inline-block;padding:14px 32px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;letter-spacing:0.3px;">
         Browse Available Homes &rarr;
       </a>
@@ -456,7 +456,7 @@
         {% if nearby.bathrooms %}{% if nearby.bedrooms %} &nbsp;&middot;&nbsp; {% endif %}{{ nearby.bathrooms|floatformat:0 }} ba{% endif %}
         {% if nearby.sqft %}{% if nearby.bedrooms or nearby.bathrooms %} &nbsp;&middot;&nbsp; {% endif %}{{ nearby.sqft }} sqft{% endif %}
       </p>
-      <a href="{{ frontend_url }}/homes-for-rent/{{ nearby.slug }}"
+      <a href="{{ frontend_url }}/houses-for-rent/{{ nearby.slug }}"
          style="display:inline-block;background-color:#081C15;color:#ffffff;font-size:12px;font-weight:700;padding:8px 20px;border-radius:8px;text-decoration:none;">
         View Home &rarr;
       </a>
@@ -468,7 +468,7 @@
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 36px 0;">
   <tr>
     <td align="center">
-      <a href="{{ frontend_url }}/homes-for-rent{% if search_city %}?q={{ search_city }}{% endif %}"
+      <a href="{{ frontend_url }}/houses-for-rent{% if search_city %}?q={{ search_city }}{% endif %}"
          style="display:inline-block;background-color:#ffffff;border:1.5px solid #012d1d;color:#012d1d;font-size:13px;font-weight:700;padding:12px 32px;border-radius:8px;text-decoration:none;">
         See All Homes in {{ search_city }} &rarr;
       </a>

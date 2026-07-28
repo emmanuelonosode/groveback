@@ -158,7 +158,7 @@ POSTS = [
 
 <p>Renting with a pet should be a detail, not an ordeal. Filter for what your family actually needs, ask direct questions, get the terms in writing, and walk away from anyone who won't give them to you.</p>
 
-<p>When you're ready, <a href="/homes-for-rent">browse our move-in ready homes</a> — every listing shows its pet policy up front, so there are no surprises at the bottom of the page. You can <a href="/apply">apply online in about ten minutes</a> and have a decision within a day.</p>
+<p>When you're ready, <a href="/houses-for-rent">browse our move-in ready homes</a> — every listing shows its pet policy up front, so there are no surprises at the bottom of the page. You can <a href="/apply">apply online in about ten minutes</a> and have a decision within a day.</p>
 
 <p>Own a property and tired of turning good tenants away over pet policy? <a href="/property-management">Request a free rental analysis</a> and we'll show you what your home could earn with a pet policy that widens your applicant pool instead of shrinking it.</p>
 """.strip(),
@@ -284,7 +284,7 @@ POSTS = [
 
 <p>Applying for a home shouldn't feel like sending paperwork into a void. Gather your documents, be candid about anything unusual in your history, and expect a straight answer within a day.</p>
 
-<p><a href="/homes-for-rent">Browse our available move-in ready homes</a>, then <a href="/apply">apply online in about ten minutes</a>. You'll have a decision within 24 hours — and if the answer is no, you'll know that fast too, so you can keep moving.</p>
+<p><a href="/houses-for-rent">Browse our available move-in ready homes</a>, then <a href="/apply">apply online in about ten minutes</a>. You'll have a decision within 24 hours — and if the answer is no, you'll know that fast too, so you can keep moving.</p>
 
 <p>If you own a rental and your vacancies are sitting empty while applications pile up, <a href="/property-management">request a free rental analysis</a>. Faster, clearer screening fills homes sooner and cuts the vacancy weeks that quietly cost more than any fee.</p>
 """.strip(),
@@ -430,7 +430,7 @@ POSTS = [
 
 <p>A genuinely move-in ready home means your first weeks go to unpacking and settling children into school — not to chasing repairs that should have been handled before you arrived.</p>
 
-<p><a href="/homes-for-rent">Browse our move-in ready homes</a> — every one has been through the 30-point inspection before listing, professionally cleaned and re-keyed. <a href="/apply">Apply online in about ten minutes</a> and get a decision within 24 hours, with no hidden fees at signing.</p>
+<p><a href="/houses-for-rent">Browse our move-in ready homes</a> — every one has been through the 30-point inspection before listing, professionally cleaned and re-keyed. <a href="/apply">Apply online in about ten minutes</a> and get a decision within 24 hours, with no hidden fees at signing.</p>
 
 <p>Own a rental and finding that deferred maintenance costs you good tenants? <a href="/property-management">Request a free rental analysis</a> and we'll show you what a properly prepped home does for both rent and tenant retention.</p>
 """.strip(),
@@ -569,7 +569,7 @@ POSTS = [
 
 <p>A Sun Belt relocation is one of the better financial decisions many families make. It goes best when you rent first, choose the neighbourhood rather than just the house, and work with someone who tells you the full cost up front.</p>
 
-<p><a href="/homes-for-rent">Browse move-in ready homes across all our markets</a>, or go straight to <a href="/rentals/atlanta-ga">Atlanta</a>, <a href="/rentals/charlotte-nc">Charlotte</a> or <a href="/rentals/phoenix-az">Phoenix</a>. Every home is inspected and prepped before listing, and you can <a href="/apply">apply online in ten minutes</a> with a decision inside a day.</p>
+<p><a href="/houses-for-rent">Browse move-in ready homes across all our markets</a>, or go straight to <a href="/rentals/atlanta-ga">Atlanta</a>, <a href="/rentals/charlotte-nc">Charlotte</a> or <a href="/rentals/phoenix-az">Phoenix</a>. Every home is inspected and prepped before listing, and you can <a href="/apply">apply online in ten minutes</a> with a decision inside a day.</p>
 
 <p>Own property in a Sun Belt market and want to know what it should be earning? <a href="/property-management">Request a free rental analysis</a>.</p>
 """.strip(),
@@ -714,7 +714,7 @@ POSTS = [
 
 <p>So ask. Get it in writing. And walk away from anyone who won't put a number on paper before you've committed.</p>
 
-<p><a href="/homes-for-rent">Browse our move-in ready homes</a> — the price on the listing is the price you pay, and you can <a href="/apply">apply online in about ten minutes</a> with a decision inside 24 hours. Nothing appears at signing that wasn't there when you applied.</p>
+<p><a href="/houses-for-rent">Browse our move-in ready homes</a> — the price on the listing is the price you pay, and you can <a href="/apply">apply online in about ten minutes</a> with a decision inside 24 hours. Nothing appears at signing that wasn't there when you applied.</p>
 
 <p>If you own a rental and you'd rather compete on quality than on hidden charges, <a href="/property-management">request a free rental analysis</a>. Transparent pricing attracts tenants who stay — and tenant turnover costs far more than any admin fee recovers.</p>
 """.strip(),

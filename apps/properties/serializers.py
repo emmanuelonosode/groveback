@@ -141,7 +141,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         from django.utils import timezone
         from apps.analytics.models import PageVisit
 
-        base = f"/homes-for-rent/{obj.slug}"
+        base = f"/houses-for-rent/{obj.slug}"
         cutoff = timezone.now() - timedelta(days=30)
         try:
             return (

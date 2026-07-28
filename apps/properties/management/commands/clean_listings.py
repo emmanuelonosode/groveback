@@ -1,20 +1,29 @@
 """
-Management command: clean_listings
+Management command: clean_listings  —  DEPRECATED, DO NOT RUN.
 
-- Sets all properties to pet-friendly (adds "Pets Allowed" amenity)
-- Reduces each rental price by a random 20–40%
-- Strips InvitationHomes links and stray HTML from description fields
+Superseded by `sanitize_listings`, which does the same three jobs correctly.
 
-Usage:
-    python manage.py clean_listings
-    python manage.py clean_listings --dry-run   # preview only, no DB writes
+Why this one is unsafe: the discount below is applied to `prop.price`, so every run
+marks down the already-marked-down figure. Prices compound on each invocation —
+2000 -> 1400 -> 980 -> 686 — and because nothing preserved the source price, the
+original was unrecoverable after the first run.
+
+The comment further down claims seeding the RNG with `prop.id` makes re-runs
+idempotent. It does not. The seed fixes which *percentage* a property gets; it does
+nothing about applying that percentage to an already-discounted number.
+
+`sanitize_listings` anchors every markdown to `Property.original_price`, so it is
+genuinely re-runnable and takes the percentage as an argument instead of picking one
+at random.
+
+    python manage.py sanitize_listings --discount 15 --dry-run
 """
 
 import re
 import random
 from decimal import Decimal, ROUND_HALF_UP
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from apps.properties.models import Property, PropertyAmenity, AmenityCategory
@@ -47,6 +56,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        # Hard stop: this command compounds discounts on every run and destroys the
+        # source price. Kept only so the history/behaviour stays readable.
+        raise CommandError(
+            "clean_listings is deprecated and unsafe — it compounds the discount on every "
+            "run and overwrites the source price irrecoverably.\n"
+            "Use: python manage.py sanitize_listings --discount <pct> [--dry-run]"
+        )
+
+    def _disabled_handle(self, *args, **options):
         dry_run = options["dry_run"]
         if dry_run:
             self.stdout.write(self.style.WARNING("DRY RUN — no changes will be saved"))
