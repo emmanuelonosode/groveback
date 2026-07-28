@@ -55,6 +55,7 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
+from apps.accounts.models import Role
 from apps.properties.models import (
     Property, PropertyImage, PropertyAmenity, AmenityCategory,
 )
@@ -399,6 +400,14 @@ class Command(BaseCommand):
             return "created"
 
         changed = [f for f, v in fields.items() if getattr(prop, f) != v]
+
+        # Self-heal a listing whose owner isn't publicly resolvable. Only reassigned when
+        # the current owner would 404 at /agents/<id>, so deliberate per-property agent
+        # assignments made in the admin are never clobbered.
+        if prop.agent_id != agent.id and (prop.agent is None or prop.agent.role != Role.AGENT):
+            prop.agent = agent
+            changed.append("agent")
+
         if changed:
             for f in changed:
                 setattr(prop, f, fields[f])
@@ -464,9 +473,22 @@ class Command(BaseCommand):
         if discount is not None and not (Decimal(0) <= discount < Decimal(100)):
             raise CommandError(f"--discount must be >= 0 and < 100 (got {discount}).")
 
-        agent = User.objects.filter(is_active=True, is_staff=True).order_by("id").first()
+        # Must be a user the PUBLIC agent endpoints will serve. AgentListView and
+        # AgentDetailView both filter role=AGENT, so assigning listings to a staff/admin
+        # account makes every "View profile" link on a property page 404 — the agent id
+        # on the listing simply isn't resolvable at /agents/<id>.
+        agent = (
+            User.objects.filter(is_active=True, role=Role.AGENT).order_by("id").first()
+            or User.objects.filter(is_active=True, is_staff=True).order_by("id").first()
+        )
         if agent is None:
-            raise CommandError("No active staff user to own imported listings. Create one first.")
+            raise CommandError("No active agent or staff user to own imported listings. Create one first.")
+        if agent.role != Role.AGENT:
+            self.stdout.write(self.style.WARNING(
+                f"No role=AGENT user found — falling back to {agent.email}. Property pages will "
+                f"link to /agents/{agent.id}, which the public agent endpoint will 404 until that "
+                f"user's role is set to AGENT."
+            ))
 
         session = requests.Session()
         self.stdout.write("Fetching Invitation Homes property sitemap …")

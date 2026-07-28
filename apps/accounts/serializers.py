@@ -34,13 +34,27 @@ class PublicAgentSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(read_only=True)
     active_listings = serializers.SerializerMethodField()
     avatar_url = serializers.SerializerMethodField()
+    has_public_profile = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         fields = [
             "id", "first_name", "last_name", "full_name",
             "phone", "email", "avatar_url", "agent_profile", "active_listings",
+            "has_public_profile",
         ]
+
+    def get_has_public_profile(self, obj):
+        """
+        Whether /agents/<id> will actually resolve for this user.
+
+        AgentListView and AgentDetailView both filter role=AGENT, is_active=True. A
+        listing owned by a staff or admin account therefore renders a "View profile"
+        link straight to a 404 — which is what happened when every imported property
+        was assigned to the admin account rather than the agent one. The frontend uses
+        this to hide the link instead of shipping a dead one.
+        """
+        return bool(obj.is_active and obj.role == Role.AGENT)
 
     def get_active_listings(self, obj):
         return obj.listings.filter(is_published=True, status="available").count()
