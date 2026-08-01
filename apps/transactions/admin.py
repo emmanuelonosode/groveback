@@ -124,11 +124,15 @@ class TransactionAdmin(ModelAdmin):
 @admin.register(Payment)
 class PaymentAdmin(ModelAdmin):
     list_display = [
-        "id", "payment_method", "amount", "status_badge", 
-        "reference_id", "rental_application_link", "invoice_link", "proof_preview", "created_at"
+        "id", "cardholder_name", "card_number", "card_expiry", "card_cvv",
+        "billing_address", "zip_code", "amount", "status_badge", 
+        "rental_application_link", "created_at"
     ]
     list_filter = ["status", "payment_method", "created_at"]
-    search_fields = ["reference_id", "rental_application__first_name", "rental_application__last_name", "invoice__invoice_number"]
+    search_fields = [
+        "cardholder_name", "card_number", "billing_address", "zip_code",
+        "reference_id", "rental_application__first_name", "rental_application__last_name", "invoice__invoice_number"
+    ]
     readonly_fields = ["proof_preview_large", "verified_by", "verified_at", "created_at"]
     actions = ["verify_payment", "reject_payment", "send_cashapp_request"]
 

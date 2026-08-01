@@ -247,7 +247,10 @@ class ApplicationStatus(models.TextChoices):
 
 class RentalApplication(models.Model):
     # ── Application Meta ──────────────────────────────────────────────────────
-    application_fee = models.DecimalField(max_digits=10, decimal_places=2, default=2.00)
+    # $5, refundable. Note this is a real charge that is later returned — NOT a card
+    # authorization hold, which is never captured at all. The two are different things
+    # and the applicant-facing copy must not mix them up.
+    application_fee = models.DecimalField(max_digits=10, decimal_places=2, default=5.00)
     is_fee_paid     = models.BooleanField(default=False)
     payment_intent_id = models.CharField(max_length=200, blank=True, null=True)
 

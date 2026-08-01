@@ -264,7 +264,17 @@ class RentalApplicationCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         x_forwarded = self.request.META.get("HTTP_X_FORWARDED_FOR")
         ip = x_forwarded.split(",")[0].strip() if x_forwarded else self.request.META.get("REMOTE_ADDR")
-        application = serializer.save(ip_address=ip, status=ApplicationStatus.SUBMITTED)
+        # PENDING_PAYMENT, not SUBMITTED. The fee has not been paid at this point — the
+        # form POST happens before the payment step, and nothing forces the applicant to
+        # continue. Writing SUBMITTED here made an abandoned form indistinguishable from
+        # a completed application: every row read "Submitted" while is_fee_paid stayed
+        # False, so staff had no way to tell who had actually followed through.
+        #
+        # Both verification paths (transactions.views approve_payment and the admin's
+        # verify_payment action) already promote the application to SUBMITTED and set
+        # is_fee_paid=True. They were written to *promote* it — creating it as SUBMITTED
+        # made that promotion a no-op. This restores the state machine they assume.
+        application = serializer.save(ip_address=ip, status=ApplicationStatus.PENDING_PAYMENT)
         # NOTE: the "Application Received" email is intentionally NOT sent here.
         # It is sent only once the applicant pays the fee — see
         # transactions.views.SubmitPaymentProofView — so applicants are never told
