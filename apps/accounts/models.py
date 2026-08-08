@@ -122,13 +122,23 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         self.email_verification_expires = timezone.now() + timedelta(minutes=15)
         self.save(update_fields=['email_verification_code', 'email_verification_expires'])
 
+        # Deliver the OTP email OFF the request path. It was sent inline here, so the
+        # register/resend response blocked on SMTP latency — a slow handshake pushed the
+        # response past Cloudflare's origin timeout and returned 522 to the browser as
+        # "Load failed". The code is already persisted above, so verification works even
+        # if the email is still in flight. Mirrors the threaded admin alert in RegisterView.
+        import threading
+        threading.Thread(target=self._deliver_verification_email, daemon=True).start()
+
+        return self.email_verification_code
+
+    def _deliver_verification_email(self):
+        """Send the OTP email; prefer the Celery task, fall back to synchronous SMTP."""
         try:
             from apps.notifications.tasks import send_verification_email
             send_verification_email(self.id)
         except Exception:
             self._send_verification_email_sync()
-
-        return self.email_verification_code
 
     def _send_verification_email_sync(self):
         """Send the OTP email synchronously when Celery is not available."""

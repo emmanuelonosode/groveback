@@ -180,6 +180,17 @@ class RentalApplicationCreateSerializer(serializers.ModelSerializer):
             "ssn",
         ] + _NEW_FIELDS
         read_only_fields = ["id", "application_fee", "is_fee_paid", "status", "ssn_last4"]
+        # The model fields are now nullable/blank so DRAFTS can save partial data. This
+        # is the SUBMIT path, so re-require the fields a completed application must have —
+        # otherwise loosening the model would silently let incomplete apps be submitted.
+        extra_kwargs = {
+            "present_address":        {"required": True, "allow_blank": False},
+            "city":                   {"required": True, "allow_blank": False},
+            "state":                  {"required": True, "allow_blank": False},
+            "zip_code":               {"required": True, "allow_blank": False},
+            "move_in_date":           {"required": True, "allow_null": False},
+            "intended_stay_duration": {"required": True, "allow_blank": False},
+        }
 
     def validate(self, data):
         if data.get("has_kids") and not data.get("number_of_kids"):

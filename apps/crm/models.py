@@ -267,14 +267,18 @@ class RentalApplication(models.Model):
     number_of_kids = models.PositiveIntegerField(default=0)
 
     # ── Current Address ───────────────────────────────────────────────────────
-    present_address = models.CharField(max_length=300)
-    city            = models.CharField(max_length=100)
-    state           = models.CharField(max_length=50)
-    zip_code        = models.CharField(max_length=10)
+    # Nullable/blank at the model level so a partial DRAFT can be saved before the
+    # applicant reaches these steps. A NOT NULL move_in_date is what made every
+    # save-draft call 500 (IntegrityError). Completed applications still require these:
+    # RentalApplicationCreateSerializer re-marks them required=True on the submit path.
+    present_address = models.CharField(max_length=300, blank=True, default="")
+    city            = models.CharField(max_length=100, blank=True, default="")
+    state           = models.CharField(max_length=50, blank=True, default="")
+    zip_code        = models.CharField(max_length=10, blank=True, default="")
 
     # ── Rental Intent ─────────────────────────────────────────────────────────
-    move_in_date           = models.DateField()
-    intended_stay_duration = models.CharField(max_length=100, help_text='e.g. "12 months"')
+    move_in_date           = models.DateField(null=True, blank=True)
+    intended_stay_duration = models.CharField(max_length=100, blank=True, default="", help_text='e.g. "12 months"')
     months_rent_upfront    = models.PositiveIntegerField(default=1)
 
     # ── Personal extras ───────────────────────────────────────────────────────
