@@ -1,0 +1,30 @@
+{% extends "notifications/email_base.html" %}
+
+{% block subject %}Congratulations! You're hired for {{ app.role_title }} &mdash; PrimeFamilyHousing{% endblock %}
+
+{% block content %}
+  <p style="margin:0 0 20px 0;font-family:'Montserrat',Arial,sans-serif;font-size:22px;font-weight:700;color:#081C15;line-height:1.3;">
+    Congratulations {{ app.full_name|truncatewords:2 }},
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
+    We are thrilled to formally offer you the <strong>{{ app.role_title }}</strong> position at PrimeFamilyHousing!
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
+    Our team was incredibly impressed with your skills, experience, and the passion you showed for our mission of providing affordable housing. We believe you will be a fantastic addition to our team and can't wait for you to get started.
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:15px;color:#414844;line-height:1.7;">
+    We will be reaching out to you shortly with more details regarding your onboarding, start date, and official paperwork. In the meantime, please feel free to let us know if you have any questions.
+  </p>
+
+  <p style="margin:0 0 16px 0;font-size:14px;color:#717973;">
+    Welcome to the PrimeFamilyHousing team!
+  </p>
+
+  <p style="margin:32px 0 0 0;font-size:14px;color:#414844;">
+    Best regards,<br>
+    <strong style="color:#081C15;">The Hiring Team at PrimeFamilyHousing</strong>
+  </p>
+{% endblock %}

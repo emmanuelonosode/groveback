@@ -21,6 +21,7 @@ class JobApplicationAdmin(ModelAdmin):
         "mark_hired",
         "mark_rejected",
         "send_rejection_email_action",
+        "send_hired_email_action",
     ]
 
     fieldsets = (
@@ -86,3 +87,16 @@ class JobApplicationAdmin(ModelAdmin):
             self.message_user(request, f"Rejection email queued for {count} applicant(s).")
         except Exception as e:
             self.message_user(request, f"Error queuing emails: {e}", level="error")
+
+    @admin.action(description="Send hired/acceptance email to selected applicants")
+    def send_hired_email_action(self, request, queryset):
+        try:
+            from apps.notifications.tasks import send_job_hired_email
+            count = 0
+            for app in queryset:
+                send_job_hired_email(app.pk)
+                count += 1
+            self.message_user(request, f"Hired email queued for {count} applicant(s).")
+        except Exception as e:
+            self.message_user(request, f"Error queuing emails: {e}", level="error")
+

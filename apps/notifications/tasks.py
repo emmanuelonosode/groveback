@@ -309,6 +309,34 @@ def send_job_rejection_email(application_id: int):
         raise
 
 
+def send_job_hired_email(application_id: int):
+    """Send an acceptance/hired email to an applicant."""
+    try:
+        from apps.careers.models import JobApplication
+
+        app = JobApplication.objects.get(pk=application_id)
+        from_header, connection = _get_email_sender()
+
+        subject = f"Congratulations — Job Offer for {app.role_title}"
+        body = render_to_string(
+            "notifications/job_application_hired.html", {"app": app}
+        )
+        msg = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=from_header,
+            to=[app.email],
+            connection=connection,
+        )
+        msg.content_subtype = "html"
+        msg.send()
+        return f"Hired email sent to {app.email}"
+
+    except Exception:
+        logger.exception("send_job_hired_email failed for application %s", application_id)
+        raise
+
+
 def _payment_recipient(payment):
     """
     Resolve a payment to (email, full_name) across all three payment contexts:
