@@ -226,6 +226,22 @@ def on_user_verified(sender, instance, created, **kwargs):
         except Exception:
             import logging
             logging.getLogger(__name__).exception("Failed to create deferred application fee invoice")
+
+        # ── Link any existing unassigned Move-in invoices ──
+        try:
+            from apps.crm.models import RentalApplication
+            from apps.transactions.models import Invoice
+
+            apps = RentalApplication.objects.filter(email=instance.email)
+            for app in apps:
+                Invoice.objects.filter(
+                    title__icontains="Move-in Costs",
+                    description__icontains=f"Application ID #{app.id}",
+                    user__isnull=True
+                ).update(user=instance)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("Failed to link existing move-in invoices to new user")
 def connect_signals():
     """
     Connect all signal handlers using the real model classes.
