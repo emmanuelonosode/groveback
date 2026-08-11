@@ -296,6 +296,12 @@ def trigger_payment_notifications(sender, instance, created, **kwargs):
         # Only fire verification email once — gate on receipt_sent flag
         if not created and instance.status == "VERIFIED" and instance.verified_at and not instance.receipt_sent:
             Payment.objects.filter(pk=instance.pk).update(receipt_sent=True)
+            
+            if instance.invoice and instance.invoice.status != "PAID":
+                from apps.transactions.models import InvoiceStatus
+                instance.invoice.status = InvoiceStatus.PAID
+                instance.invoice.save(update_fields=["status"])
+
             _send(send_payment_verified_email, instance.pk)
 
         # Rejection notification
