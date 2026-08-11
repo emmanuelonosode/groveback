@@ -278,7 +278,7 @@ class InvoiceAdmin(ModelAdmin):
     search_fields = ["invoice_number", "title", "user__email", "transaction__client__lead__full_name"]
     ordering      = ["-created_at"]
     readonly_fields = ["invoice_number", "pdf", "created_at", "pdf_link"]
-    actions = ["generate_pdf_action", "send_invoice_action"]
+    actions = ["generate_pdf_action", "send_invoice_action", "send_reminder_action"]
 
     fieldsets = (
         ("Invoice Info", {
@@ -370,3 +370,19 @@ class InvoiceAdmin(ModelAdmin):
         if skipped:
             msg += f" {skipped} skipped — generate PDF first."
         self.message_user(request, msg)
+
+    @admin.action(description="Send Payment Reminder Email")
+    def send_reminder_action(self, request, queryset):
+        from apps.notifications.tasks import send_invoice_reminder_email
+        sent = 0
+        for invoice in queryset:
+            try:
+                send_invoice_reminder_email(invoice.pk)
+                # Ensure we also mark the automated reminder sent flag
+                invoice.due_reminder_sent = True
+                invoice.save(update_fields=["due_reminder_sent"])
+                sent += 1
+            except Exception:
+                pass
+        self.message_user(request, f"Reminder email manually sent for {sent} invoice(s).")
+
