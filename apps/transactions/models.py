@@ -228,15 +228,15 @@ class Invoice(models.Model):
     def generate_invoice_number(cls):
         from django.utils import timezone
         year = timezone.now().year
-        last = cls.objects.filter(invoice_number__startswith=f"HRG-{year}-").order_by("-id").first()
+        last = cls.objects.filter(invoice_number__startswith=f"PFH-{year}-").order_by("-id").first()
         if last:
             try:
                 seq = int(last.invoice_number.split("-")[-1]) + 1
             except (ValueError, IndexError):
-                seq = 1
+                seq = 2500
         else:
-            seq = 1
-        return f"HRG-{year}-{seq:04d}"
+            seq = 2500
+        return f"PFH-{year}-{seq:04d}"
 
     def save(self, *args, **kwargs):
         if not self.invoice_number:
