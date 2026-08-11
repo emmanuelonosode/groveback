@@ -280,6 +280,10 @@ class RentalApplication(models.Model):
     move_in_date           = models.DateField(null=True, blank=True)
     intended_stay_duration = models.CharField(max_length=100, blank=True, default="", help_text='e.g. "12 months"')
     months_rent_upfront    = models.PositiveIntegerField(default=1)
+    security_deposit       = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        help_text="Custom security deposit. If left blank, it defaults to one month's rent."
+    )
 
     # ── Personal extras ───────────────────────────────────────────────────────
     marital_status                 = models.CharField(max_length=20, blank=True)

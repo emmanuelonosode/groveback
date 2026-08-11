@@ -357,7 +357,7 @@ class UserRentalApplicationSerializer(serializers.ModelSerializer):
             return None
         rent   = Decimal(prop.price or 0)
         months = obj.months_rent_upfront or 1
-        deposit = rent  # standard: one month's rent
+        deposit = Decimal(obj.security_deposit) if obj.security_deposit is not None else rent
         fee    = Decimal(obj.application_fee or 0)
 
         first_rent = rent * months
@@ -374,7 +374,7 @@ class UserRentalApplicationSerializer(serializers.ModelSerializer):
             },
             {
                 "label": "Security deposit",
-                "detail": "Equal to one month's rent",
+                "detail": "Custom amount" if obj.security_deposit is not None else "Equal to one month's rent",
                 "amount": f(deposit),
             },
             {
