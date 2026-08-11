@@ -175,6 +175,10 @@ def on_application_save(sender, instance, created, **kwargs):
             name=instance.full_name,
             tags=["Applicant", "Approved Tenant"],
         )
+        try:
+            instance.generate_move_in_invoice()
+        except Exception:
+            logger.exception(f"Failed to generate move-in invoice for application {instance.id}")
 
 
 # ── Signal: New verified portal user ──────────────────────────────────────────

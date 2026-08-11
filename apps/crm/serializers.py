@@ -347,63 +347,9 @@ class UserRentalApplicationSerializer(serializers.ModelSerializer):
 
     def get_cost_breakdown(self, obj):
         """
-        Estimated move-in costs. Rent comes from the applied property; the
-        security deposit follows the standard one-month convention. Amounts are
-        plain numbers so the portal can format them.
+        Estimated move-in costs calculated by the model.
         """
-        from decimal import Decimal
-        prop = obj.rental_property
-        if not prop:
-            return None
-        rent   = Decimal(prop.price or 0)
-        months = obj.months_rent_upfront or 1
-        deposit = Decimal(obj.security_deposit) if obj.security_deposit is not None else rent
-        fee    = Decimal(obj.application_fee or 0)
-        lease_admin = Decimal(obj.lease_admin_fee) if obj.lease_admin_fee is not None else Decimal("150.00")
-        pet_fee = Decimal(obj.pet_fee) if obj.pet_fee is not None else Decimal(0)
-
-        first_rent = rent * months
-        total = first_rent + deposit + fee + lease_admin + pet_fee
-
-        def f(v):
-            return float(round(Decimal(v), 2))
-
-        items = [
-            {
-                "label": "First month's rent" if months == 1 else f"Rent upfront ({months} months)",
-                "detail": f"${f(rent):,.2f}/mo" if months > 1 else "",
-                "amount": f(first_rent),
-            },
-            {
-                "label": "Security deposit",
-                "detail": "Custom amount" if obj.security_deposit is not None else "Equal to one month's rent",
-                "amount": f(deposit),
-            },
-            {
-                "label": "Application fee",
-                "detail": "Paid" if obj.is_fee_paid else "Due",
-                "amount": f(fee),
-            },
-            {
-                "label": "Lease administration fee",
-                "detail": "Standard processing fee" if obj.lease_admin_fee is None else "Custom amount",
-                "amount": f(lease_admin),
-            }
-        ]
-
-        if pet_fee > 0:
-            items.append({
-                "label": "Pet fee",
-                "detail": "Custom amount",
-                "amount": f(pet_fee),
-            })
-        return {
-            "monthly_rent": f(rent),
-            "months_upfront": months,
-            "items": items,
-            "total": f(total),
-            "currency": "USD",
-        }
+        return obj.calculate_move_in_costs()
 
 
 class ReferrerSerializer(serializers.ModelSerializer):

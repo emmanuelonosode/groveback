@@ -417,10 +417,24 @@ def send_payment_verified_email(payment_id: int):
             "frontend_url": settings.FRONTEND_URL,
         })
 
+        # Generate the PDF receipt automatically before sending the email
+        generate_payment_receipt(payment_id)
+
         msg = EmailMessage(subject=subject, body=body, from_email=from_header, to=[recipient_email], connection=connection)
         msg.content_subtype = "html"
+
+        # Attempt to attach the generated PDF
+        from django.core.files.storage import default_storage
+        file_name = f"receipts/receipt_payment_{payment.pk}.pdf"
+        try:
+            with default_storage.open(file_name, 'rb') as f:
+                pdf_bytes = f.read()
+            msg.attach(f"Receipt_Payment_{payment.pk}.pdf", pdf_bytes, "application/pdf")
+        except Exception as e:
+            logger.warning(f"Could not attach PDF receipt to email: {e}")
+
         msg.send()
-        return f"Payment verification sent to {recipient_email}"
+        return f"Payment verification sent to {recipient_email} with PDF receipt"
 
     except Exception:
         logger.exception("send_payment_verified_email failed for payment %s", payment_id)

@@ -407,6 +407,108 @@ class RentalApplication(models.Model):
         parts.append(self.last_name)
         return " ".join(parts)
 
+    def calculate_move_in_costs(self):
+        from decimal import Decimal
+        prop = self.rental_property
+        if not prop:
+            return None
+        rent = Decimal(prop.price or 0)
+        months = self.months_rent_upfront or 1
+        deposit = Decimal(self.security_deposit) if self.security_deposit is not None else rent
+        fee = Decimal(self.application_fee or 0)
+        lease_admin = Decimal(self.lease_admin_fee) if self.lease_admin_fee is not None else Decimal("150.00")
+        pet_fee = Decimal(self.pet_fee) if self.pet_fee is not None else Decimal(0)
+
+        first_rent = rent * months
+        total = first_rent + deposit + fee + lease_admin + pet_fee
+
+        def f(v):
+            return float(round(Decimal(v), 2))
+
+        items = [
+            {
+                "label": "First month's rent" if months == 1 else f"Rent upfront ({months} months)",
+                "detail": f"${f(rent):,.2f}/mo" if months > 1 else "",
+                "amount": f(first_rent),
+            },
+            {
+                "label": "Security deposit",
+                "detail": "Custom amount" if self.security_deposit is not None else "Equal to one month's rent",
+                "amount": f(deposit),
+            },
+            {
+                "label": "Application fee",
+                "detail": "Paid" if self.is_fee_paid else "Due",
+                "amount": f(fee),
+            },
+            {
+                "label": "Lease administration fee",
+                "detail": "Standard processing fee" if self.lease_admin_fee is None else "Custom amount",
+                "amount": f(lease_admin),
+            }
+        ]
+
+        if pet_fee > 0:
+            items.append({
+                "label": "Pet fee",
+                "detail": "Custom amount",
+                "amount": f(pet_fee),
+            })
+        return {
+            "monthly_rent": f(rent),
+            "months_upfront": months,
+            "items": items,
+            "total": f(total),
+            "currency": "USD",
+        }
+
+    def generate_move_in_invoice(self):
+        """Automatically generates an invoice for the move-in costs when approved."""
+        from django.utils import timezone
+        from apps.transactions.models import Invoice, InvoiceStatus
+        from apps.accounts.models import CustomUser
+
+        if not self.rental_property:
+            return None
+
+        # Link to a portal user if they exist
+        user = CustomUser.objects.filter(email=self.email).first()
+
+        title = f"Move-in Costs - {self.rental_property.title}"
+        existing_invoice = Invoice.objects.filter(
+            title=title,
+            description__icontains=f"Application ID #{self.id}"
+        ).exists()
+
+        if existing_invoice:
+            return None  # Do not duplicate
+
+        costs = self.calculate_move_in_costs()
+        if not costs:
+            return None
+
+        line_items = []
+        for item in costs["items"]:
+            line_items.append({
+                "description": item["label"],
+                "quantity": 1,
+                "unit_price": float(item["amount"]),
+                "total": float(item["amount"])
+            })
+
+        invoice = Invoice.objects.create(
+            user=user,
+            title=title,
+            description=f"Move-in costs for Application ID #{self.id}.",
+            issued_date=timezone.now().date(),
+            due_date=timezone.now().date(),
+            subtotal=costs["total"],
+            total=costs["total"],
+            status=InvoiceStatus.SENT,
+            line_items=line_items
+        )
+        return invoice
+
     def save(self, *args, **kwargs):
         # Auto-generate certification text
         if not self.certification_text:
