@@ -518,11 +518,9 @@
                                             >
                                               Congratulations! We are thrilled
                                               to inform you that your
-                                              application{% if
-                                              app.rental_property %} for
+                                              application{% if app.rental_property %} for
                                               <strong style="color: #ffffff"
-                                                >{{ app.rental_property.title
-                                                }}</strong
+                                                >{{ app.rental_property.title }}</strong
                                               >{% endif %} has been approved.
                                               You&apos;re just a few steps away
                                               from getting your keys.
@@ -1211,11 +1209,7 @@
                                                       color: #414844;
                                                     "
                                                   >
-                                                    Schedule your walkthrough{%
-                                                    if app.rental_property.agent
-                                                    %} with {{
-                                                    app.rental_property.agent.first_name
-                                                    }}{% endif %} and receive
+                                                    Schedule your walkthrough{% if app.rental_property.agent %} with {{ app.rental_property.agent.first_name }}{% endif %} and receive
                                                     your keys on move-in day.
                                                   </p>
                                                 </td>

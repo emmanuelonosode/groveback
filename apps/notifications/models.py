@@ -72,8 +72,9 @@ class EmailConfiguration(models.Model):
         Use as a context manager or pass directly to EmailMessage(connection=...).
         """
         from django.core.mail import get_connection
+        from django.conf import settings
         return get_connection(
-            backend="django.core.mail.backends.smtp.EmailBackend",
+            backend=settings.EMAIL_BACKEND,
             host=self.smtp_host,
             port=self.smtp_port,
             username=self.email_host_user,
