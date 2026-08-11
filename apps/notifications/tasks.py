@@ -226,6 +226,90 @@ def send_invoice_email(invoice_id: int):
         raise
 
 
+@shared_task
+def send_daily_invoice_reminders():
+    """Daily task to remind users about unpaid invoices due in 2 days or less."""
+    from django.utils import timezone
+    from datetime import timedelta
+    from apps.transactions.models import Invoice
+
+    target_date = timezone.now().date() + timedelta(days=2)
+    
+    invoices = Invoice.objects.filter(
+        status="SENT", 
+        due_date__lte=target_date, 
+        due_reminder_sent=False
+    )
+
+    count = 0
+    for invoice in invoices:
+        try:
+            send_invoice_reminder_email(invoice.id)
+            invoice.due_reminder_sent = True
+            invoice.save(update_fields=["due_reminder_sent"])
+            count += 1
+        except Exception:
+            logger.exception("Failed to send reminder for invoice %s", invoice.id)
+
+    return f"Sent {count} invoice reminders."
+
+
+def send_invoice_reminder_email(invoice_id: int):
+    """Email the invoice payment reminder to the client."""
+    try:
+        from apps.transactions.models import Invoice
+        import urllib.request
+
+        invoice = Invoice.objects.select_related(
+            "transaction__client__lead",
+            "transaction__agent",
+            "user",
+        ).get(pk=invoice_id)
+
+        if invoice.user:
+            client_email = invoice.user.email
+            client_name = invoice.user.full_name
+        elif invoice.transaction and invoice.transaction.client:
+            client_email = invoice.transaction.client.email
+            client_name = invoice.transaction.client.full_name
+        else:
+            return "No recipient found — skipped."
+
+        realtor = invoice.transaction.agent if invoice.transaction else None
+
+        from_header, connection = _get_email_sender()
+        subject = f"Payment Reminder: {invoice.title}"
+        body = render_to_string("notifications/invoice_reminder_email.html", {
+            "invoice": invoice,
+            "client_name": client_name,
+            "realtor": realtor,
+            "frontend_url": settings.FRONTEND_URL,
+        })
+
+        msg = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=from_header,
+            to=[client_email],
+            connection=connection,
+        )
+        msg.content_subtype = "html"
+
+        if invoice.pdf:
+            try:
+                pdf_data = urllib.request.urlopen(invoice.pdf).read()
+                msg.attach(f"{invoice.invoice_number}.pdf", pdf_data, "application/pdf")
+            except Exception:
+                pass
+
+        msg.send()
+        return f"Invoice reminder emailed to {client_email}"
+
+    except Exception:
+        logger.exception("send_invoice_reminder_email failed for invoice %s", invoice_id)
+        raise
+
+
 # ---------------------------------------------------------------------------
 # Careers / Job Applications
 # ---------------------------------------------------------------------------

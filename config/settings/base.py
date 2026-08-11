@@ -213,6 +213,11 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.properties.tasks.unpublish_stale_listings",
         "schedule": crontab(hour=4, minute=0),
     },
+    # Daily 9 AM — remind users about unpaid invoices due in 2 days or less
+    "invoice-due-reminders": {
+        "task": "apps.notifications.tasks.send_daily_invoice_reminders",
+        "schedule": crontab(hour=9, minute=0),
+    },
 }
 
 # ── Email ──────────────────────────────────────────────────────────────────────

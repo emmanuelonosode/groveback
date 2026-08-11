@@ -216,6 +216,7 @@ class Invoice(models.Model):
     total = models.DecimalField(max_digits=12, decimal_places=2)
     pdf = models.CharField(max_length=500, blank=True, help_text="URL of generated PDF invoice")
     status = models.CharField(max_length=10, choices=InvoiceStatus.choices, default=InvoiceStatus.DRAFT)
+    due_reminder_sent = models.BooleanField(default=False, help_text="Whether the upcoming due date reminder has been sent")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
