@@ -478,10 +478,7 @@ class RentalApplication(models.Model):
         existing_invoice = Invoice.objects.filter(
             title=title,
             description__icontains=f"Application ID #{self.id}"
-        ).exists()
-
-        if existing_invoice:
-            return None  # Do not duplicate
+        ).first()
 
         costs = self.calculate_move_in_costs()
         if not costs:
@@ -495,6 +492,18 @@ class RentalApplication(models.Model):
                 "unit_price": float(item["amount"]),
                 "total": float(item["amount"])
             })
+
+        if existing_invoice:
+            if existing_invoice.status == InvoiceStatus.PAID:
+                return existing_invoice  # Do not update if already paid
+            
+            existing_invoice.line_items = line_items
+            existing_invoice.subtotal = costs["total"]
+            existing_invoice.total = costs["total"]
+            if user and not existing_invoice.user:
+                existing_invoice.user = user
+            existing_invoice.save(update_fields=['line_items', 'subtotal', 'total', 'user'])
+            return existing_invoice
 
         invoice = Invoice.objects.create(
             user=user,
