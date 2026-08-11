@@ -314,7 +314,7 @@ class RentalApplicationAdmin(ModelAdmin):
             ),
         }),
         ("Rental Details", {
-            "fields": ("rental_property", "move_in_date", "intended_stay_duration", "months_rent_upfront", "security_deposit"),
+            "fields": ("rental_property", "move_in_date", "intended_stay_duration", "months_rent_upfront", "security_deposit", "lease_admin_fee", "pet_fee"),
         }),
         ("Household", {
             "fields": (

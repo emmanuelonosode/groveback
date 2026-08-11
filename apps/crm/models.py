@@ -284,6 +284,14 @@ class RentalApplication(models.Model):
         max_digits=12, decimal_places=2, null=True, blank=True,
         help_text="Custom security deposit. If left blank, it defaults to one month's rent."
     )
+    lease_admin_fee        = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        help_text="Optional lease administration fee (e.g. 150.00)."
+    )
+    pet_fee                = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True,
+        help_text="Optional pet fee."
+    )
 
     # ── Personal extras ───────────────────────────────────────────────────────
     marital_status                 = models.CharField(max_length=20, blank=True)
