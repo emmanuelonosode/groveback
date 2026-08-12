@@ -117,7 +117,7 @@ def mailer_contacts(request):
 
     # ── 2. Portal Users (role=CLIENT) ─────────────────────────────────────────
     if contact_type in ("all", "users"):
-        from apps.accounts.models import CustomUser, Role
+        from apps.accounts.models import CustomUser
 
         user_qs = CustomUser.objects.filter(
             role=Role.CLIENT, is_active=True, is_email_verified=True
