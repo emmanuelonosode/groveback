@@ -13,9 +13,10 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from apps.accounts.models import Role
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ def _build_contact(email, name, phone="", tags=None, source=None, budget_min=Non
 
 
 @api_view(["GET"])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def mailer_contacts(request):
     """
     GET /api/v1/mailer/contacts/
@@ -58,8 +59,8 @@ def mailer_contacts(request):
       - updated_since (ISO datetime — only return contacts updated after this date)
       - type         (all | leads | clients | users — filter by contact source)
     """
-    if not _verify_mailer_key(request):
-        return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+    if request.user.role == Role.CLIENT:
+        return Response({"error": "Unauthorized"}, status=status.HTTP_403_FORBIDDEN)
 
     page = max(1, int(request.GET.get("page", 1)))
     page_size = min(1000, max(1, int(request.GET.get("page_size", 500))))
@@ -164,6 +165,27 @@ def mailer_contacts(request):
                 contacts[email] = _build_contact(
                     email=client.lead.email,
                     name=client.lead.full_name,
+                    tags=tags,
+                )
+
+    # ── 4. Applications ───────────────────────────────────────────────────────
+    if contact_type in ("all", "applications", "leads"):
+        from apps.crm.models import RentalApplication
+
+        app_qs = RentalApplication.objects.exclude(email="")
+        
+        for app in app_qs.iterator():
+            email = app.email.lower().strip()
+            tags = ["Applicant"]
+            name = f"{app.first_name} {app.last_name}".strip()
+            existing = contacts.get(email)
+            if existing:
+                existing["tags"] = list(set(existing["tags"] + tags))
+            else:
+                contacts[email] = _build_contact(
+                    email=app.email,
+                    name=name,
+                    phone=app.cell_phone,
                     tags=tags,
                 )
 
