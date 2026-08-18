@@ -467,35 +467,35 @@ def proxy_property_image(request, slug, filename):
         resp["X-Robots-Tag"] = "index, follow, max-image-preview:large"
         return resp
 
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+    }
+
     candidates = [
         f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{slug}/{filename}",
         f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{filename}",
-        f"https://images.invitationhomes.com/web/w_500,h_250,c_limit,q_auto/{slug}/{filename}",
+        f"https://images.invitationhomes.com/{slug}/{filename}",
     ]
 
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) PrimeFamilyHousing/1.0",
-        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-    }
-
-    for url in candidates:
+    for candidate_url in candidates:
         try:
-            req = urllib.request.Request(url, headers=headers)
-            with urllib.request.urlopen(req, timeout=8) as r:
-                if r.status == 200:
-                    content = r.read()
-                    content_type = r.headers.get("Content-Type", "image/jpeg")
+            req = urllib.request.Request(candidate_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                if resp.status == 200:
+                    data = resp.read()
                     try:
                         os.makedirs(local_dir, exist_ok=True)
-                        with open(local_path, "wb") as out:
-                            out.write(content)
+                        with open(local_path, "wb") as f:
+                            f.write(data)
                     except Exception:
                         pass
-                    response = HttpResponse(content, content_type=content_type)
-                    response["Cache-Control"] = "public, max-age=31536000, immutable"
-                    response["X-Robots-Tag"] = "index, follow, max-image-preview:large"
-                    return response
+                    content_type = resp.headers.get("Content-Type") or "image/jpeg"
+                    http_resp = HttpResponse(data, content_type=content_type)
+                    http_resp["Cache-Control"] = "public, max-age=31536000, immutable"
+                    http_resp["X-Robots-Tag"] = "index, follow, max-image-preview:large"
+                    return http_resp
         except Exception:
             continue
 
-    raise Http404("Image not found")
+    return HttpResponse("Image not found", status=404)

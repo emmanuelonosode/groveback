@@ -13,6 +13,12 @@ def _resolve_image_url(image_field):
         return val[len("https://primefamilyhousing.com"):]
     if val.startswith("http://primefamilyhousing.com/media/"):
         return val[len("http://primefamilyhousing.com"):]
+    if "images.invitationhomes.com" in val:
+        parts = val.split("/")
+        if len(parts) >= 2:
+            slug = parts[-2]
+            filename = parts[-1]
+            return f"/media/properties/{slug}/{filename}"
     return val
 
 
