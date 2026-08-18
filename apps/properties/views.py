@@ -449,7 +449,7 @@ from django.views.decorators.cache import cache_control
 def proxy_property_image(request, slug, filename):
     """
     Branded Image Proxy for Prime Family Housing.
-    Serves images under https://primefamilyhousing.com/media/properties/{slug}/{filename}
+    Serves images under https://admin.primefamilyhousing.com/media/properties/{slug}/{filename}
     without exposing third-party CDN domains to Google crawlers or visitors.
     """
     local_dir = os.path.join(settings.MEDIA_ROOT, "properties", slug)
@@ -472,16 +472,29 @@ def proxy_property_image(request, slug, filename):
         "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
     }
 
-    candidates = [
+    candidates = []
+
+    # 1. First check if DB holds the exact source URL for this filename
+    try:
+        from .models import PropertyImage
+        db_img = PropertyImage.objects.filter(image__contains=filename).first()
+        if db_img and str(db_img.image).startswith("http") and "primefamilyhousing.com" not in str(db_img.image):
+            candidates.append(str(db_img.image))
+    except Exception:
+        pass
+
+    # 2. Standard CDN structure candidates
+    candidates.extend([
         f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{slug}/{filename}",
         f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{filename}",
         f"https://images.invitationhomes.com/{slug}/{filename}",
-    ]
+        f"https://images.invitationhomes.com/{filename}",
+    ])
 
     for candidate_url in candidates:
         try:
             req = urllib.request.Request(candidate_url, headers=headers)
-            with urllib.request.urlopen(req, timeout=8) as resp:
+            with urllib.request.urlopen(req, timeout=10) as resp:
                 if resp.status == 200:
                     data = resp.read()
                     try:
