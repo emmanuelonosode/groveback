@@ -9,16 +9,24 @@ def _resolve_image_url(image_field):
     val = str(image_field)
     if val.startswith("image/upload/http"):
         val = val[len("image/upload/"):]
+    
+    # Branded URL handling -> point to official backend media host
+    if val.startswith("https://admin.primefamilyhousing.com/media/"):
+        return val
     if val.startswith("https://primefamilyhousing.com/media/"):
-        return val[len("https://primefamilyhousing.com"):]
+        return "https://admin.primefamilyhousing.com" + val[len("https://primefamilyhousing.com"):]
     if val.startswith("http://primefamilyhousing.com/media/"):
-        return val[len("http://primefamilyhousing.com"):]
+        return "https://admin.primefamilyhousing.com" + val[len("http://primefamilyhousing.com"):]
+    if val.startswith("/media/"):
+        return "https://admin.primefamilyhousing.com" + val
+
     if "images.invitationhomes.com" in val:
         parts = val.split("/")
         if len(parts) >= 2:
             slug = parts[-2]
             filename = parts[-1]
-            return f"/media/properties/{slug}/{filename}"
+            return f"https://admin.primefamilyhousing.com/media/properties/{slug}/{filename}"
+
     return val
 
 
