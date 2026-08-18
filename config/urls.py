@@ -3,8 +3,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from apps.properties.views import proxy_property_image
 
 urlpatterns = [
+    # Media Proxy
+    path("media/properties/<str:slug>/<str:filename>", proxy_property_image, name="proxy_property_image"),
+
     # Admin
     path("admin/", admin.site.urls),
 
@@ -16,7 +20,6 @@ urlpatterns = [
     # App APIs — public
     path("api/v1/properties/", include("apps.properties.urls")),
     path("api/v1/agents/", include("apps.accounts.agent_urls")),
-    # Agent listings & contact (mounted under agents/)
     path("api/v1/agents/", include("apps.properties.agent_urls")),
 
     # App APIs — staff
@@ -36,10 +39,8 @@ urlpatterns = [
     path("api/v1/documents/", include("apps.documents.urls")),
     path("api/v1/maintenance/", include("apps.maintenance.urls")),
 
-    # ── PrimeFamily Mailer Integration ───────────────────────────────────────────
-    # Secure sync API — protected by X-Mailer-Key header
+    # PrimeFamily Mailer Integration
     path("api/v1/mailer/", include("apps.crm.mailer_urls")),
-
 ]
 
 if settings.DEBUG:

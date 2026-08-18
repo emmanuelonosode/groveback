@@ -437,3 +437,65 @@ def parse_query(request):
     if not filters:
         return Response({"ok": False})
     return Response({"ok": True, "filters": filters})
+
+
+import os
+import urllib.request
+from django.http import HttpResponse, Http404
+from django.conf import settings
+from django.views.decorators.cache import cache_control
+
+@cache_control(public=True, max_age=31536000, immutable=True)
+def proxy_property_image(request, slug, filename):
+    """
+    Branded Image Proxy for Prime Family Housing.
+    Serves images under https://primefamilyhousing.com/media/properties/{slug}/{filename}
+    without exposing third-party CDN domains to Google crawlers or visitors.
+    """
+    local_dir = os.path.join(settings.MEDIA_ROOT, "properties", slug)
+    local_path = os.path.join(local_dir, filename)
+    if os.path.exists(local_path):
+        with open(local_path, "rb") as f:
+            content = f.read()
+        content_type = "image/jpeg"
+        if filename.lower().endswith(".png"):
+            content_type = "image/png"
+        elif filename.lower().endswith(".webp"):
+            content_type = "image/webp"
+        resp = HttpResponse(content, content_type=content_type)
+        resp["Cache-Control"] = "public, max-age=31536000, immutable"
+        resp["X-Robots-Tag"] = "index, follow, max-image-preview:large"
+        return resp
+
+    candidates = [
+        f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{slug}/{filename}",
+        f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{filename}",
+        f"https://images.invitationhomes.com/web/w_500,h_250,c_limit,q_auto/{slug}/{filename}",
+    ]
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) PrimeFamilyHousing/1.0",
+        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+    }
+
+    for url in candidates:
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=8) as r:
+                if r.status == 200:
+                    content = r.read()
+                    content_type = r.headers.get("Content-Type", "image/jpeg")
+                    try:
+                        os.makedirs(local_dir, exist_ok=True)
+                        with open(local_path, "wb") as out:
+                            out.write(content)
+                    except Exception:
+                        pass
+                    response = HttpResponse(content, content_type=content_type)
+                    response["Cache-Control"] = "public, max-age=31536000, immutable"
+                    response["X-Robots-Tag"] = "index, follow, max-image-preview:large"
+                    return response
+        except Exception:
+            continue
+
+    raise Http404("Image not found")

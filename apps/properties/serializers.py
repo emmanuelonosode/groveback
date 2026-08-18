@@ -4,27 +4,16 @@ from apps.accounts.serializers import PublicAgentSerializer
 
 
 def _resolve_image_url(image_field):
-    """
-    Safely extract a full URL from an image field value.
-
-    `PropertyImage.image` is a plain URLField, so the value is almost always a
-    string that can be returned as-is. Django file fields (`.url`) are still
-    handled for any legacy/uploaded values.
-
-    The `image/upload/` guard covers rows written before migration
-    properties.0009 cleaned them up — cheap insurance if an old backup is
-    restored; it is a no-op for normal data.
-    """
     if not image_field:
         return None
-
-    if isinstance(image_field, str):
-        if image_field.startswith("image/upload/http"):
-            return image_field[len("image/upload/"):]
-        return image_field
-
-    url = getattr(image_field, "url", None)
-    return url or str(image_field)
+    val = str(image_field)
+    if val.startswith("image/upload/http"):
+        val = val[len("image/upload/"):]
+    if val.startswith("https://primefamilyhousing.com/media/"):
+        return val[len("https://primefamilyhousing.com"):]
+    if val.startswith("http://primefamilyhousing.com/media/"):
+        return val[len("http://primefamilyhousing.com"):]
+    return val
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
