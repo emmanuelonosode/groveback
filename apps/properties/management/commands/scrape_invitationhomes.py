@@ -511,6 +511,13 @@ def _listing_from_json(obj: dict, market_slug: str, default_state: str) -> dict 
             if name:
                 amenities.append(str(name))
 
+    if _pick(obj, "allow_selfshow", "allowSelfShow", "selfTour", default=False):
+        amenities.append("Self-Tour Available")
+        
+    avail = _pick(obj, "available_on", "availableOn", "availableDate", default="")
+    if avail:
+        amenities.append(f"Available: {avail}")
+
     needs_detail = not description or not image_urls
 
     return {

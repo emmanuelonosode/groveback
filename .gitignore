@@ -55,3 +55,7 @@ staticfiles/
 *.swp
 *.swo
 .DS_Store
+
+# One-off local repair/dump scripts — not part of the app
+fix_*.py
+dump_*.py

@@ -96,6 +96,13 @@ class PropertyAdmin(ModelAdmin):
                 "homepage_featured: shows this property in the 'Available Now' section on the homepage (max 6)."
             ),
         }),
+        ("Rich Data (JSON & Extended)", {
+            "fields": (
+                "is_pet_friendly", "has_pool", "allow_selfshow", "available_on",
+                "schools", "fees", "office_info", "floor_plans"
+            ),
+            "description": "These fields store JSON data (arrays/objects) and extra boolean features synced from Supabase.",
+        }),
         ("Timestamps", {
             "fields": ("created_at", "updated_at"),
             "classes": ("collapse",),

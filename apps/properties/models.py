@@ -95,6 +95,9 @@ class Property(models.Model):
     )
     is_published = models.BooleanField(default=False)
 
+    # Raw Schema Data
+    raw_data = models.JSONField(default=dict, blank=True, help_text="Stores raw JSON schema data from scrapers")
+
     # Relations
     agent = models.ForeignKey(
         "accounts.CustomUser",
@@ -106,6 +109,20 @@ class Property(models.Model):
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Scraped Fields
+    available_on = models.CharField(max_length=100, blank=True, null=True)
+    is_pet_friendly = models.BooleanField(default=False)
+    has_pool = models.BooleanField(default=False)
+    allow_selfshow = models.BooleanField(default=False)
+    
+    # JSON Fields for complex data
+    schools = models.JSONField(blank=True, null=True, help_text="List of nearby schools")
+    fees = models.JSONField(blank=True, null=True, help_text="Monthly fees and costs")
+    floor_plans = models.JSONField(blank=True, null=True, help_text="Floor plan images/data")
+    office_info = models.JSONField(blank=True, null=True, help_text="Management office contact info")
+
+
 
     class Meta:
         verbose_name = "Property"
@@ -150,6 +167,8 @@ class PropertyImage(models.Model):
     is_primary = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=0)
 
+
+
     class Meta:
         ordering = ["order", "id"]
 
@@ -167,6 +186,8 @@ class AmenityCategory(models.Model):
     name = models.CharField(max_length=100)
     icon = models.CharField(max_length=50, blank=True, help_text="Lucide icon name, e.g. 'home'")
     order = models.PositiveIntegerField(default=0)
+
+
 
     class Meta:
         ordering = ["order"]
@@ -188,6 +209,8 @@ class PropertyAmenity(models.Model):
     )
     name = models.CharField(max_length=100)
 
+
+
     class Meta:
         verbose_name_plural = "Amenities"
 
@@ -198,6 +221,8 @@ class FavoriteProperty(models.Model):
     user = models.ForeignKey("accounts.CustomUser", on_delete=models.CASCADE, related_name="favorite_properties")
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="favorited_by")
     created_at = models.DateTimeField(auto_now_add=True)
+
+
 
     class Meta:
         verbose_name = "Favorite Property"

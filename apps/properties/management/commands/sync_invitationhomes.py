@@ -79,6 +79,30 @@ LD_RE = re.compile(r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>', re.S
 
 
 # ── JSON-LD helpers ──────────────────────────────────────────────────────────
+
+def decode_sveltekit_data(data_pool):
+    def resolve(val, seen=None):
+        if seen is None: seen = set()
+        if isinstance(val, int):
+            if val < 0 or val >= len(data_pool): return val
+            target = data_pool[val]
+            if isinstance(target, (dict, list)):
+                if val in seen: return f"[Ref {val}]"
+                seen.add(val)
+                return resolve(target, seen.copy())
+            else:
+                return target
+        elif isinstance(val, dict):
+            return {k: resolve(v, seen.copy()) for k, v in val.items()}
+        elif isinstance(val, list):
+            return [resolve(item, seen.copy()) for item in val]
+        else:
+            return val
+    if not data_pool or not isinstance(data_pool, list): return {}
+    root = data_pool[0]
+    return {k: resolve(v) for k, v in root.items()}
+
+
 def _iter_nodes(doc):
     """Yield every dict in a JSON-LD document, however deeply nested."""
     stack = [doc]
@@ -253,6 +277,14 @@ def parse_listing(html: str, url: str) -> dict | None:
             if isinstance(a, dict) and a.get("name")
         ]
 
+    if _scalar(html, "allow_selfshow"):
+        amenities.append({"name": "Self-Tour Available", "category": "Features"})
+        
+    avail_date = _scalar(html, "available_on")
+    if avail_date:
+        amenities.append({"name": f"Available: {str(avail_date)[:10]}", "category": "Features"})
+
+
     year_built = _scalar(html, "year_built")
     tour = _scalar(html, "virtual_tour_url") or ""
     tour_mobile = _scalar(html, "virtual_tour_url_mobile") or ""
@@ -337,7 +369,27 @@ class Command(BaseCommand):
                 # copy into mojibake — "décor" arriving as "dÃ©cor" and landing in the
                 # description verbatim. Their pages are UTF-8; say so explicitly.
                 r.encoding = "utf-8"
-                return parse_listing(r.text, url)
+                parsed = parse_listing(r.text, url)
+                if parsed:
+                    # Also fetch __data.json to get availability and self_tour
+                    try:
+                        data_url = f"{url.rstrip('/')}/__data.json"
+                        dr = session.get(data_url, headers=HEADERS, timeout=timeout)
+                        if dr.status_code == 200:
+                            json_payload = dr.json()
+                            nodes = json_payload.get("nodes", [])
+                            if len(nodes) >= 2:
+                                page_data = decode_sveltekit_data(nodes[1]["data"])
+                                prop_data = page_data.get("property", {})
+                                parsed["raw_data"] = page_data
+                                if prop_data.get("allow_selfshow"):
+                                    parsed["amenities"].append({"name": "Self-Tour Available", "category": "Features"})
+                                avail_date = prop_data.get("available_on")
+                                if avail_date:
+                                    parsed["amenities"].append({"name": f"Available: {str(avail_date)[:10]}", "category": "Features"})
+                    except Exception as e:
+                        print(f"Warning: Failed to fetch __data.json for {url}: {e}")
+                return parsed
             except Exception:
                 if attempt == 2:
                     return None
@@ -390,6 +442,7 @@ class Command(BaseCommand):
             "virtual_tour_url": data["virtual_tour_url"][:200],
             "tour_360_url": data["tour_360_url"][:200],
             "neighborhood": data["neighborhood"][:100],
+            "raw_data": data.get("raw_data", {}),
         }
 
         prop = Property.objects.filter(slug=data["slug"]).first()
