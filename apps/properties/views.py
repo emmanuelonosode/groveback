@@ -440,75 +440,107 @@ def parse_query(request):
 
 
 import os
+import re
 import urllib.request
 from django.http import HttpResponse, Http404
 from django.conf import settings
 from django.views.decorators.cache import cache_control
 
+# Origin fetches happen while a gunicorn worker is held. With 3 workers and a
+# 120s worker timeout, a handful of concurrent cache misses is enough to starve
+# the API — which is what produced the frontend's UND_ERR_HEADERS_TIMEOUT storm
+# and 15 WORKER TIMEOUTs. Keep the worst case per request small and bounded.
+_ORIGIN_TIMEOUT = 4          # seconds per candidate
+_MAX_IMAGE_BYTES = 15 * 1024 * 1024
+# Dots are legitimate (extensions, UUID-ish names), so they cannot simply be
+# banned — but a segment that is *only* dots is a traversal attempt. "/" is
+# already excluded by the URL converter; this closes ".." and "...".
+_SAFE_SEGMENT = re.compile(r"^(?!\.+$)[A-Za-z0-9._-]+$")
+
+_CONTENT_TYPES = {".png": "image/png", ".webp": "image/webp", ".gif": "image/gif",
+                  ".jpg": "image/jpeg", ".jpeg": "image/jpeg"}
+
+
+def _image_content_type(filename):
+    return _CONTENT_TYPES.get(os.path.splitext(filename)[1].lower(), "image/jpeg")
+
+
+def _image_response(data, content_type):
+    resp = HttpResponse(data, content_type=content_type)
+    resp["Cache-Control"] = "public, max-age=31536000, immutable"
+    resp["X-Robots-Tag"] = "index, follow, max-image-preview:large"
+    return resp
+
+
 @cache_control(public=True, max_age=31536000, immutable=True)
 def proxy_property_image(request, slug, filename):
+    """Serve a listing photo from our own domain.
+
+    Public URL is https://admin.primefamilyhousing.com/media/properties/{slug}/{filename},
+    so no third-party CDN is ever named in HTML a visitor or crawler sees. Bytes
+    come from disk once cached; on a miss they are fetched from the origin and
+    written through.
+
+    `slug` here is the *image* path segment, which is the upstream listing key —
+    not the property's public slug. The two diverged when listings were
+    re-slugged to <city>-<state>-<address>; the image path is what is stored on
+    PropertyImage.image and must keep matching what the origin serves.
     """
-    Branded Image Proxy for Prime Family Housing.
-    Serves images under https://admin.primefamilyhousing.com/media/properties/{slug}/{filename}
-    without exposing third-party CDN domains to Google crawlers or visitors.
-    """
+    # `<str:...>` excludes "/" but not "..", so both segments are still
+    # attacker-controlled path components. Validate before touching the filesystem.
+    if not _SAFE_SEGMENT.match(slug) or not _SAFE_SEGMENT.match(filename):
+        raise Http404("Invalid image path")
+
     local_dir = os.path.join(settings.MEDIA_ROOT, "properties", slug)
     local_path = os.path.join(local_dir, filename)
     if os.path.exists(local_path):
         with open(local_path, "rb") as f:
-            content = f.read()
-        content_type = "image/jpeg"
-        if filename.lower().endswith(".png"):
-            content_type = "image/png"
-        elif filename.lower().endswith(".webp"):
-            content_type = "image/webp"
-        resp = HttpResponse(content, content_type=content_type)
-        resp["Cache-Control"] = "public, max-age=31536000, immutable"
-        resp["X-Robots-Tag"] = "index, follow, max-image-preview:large"
-        return resp
+            return _image_response(f.read(), _image_content_type(filename))
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        ),
         "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
     }
 
-    candidates = []
-
-    # 1. First check if DB holds the exact source URL for this filename
-    try:
-        from .models import PropertyImage
-        db_img = PropertyImage.objects.filter(image__contains=filename).first()
-        if db_img and str(db_img.image).startswith("http") and "primefamilyhousing.com" not in str(db_img.image):
-            candidates.append(str(db_img.image))
-    except Exception:
-        pass
-
-    # 2. Standard CDN structure candidates
-    candidates.extend([
+    # The stored path already encodes the origin layout, so the URL is derivable
+    # from (slug, filename) alone. The previous implementation ran
+    # `PropertyImage.objects.filter(image__contains=filename)` first — an
+    # unindexed LIKE '%...%' over ~92k rows on every miss, and unindexable because
+    # of the leading wildcard. Dropped: it cost a table scan to learn what string
+    # formatting already tells us.
+    candidates = (
         f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{slug}/{filename}",
-        f"https://images.invitationhomes.com/web/w_1500,h_1000,c_limit,q_auto/{filename}",
         f"https://images.invitationhomes.com/{slug}/{filename}",
-        f"https://images.invitationhomes.com/{filename}",
-    ])
+    )
 
     for candidate_url in candidates:
         try:
             req = urllib.request.Request(candidate_url, headers=headers)
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                if resp.status == 200:
-                    data = resp.read()
-                    try:
-                        os.makedirs(local_dir, exist_ok=True)
-                        with open(local_path, "wb") as f:
-                            f.write(data)
-                    except Exception:
-                        pass
-                    content_type = resp.headers.get("Content-Type") or "image/jpeg"
-                    http_resp = HttpResponse(data, content_type=content_type)
-                    http_resp["Cache-Control"] = "public, max-age=31536000, immutable"
-                    http_resp["X-Robots-Tag"] = "index, follow, max-image-preview:large"
-                    return http_resp
+            with urllib.request.urlopen(req, timeout=_ORIGIN_TIMEOUT) as resp:
+                if resp.status != 200:
+                    continue
+                data = resp.read(_MAX_IMAGE_BYTES + 1)
+                if len(data) > _MAX_IMAGE_BYTES:
+                    continue
+                content_type = resp.headers.get("Content-Type") or _image_content_type(filename)
         except Exception:
             continue
+
+        try:
+            os.makedirs(local_dir, exist_ok=True)
+            # Write to a temp name then rename, so a request that dies mid-write
+            # cannot leave a truncated file that every later request serves as if
+            # it were a valid cached image.
+            tmp_path = f"{local_path}.{os.getpid()}.part"
+            with open(tmp_path, "wb") as f:
+                f.write(data)
+            os.replace(tmp_path, local_path)
+        except OSError:
+            pass  # disk full or read-only: still serve the bytes we already have
+
+        return _image_response(data, content_type)
 
     return HttpResponse("Image not found", status=404)
