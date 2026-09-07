@@ -2,15 +2,28 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponseRedirect
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.properties.views import proxy_property_image
 
+def track_open_redirect(request):
+    qs = request.META.get('QUERY_STRING', '')
+    url = "https://mailer.primefamilyhousing.com/api/track/open"
+    if qs:
+        url = f"{url}?{qs}"
+    return HttpResponseRedirect(url)
+
 urlpatterns = [
+    # Tracking Redirect for Mailer
+    path("api/track/open", track_open_redirect),
+    path("api/track/open/", track_open_redirect),
+
     # Media Proxy
     path("media/properties/<str:slug>/<str:filename>", proxy_property_image, name="proxy_property_image"),
 
     # Admin
     path("admin/", admin.site.urls),
+
 
     # JWT auth
     path("api/v1/auth/token/", TokenObtainPairView.as_view(), name="token_obtain"),
