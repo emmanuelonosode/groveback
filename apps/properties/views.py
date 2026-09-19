@@ -132,7 +132,7 @@ class HomepagePropertiesView(generics.ListAPIView):
             .order_by("-created_at")[:6]
         )
         if qs.count() == 0:
-            # Fallback: use is_featured so the homepage never shows empty
+            # Fallback 1: use is_featured
             qs = (
                 Property.objects
                 .filter(is_featured=True, is_published=True, status="available")
@@ -140,7 +140,17 @@ class HomepagePropertiesView(generics.ListAPIView):
                 .prefetch_related("images")
                 .order_by("-created_at")[:6]
             )
+        if qs.count() == 0:
+            # Fallback 2: use latest available published properties so homepage always has houses
+            qs = (
+                Property.objects
+                .filter(is_published=True, status="available")
+                .select_related("agent")
+                .prefetch_related("images")
+                .order_by("-created_at")[:6]
+            )
         return qs
+
 
 
 class AgentListingsView(generics.ListAPIView):
