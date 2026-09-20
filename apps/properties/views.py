@@ -75,7 +75,7 @@ class PropertyListCreateView(generics.ListCreateAPIView):
             or not self.request.user.is_authenticated
             or self.request.user.role == "CLIENT"
         ):
-            return qs.filter(is_published=True, status__in=["available", "under-contract"])
+            return qs.filter(is_published=True, status="available")
         return qs
 
 

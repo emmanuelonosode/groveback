@@ -71,10 +71,17 @@ class Command(BaseCommand):
             default=0,
             help="Stop after N listings (0 = no limit). For spot-checking a run.",
         )
+        parser.add_argument(
+            "--delete-unavailable",
+            action="store_true",
+            default=True,
+            help="Delete hold/off-market and stale properties not available in Supabase.",
+        )
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
         limit = options["limit"]
+        delete_unavailable = options["delete_unavailable"]
 
         base_url = os.environ.get("SUPABASE_URL", DEFAULT_SUPABASE_URL).rstrip("/")
         key = os.environ.get("SUPABASE_KEY") or os.environ.get("SUPABASE_ANON_KEY")
@@ -86,6 +93,16 @@ class Command(BaseCommand):
                 )
             )
             return
+
+        if delete_unavailable:
+            unavail_qs = Property.objects.exclude(status="available")
+            unavail_count = unavail_qs.count()
+            if unavail_count > 0:
+                if not dry_run:
+                    unavail_qs.delete()
+                    self.stdout.write(self.style.SUCCESS(f"Deleted {unavail_count} off-market/unavailable properties."))
+                else:
+                    self.stdout.write(self.style.WARNING(f"Would delete {unavail_count} off-market/unavailable properties."))
 
         if dry_run:
             self.stdout.write(self.style.WARNING("DRY RUN — no writes will be made."))
@@ -122,6 +139,13 @@ class Command(BaseCommand):
                 leaked += 1
             else:
                 skipped += 1
+
+        if delete_unavailable and not limit and claimed and not dry_run:
+            stale_qs = Property.objects.filter(status="available").exclude(slug__in=claimed)
+            stale_count = stale_qs.count()
+            if stale_count > 0:
+                stale_qs.delete()
+                self.stdout.write(self.style.SUCCESS(f"Pruned {stale_count} properties that are no longer available in Supabase."))
 
         self.stdout.write(
             self.style.SUCCESS(
