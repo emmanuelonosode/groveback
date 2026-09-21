@@ -83,8 +83,13 @@ class Command(BaseCommand):
         limit = options["limit"]
         delete_unavailable = options["delete_unavailable"]
 
-        base_url = os.environ.get("SUPABASE_URL", DEFAULT_SUPABASE_URL).rstrip("/")
-        key = os.environ.get("SUPABASE_KEY") or os.environ.get("SUPABASE_ANON_KEY")
+        try:
+            from decouple import config
+            base_url = config("SUPABASE_URL", default=DEFAULT_SUPABASE_URL).rstrip("/")
+            key = config("SUPABASE_KEY", default=None) or config("SUPABASE_ANON_KEY", default=None) or os.environ.get("SUPABASE_KEY")
+        except Exception:
+            base_url = os.environ.get("SUPABASE_URL", DEFAULT_SUPABASE_URL).rstrip("/")
+            key = os.environ.get("SUPABASE_KEY") or os.environ.get("SUPABASE_ANON_KEY")
         if not key:
             self.stderr.write(
                 self.style.ERROR(
@@ -164,43 +169,58 @@ class Command(BaseCommand):
     # ── fetch ────────────────────────────────────────────────────────────────
     def _fetch_all(self, base_url, key, limit):
         headers = {"apikey": key, "Authorization": f"Bearer {key}"}
-        rows, offset = [], 0
+        cols = (
+            "slug,title,description,address,city,state,zip_code,price,bedrooms,"
+            "bathrooms,sqft,year_built,latitude,longitude,cross_street,virtual_tour_url,"
+            "fees,floor_plans,schools,office,available_on,is_pet_friendly,has_pool,"
+            "allow_selfshow,market_name,images,amenities"
+        )
+        rows = []
+        last_slug = None
 
         while True:
-            url = (
-                f"{base_url}/rest/v1/properties"
-                f"?status=eq.available&select=*&limit={PAGE_SIZE}&offset={offset}"
-            )
+            if last_slug:
+                url = (
+                    f"{base_url}/rest/v1/properties"
+                    f"?status=eq.available&select={cols}&order=slug.asc&slug=gt.{last_slug}&limit={PAGE_SIZE}"
+                )
+            else:
+                url = (
+                    f"{base_url}/rest/v1/properties"
+                    f"?status=eq.available&select={cols}&order=slug.asc&limit={PAGE_SIZE}"
+                )
+
             page = None
             for attempt in range(MAX_RETRIES):
                 try:
-                    res = requests.get(url, headers=headers, timeout=25)
+                    res = requests.get(url, headers=headers, timeout=30)
                 except requests.exceptions.RequestException as exc:
-                    self.stderr.write(f"Network error at offset {offset}: {exc}. Retrying...")
+                    self.stderr.write(f"Network error (attempt {attempt+1}/{MAX_RETRIES}): {exc}. Retrying...")
                     time.sleep(2 * (attempt + 1))
                     continue
+
                 if res.status_code != 200:
-                    self.stderr.write(f"Supabase returned {res.status_code}: {res.text[:200]}")
-                    return rows
+                    self.stderr.write(f"Supabase error {res.status_code} (attempt {attempt+1}/{MAX_RETRIES}): {res.text[:200]}")
+                    time.sleep(2 * (attempt + 1))
+                    continue
+
                 page = res.json()
                 break
 
             if page is None:
-                # Exhausted retries on a network fault. Returning a partial page set
-                # here would let the caller treat a truncated feed as authoritative,
-                # so bail loudly instead.
                 self.stderr.write(
-                    self.style.ERROR(f"Giving up at offset {offset} after {MAX_RETRIES} attempts.")
+                    self.style.ERROR(f"Aborting: exhausted {MAX_RETRIES} attempts fetching from Supabase.")
                 )
-                return rows
+                return None
+
             if not page:
                 break
 
             rows.extend(page)
+            last_slug = page[-1].get("slug")
             self.stdout.write(f"  fetched {len(rows)} so far...")
             if limit and len(rows) >= limit:
                 return rows[:limit]
-            offset += PAGE_SIZE
 
         return rows
 
