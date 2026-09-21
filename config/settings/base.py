@@ -207,6 +207,11 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.analytics.tasks.flush_analytics_telemetry",
         "schedule": crontab(minute="*/1"),
     },
+    # Daily 3 AM — sync fresh available listings from Supabase data lake
+    "sync-properties-from-supabase": {
+        "task": "apps.properties.tasks.sync_properties_from_supabase",
+        "schedule": crontab(hour=3, minute=0),
+    },
     # Daily 4 AM — unpublish rented/sold listings older than the 60-day grace
     # period (pages 404 after this; until then they show the "rented" banner)
     "unpublish-stale-listings": {

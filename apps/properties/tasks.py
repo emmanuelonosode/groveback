@@ -23,3 +23,11 @@ def unpublish_stale_listings(grace_days: int = 60):
         .update(is_published=False)
     )
     return f"unpublished {count} stale listings (rented/sold > {grace_days}d)"
+
+
+@shared_task
+def sync_properties_from_supabase():
+    """Daily sync of available listings from the Supabase data lake."""
+    from django.core.management import call_command
+    call_command("sync_from_supabase")
+    return "completed sync_from_supabase"
